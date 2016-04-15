@@ -434,17 +434,18 @@ fn interact<T: SerialPort>(conn: &mut T) -> io::Result<()> {
 
     try!(conn.set_timeout(Duration::from_millis(10000)));
 
+    // let mut buf: Vec<u8> = "1c255w".to_string().into_bytes();//(0..255).collect();
+    // try!(conn.write_all(&buf[..]));
+    // try!(conn.flush());
+    // println!("sent.");
+    // let mut buffer = String::new();
+    // try!(conn.read_to_string(&mut buffer));
+    // println!("{:?}", buffer);
     let mut buf: Vec<u8> = "1c255w\n".to_string().into_bytes();//(0..255).collect();
     try!(conn.write_all(&buf[..]));
-    try!(conn.flush());
-    println!("sent.");
-    let mut buffer = String::new();
-    try!(conn.read_to_string(&mut buffer));
-    println!("{:?}", buffer);
-    // buf = "255w\n".to_string().into_bytes();//(0..255).collect();
-    // try!(conn.write(&buf[..]));
-    // try!(conn.read(&mut buf[..]));
-    // println!("{:?}", String::from_utf8(buf));
+    println!("sent {:?}", String::from_utf8(buf.clone()));
+    try!(conn.read(&mut buf[..]));
+    println!("{:?}", String::from_utf8(buf));
 
     Ok(())
 }
