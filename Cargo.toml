@@ -1,0 +1,24 @@
+[package]
+name = "dmx"
+version = "0.1.0"
+authors = ["Til Blechschmidt <til@blechschmidt.de>"]
+
+[features]
+default = ["DMX256"]
+# DMX Channel lengths
+DMX256 = []
+DMX512 = []
+
+[dependencies]
+conrod = "0.32.0"
+daggy = "0.4.0"
+piston = "0.17.0"
+piston_window = "0.37.0"
+pistoncore-input = "0.8.0"
+piston2d-graphics = "0.15.0"
+find_folder = "0.3.0"
+num = "0.1.30"
+rand = "0.3.13"
+time = "0.1.34"
+vecmath = "0.2.0"
+serial = "0.3"
