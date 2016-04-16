@@ -1,4 +1,5 @@
 #![allow(dead_code)]
+#![allow(unused_imports)]
 #[macro_use] extern crate conrod;
 extern crate piston_window;
 extern crate find_folder;
@@ -32,18 +33,8 @@ use conrod::{
 use piston_window::{ EventLoop, Glyphs, PistonWindow, UpdateEvent, WindowSettings };
 use std::sync::{Arc, Mutex, mpsc};
 use std::thread::{sleep, self};
-//use std::time::Duration;
-
-
-use std::env;
-use std::io;
 use std::time::Duration;
-
-use std::io::prelude::*;
-use serial::prelude::*;
-
-
-
+use std::net::{ UdpSocket, Ipv4Addr, SocketAddr, SocketAddrV4 };
 
 #[cfg(windows)]
 const PORT: &'static str = "COM1";
@@ -124,6 +115,7 @@ struct Channel {
     out_patch: usize,
     value: u8,
     name: String,
+    if_tx: mpsc::Sender<(usize, u8)>,
     default_mode: Mode,
     mode_selected_idx: Option<usize>,
     fader_value: u8,
@@ -132,13 +124,14 @@ struct Channel {
 }
 
 impl Channel {
-    fn new(patch: usize, name: String) -> Channel {
+    fn new(patch: usize, name: String, if_tx: mpsc::Sender<(usize, u8)>) -> Channel {
         Channel {
             out_patch: patch,
             value: 0,
             name: name,
+            if_tx: if_tx,
             default_mode: Mode::LTP,
-            mode_selected_idx: None,
+            mode_selected_idx: None,//Some(0),
             fader_value: 0,
             fader_enabled: false
         }
@@ -159,6 +152,8 @@ impl Channel {
         }
         println!(" => {}", self.value);
         //TODO: Send stuff to DMX Interface.
+        //send_to_interface(self.out_patch, self.value);
+        self.if_tx.send((self.out_patch, self.value)).unwrap();
     }
 }
 
@@ -168,11 +163,11 @@ struct Fixture {
 }
 
 impl Fixture {
-    fn new_with_type(t: Type, name: String, start_channel: usize) -> Fixture {
+    fn new_with_type(t: Type, name: String, start_channel: usize, if_tx: mpsc::Sender<(usize, u8)>) -> Fixture {
         match t {
             Type::Single => {
                 Fixture {
-                    channels: vec![ Channel::new(start_channel, "".to_string()) ],
+                    channels: vec![ Channel::new(start_channel, "".to_string(), if_tx) ],
                     name: name
                 }
             },
@@ -180,9 +175,9 @@ impl Fixture {
                 Fixture {
                     channels: (0..3).map(|i| {
                         match i {
-                            0 => { Channel::new(start_channel + i, "R".to_string()) }
-                            1 => { Channel::new(start_channel + i, "G".to_string()) }
-                            _ => { Channel::new(start_channel + i, "B".to_string()) }
+                            0 => { Channel::new(start_channel + i, "R".to_string(), if_tx.clone()) }
+                            1 => { Channel::new(start_channel + i, "G".to_string(), if_tx.clone()) }
+                            _ => { Channel::new(start_channel + i, "B".to_string(), if_tx.clone()) }
                         }
                     }).collect(),
                     name: name
@@ -191,11 +186,11 @@ impl Fixture {
         }
     }
 
-    fn new(start_channel: usize, end_channel: usize, name: String) -> Fixture {
+    fn new(start_channel: usize, end_channel: usize, name: String, if_tx: mpsc::Sender<(usize, u8)>) -> Fixture {
         let delta: usize = ( (end_channel as i16) - (start_channel as i16) ).abs() as usize;
         Fixture {
             channels: (0..delta+1).map(|channel| {
-                Channel::new(start_channel + channel, channel.to_string())
+                Channel::new(start_channel + channel, channel.to_string(), if_tx.clone())
             }).collect::<Vec<_>>(),
             name: name
         }
@@ -206,16 +201,18 @@ struct DMXApp {
     bg_color: Color,
     frame_width: f64,
     output_height: f64,
-    fixtures: Vec<Fixture>
+    fixtures: Vec<Fixture>,
+    interface: mpsc::Sender<(usize, u8)>
 }
 
 impl DMXApp {
-    fn new() -> DMXApp {
+    fn new(if_tx: mpsc::Sender<(usize, u8)>) -> DMXApp {
         DMXApp {
             bg_color: color::rgb(0.236, 0.239, 0.241),
             frame_width: 1.0,
             output_height: 230.0,
-            fixtures: Vec::new()
+            fixtures: Vec::new(),
+            interface: if_tx
         }
     }
 }
@@ -254,30 +251,6 @@ fn set_widgets(ui: &mut UiCell, app: &mut DMXApp) {
         for channel in fixture.channels.iter_mut() {
             let mut fader_enabled = channel.fader_enabled;
 
-            // let label = if input { "AUTO".to_string() } else { channel.default_mode.string() };
-            // let mut dmode = channel.default_mode.clone();
-            // let mut modes = vec!["AUTO".to_string(), "LTP".to_string(), "HTP".to_string(), "ADD".to_string(), "SUB".to_string()];
-            // DropDownList::new(&mut modes, &mut channel.mode_selected_idx)
-            //     .w_h(40.0, 30.0)
-            //     .down_from(CHANNEL_FADER + i, 5.0)
-            //     .max_visible_items(4)
-            //     .color(color::BLUE)
-            //     .frame(app.frame_width)
-            //     .frame_color(app.bg_color.plain_contrast())
-            //     .label(&label)
-            //     .label_color(app.bg_color.plain_contrast())
-            //     .react(|selected_idx: &mut Option<usize>, new_idx, string: &str| {
-            //         *selected_idx = Some(new_idx);
-            //         dmode = match string {
-            //             "HTP" => Mode::HTP,
-            //             "ADD" => Mode::ADD,
-            //             "SUB" => Mode::SUB,
-            //             "LTP" => Mode::LTP,
-            //             _     => Mode::LTP //TODO: setting disabled = true doesn't work for some reason...
-            //         };
-            //     })
-            //     .set(MODE_SELECT + i, ui);
-            // //if !input { channel.default_mode = dmode; }
             if !fader_enabled { channel.fader_value = channel.value };
             let value = channel.fader_value as f32;
             let label = if value > 0.0 { format!("{:.*}", 0, value) } else { format!("") };
@@ -319,13 +292,13 @@ fn set_widgets(ui: &mut UiCell, app: &mut DMXApp) {
                     .set(CHANNEL_VALUE + i, ui);
             }
 
-            let label = if fader_enabled { "A".to_string() } else { channel.default_mode.string() };
+            let label = if !fader_enabled { "A".to_string() } else { channel.default_mode.string() };
             let mut dmode = channel.default_mode.clone();
             let mut modes = vec!["A".to_string(), "LTP".to_string(), "HTP".to_string(), "ADD".to_string(), "SUB".to_string()];
             DropDownList::new(&mut modes, &mut channel.mode_selected_idx)
                 .w_h(40.0, 30.0)
                 .down_from(CHANNEL_FADER + i, 5.0)
-                .max_visible_items(4)
+                .max_visible_items(5)
                 .color(color::BLUE)
                 .frame(app.frame_width)
                 .frame_color(app.bg_color.plain_contrast())
@@ -400,13 +373,13 @@ fn create_output_window(app_lock: Arc<Mutex<DMXApp>>) {
     };
     {
         let mut app = app_lock.lock().unwrap();
-        let mut fix0 = Fixture::new(1, 10, "RandomThingy".to_string());
-        fix0.channels[0].set(Value::new(Mode::LTP, 239));
+        let mut fix0 = Fixture::new(1, 10, "RandomThingy".to_string(), app.interface.clone());
+        fix0.channels[0].set(Value::new(Mode::LTP, 0));
         app.fixtures.push(fix0);
-        let mut fix1 = Fixture::new_with_type(Type::RGB, "LED".to_string(), 11);
+        let mut fix1 = Fixture::new_with_type(Type::RGB, "LED".to_string(), 11, app.interface.clone());
         fix1.channels[0].set(Value::new(Mode::LTP, 92));
         app.fixtures.push(fix1);
-        let mut fix2 = Fixture::new_with_type(Type::Single, "PAR".to_string(), 14);
+        let mut fix2 = Fixture::new_with_type(Type::Single, "PAR".to_string(), 14, app.interface.clone());
         fix2.channels[0].set(Value::new(Mode::LTP, 120));
         app.fixtures.push(fix2);
     }
@@ -417,46 +390,30 @@ fn create_output_window(app_lock: Arc<Mutex<DMXApp>>) {
             let mut app = app_lock.lock().unwrap();
             event.update(|_| ui.set_widgets(|mut ui| set_widgets(&mut ui, &mut app)));
         }
-        event.draw_2d(|c, g| ui.draw_if_changed(c, g));
-        //event.draw_2d(|c, g| ui.draw(c, g));
+        // event.draw_2d(|c, g| ui.draw_if_changed(c, g));
+        event.draw_2d(|c, g| ui.draw(c, g));
     }
 }
 
-fn interact<T: SerialPort>(conn: &mut T) -> io::Result<()> {
-    try!(conn.reconfigure(&|settings| {
-        try!(settings.set_baud_rate(serial::Baud9600));
-        settings.set_char_size(serial::Bits8);
-        settings.set_parity(serial::ParityNone);
-        settings.set_stop_bits(serial::Stop1);
-        settings.set_flow_control(serial::FlowHardware);
-        Ok(())
-    }));
-
-    try!(conn.set_timeout(Duration::from_millis(10000)));
-
-    // let mut buf: Vec<u8> = "1c255w".to_string().into_bytes();//(0..255).collect();
-    // try!(conn.write_all(&buf[..]));
-    // try!(conn.flush());
-    // println!("sent.");
-    // let mut buffer = String::new();
-    // try!(conn.read_to_string(&mut buffer));
-    // println!("{:?}", buffer);
-    let mut buf: Vec<u8> = "1c255w\n".to_string().into_bytes();//(0..255).collect();
-    try!(conn.write_all(&buf[..]));
-    println!("sent {:?}", String::from_utf8(buf.clone()));
-    try!(conn.read(&mut buf[..]));
-    println!("{:?}", String::from_utf8(buf));
-
-    Ok(())
+fn send_to_interface(sock: &UdpSocket, channel: usize, value: u8) {
+    // println!("sending {}c{}w", channel, value);
+    let buf = format!("{}c{}w", channel, value).into_bytes();
+    sock.send_to(&buf, SocketAddrV4::new(Ipv4Addr::new(127, 0, 0, 1), 7777)).unwrap();
 }
 
 fn main() {
     println!("Hello world!");
 
-    let mut conn = serial::open(PORT).unwrap();
-    interact(&mut conn).unwrap();
+    let (tx, rx) = mpsc::channel::<(usize, u8)>();
+    thread::spawn(move || {
+        let sock_addr = SocketAddrV4::new(Ipv4Addr::new(0, 0, 0, 0), 9999);
+        let sock = UdpSocket::bind(sock_addr).unwrap();
+        for m in rx.iter() {
+            send_to_interface(&sock, m.0, m.1)
+        }
+    });
 
-    let app = Arc::new(Mutex::new(DMXApp::new()));
+    let app = Arc::new(Mutex::new(DMXApp::new(tx.clone())));
 
     let app_lock = app.clone();
     let output_thread = thread::spawn(move || {
@@ -466,7 +423,7 @@ fn main() {
 
     let app_lock = app.clone();
     let fade_thread = thread::spawn(move || {
-        sleep(Duration::new(5, 0));
+        sleep(Duration::new(1, 0));
         println!("Hello world from fade thread!");
         for i in 0..255 {
             {
@@ -474,6 +431,7 @@ fn main() {
                 app.fixtures[0].channels[0].set(Value::new(Mode::LTP, i));
             }
             sleep(Duration::new(0, 50000000));
+            // sleep(Duration::new(0, 1960784));
         }
     });
 
