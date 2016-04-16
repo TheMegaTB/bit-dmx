@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <string.h>   // String function definitions
 #include <unistd.h>   // for usleep()
+#include <arpa/inet.h> // inet_addr
 #include <sys/socket.h>
 #include <netinet/in.h>
 
@@ -54,8 +55,6 @@ int open_port() {
 }
 
 void write_to_serial(char* msg) {
-    int i;
-
     if( fd==-1 ) printf("port not opened.");
     char buf[strlen(msg)+1];
     sprintf(buf, "%s\n", msg);
@@ -68,12 +67,11 @@ void write_to_serial(char* msg) {
 }
 
 void udp_server() {
-    int udpSocket, nBytes;
+    int udpSocket/*, nBytes*/;
     char buffer[128];
-    struct sockaddr_in serverAddr, clientAddr;
+    struct sockaddr_in serverAddr/*, clientAddr*/;
     struct sockaddr_storage serverStorage;
-    socklen_t addr_size, client_addr_size;
-    int i;
+    socklen_t addr_size/*, client_addr_size*/;
 
     /*Create UDP socket*/
     udpSocket = socket(PF_INET, SOCK_DGRAM, 0);
@@ -93,7 +91,7 @@ void udp_server() {
     while(1) {
         /* Try to receive any incoming UDP datagram. Address and port of
           requesting client will be stored on serverStorage variable */
-        nBytes = recvfrom(udpSocket,buffer,128,0,(struct sockaddr *)&serverStorage, &addr_size);
+        /*nBytes = */recvfrom(udpSocket,buffer,128,0,(struct sockaddr *)&serverStorage, &addr_size);
 
         printf("%s\n", buffer);
         write_to_serial(buffer);
