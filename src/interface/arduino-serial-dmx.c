@@ -43,7 +43,7 @@ void error(char* msg) {
 
 int open_port() {
     char serialport[buf_max];
-    int baudrate = 230400;
+    int baudrate = 115200;
 
     strcpy(serialport, port);
     fd = serialport_init(port, baudrate);

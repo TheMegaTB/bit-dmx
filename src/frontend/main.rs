@@ -3,7 +3,6 @@
 #[macro_use] extern crate conrod;
 extern crate piston_window;
 extern crate find_folder;
-extern crate serial;
 extern crate rand;
 
 use conrod::{
@@ -131,7 +130,7 @@ impl Channel {
             name: name,
             if_tx: if_tx,
             default_mode: Mode::LTP,
-            mode_selected_idx: None,//Some(0),
+            mode_selected_idx: None,
             fader_value: 0,
             fader_enabled: false
         }
@@ -151,8 +150,6 @@ impl Channel {
             Mode::DEFAULT   => self.value = value
         }
         println!(" => {}", self.value);
-        //TODO: Send stuff to DMX Interface.
-        //send_to_interface(self.out_patch, self.value);
         self.if_tx.send((self.out_patch, self.value)).unwrap();
     }
 }
@@ -322,36 +319,6 @@ fn set_widgets(ui: &mut UiCell, app: &mut DMXApp) {
             if fader_enabled { channel.default_mode = dmode; }
             channel.fader_enabled = fader_enabled;
 
-
-            // let mut disabled = false; //TODO: If it's enabled then display a second bar representing the true output value and one for the output value
-            // let label = if disabled { "".to_string() } else { channel.default_mode.string() };
-            // let mut dmode = channel.default_mode.clone();
-            // let mut modes = vec!["".to_string(), "LTP".to_string(), "HTP".to_string(), "ADD".to_string(), "SUB".to_string()];
-            // DropDownList::new(&mut modes, &mut channel.mode_selected_idx)
-            //     .w_h(40.0, 30.0)
-            //     .down_from(CHANNEL_FADER + i, 5.0)
-            //     .max_visible_items(4)
-            //     .color(color::BLUE)
-            //     .frame(app.frame_width)
-            //     .frame_color(app.bg_color.plain_contrast())
-            //     .label(&label)
-            //     .label_color(app.bg_color.plain_contrast())
-            //     .enabled(!disabled)
-            //     .react(|selected_idx: &mut Option<usize>, new_idx, string: &str| {
-            //         *selected_idx = Some(new_idx);
-            //         dmode = match string {
-            //             "HTP" => Mode::HTP,
-            //             "ADD" => Mode::ADD,
-            //             "SUB" => Mode::SUB,
-            //             "LTP" => Mode::LTP,
-            //             _     => {disabled = true; Mode::LTP} //TODO: setting disabled = true doesn't work for some reason...
-            //         };
-            //     })
-            //     .set(MODE_SELECT + i, ui);
-            // //println!("Disabled: {}", disabled);
-            // if !disabled { channel.default_mode = dmode; }
-
-
             i+=1;
             j = false;
         }
@@ -373,15 +340,19 @@ fn create_output_window(app_lock: Arc<Mutex<DMXApp>>) {
     };
     {
         let mut app = app_lock.lock().unwrap();
-        let mut fix0 = Fixture::new(1, 10, "RandomThingy".to_string(), app.interface.clone());
-        fix0.channels[0].set(Value::new(Mode::LTP, 0));
+        let mut fix0 = Fixture::new(1, 50, "RandomThingy".to_string(), app.interface.clone());
         app.fixtures.push(fix0);
-        let mut fix1 = Fixture::new_with_type(Type::RGB, "LED".to_string(), 11, app.interface.clone());
-        fix1.channels[0].set(Value::new(Mode::LTP, 92));
-        app.fixtures.push(fix1);
-        let mut fix2 = Fixture::new_with_type(Type::Single, "PAR".to_string(), 14, app.interface.clone());
-        fix2.channels[0].set(Value::new(Mode::LTP, 120));
-        app.fixtures.push(fix2);
+        // let mut fix0 = Fixture::new_with_type(Type::RGB, "LED".to_string(), 1, app.interface.clone());
+        // fix0.channels[0].set(Value::new(Mode::LTP, 0));
+        // fix0.channels[1].set(Value::new(Mode::LTP, 0));
+        // fix0.channels[2].set(Value::new(Mode::LTP, 0));
+        // app.fixtures.push(fix0);
+        // let mut fix1 = Fixture::new_with_type(Type::RGB, "LED".to_string(), 11, app.interface.clone());
+        // fix1.channels[0].set(Value::new(Mode::LTP, 92));
+        // app.fixtures.push(fix1);
+        // let mut fix2 = Fixture::new_with_type(Type::Single, "PAR".to_string(), 14, app.interface.clone());
+        // fix2.channels[0].set(Value::new(Mode::LTP, 120));
+        // app.fixtures.push(fix2);
     }
 
     for event in window.ups(60) {
@@ -390,13 +361,12 @@ fn create_output_window(app_lock: Arc<Mutex<DMXApp>>) {
             let mut app = app_lock.lock().unwrap();
             event.update(|_| ui.set_widgets(|mut ui| set_widgets(&mut ui, &mut app)));
         }
-        // event.draw_2d(|c, g| ui.draw_if_changed(c, g));
-        event.draw_2d(|c, g| ui.draw(c, g));
+        event.draw_2d(|c, g| ui.draw_if_changed(c, g));
+        // event.draw_2d(|c, g| ui.draw(c, g));
     }
 }
 
 fn send_to_interface(sock: &UdpSocket, channel: usize, value: u8) {
-    // println!("sending {}c{}w", channel, value);
     let buf = format!("{}c{}w", channel, value).into_bytes();
     sock.send_to(&buf, SocketAddrV4::new(Ipv4Addr::new(127, 0, 0, 1), 7777)).unwrap();
 }
@@ -421,21 +391,26 @@ fn main() {
         create_output_window(app_lock);
     });
 
-    let app_lock = app.clone();
-    let fade_thread = thread::spawn(move || {
-        sleep(Duration::new(1, 0));
-        println!("Hello world from fade thread!");
-        for i in 0..255 {
-            {
-                let mut app = app_lock.lock().unwrap();
-                app.fixtures[0].channels[0].set(Value::new(Mode::LTP, i));
+    let mut fade_threads = Vec::new();
+    for channel in 0..49 {
+        let app_lock = app.clone();
+        fade_threads.push(thread::spawn(move || {
+            sleep(Duration::new(3, 0));
+            println!("Hello world from fade thread!");
+            for i in 0..255 {
+                {
+                    let mut app = app_lock.lock().unwrap();
+                    app.fixtures[0].channels[channel].set(Value::new(Mode::LTP, i));
+                }
+                sleep(Duration::new(0, 50000000));
+                // sleep(Duration::new(0, 1960784));
             }
-            sleep(Duration::new(0, 50000000));
-            // sleep(Duration::new(0, 1960784));
-        }
-    });
+        }));
+    }
 
-    fade_thread.join().unwrap();
-    println!("Fade thread exited!");
+    fade_threads.into_iter().map(|thread| {
+        thread.join().unwrap();
+        println!("Fade thread exited!");
+    }).collect::<Vec<_>>();
     output_thread.join().unwrap();
 }
