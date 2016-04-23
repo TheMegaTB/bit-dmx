@@ -26,13 +26,6 @@ fn test_fade_curve() {
     test_fade(100, 200, 5000, 30, curve_fn); //fade from 0 to 255 in 5s with 30fps
 }
 
-//time in ms
-#[allow(dead_code)]
-#[allow(unused_variables)]
-fn fake_delay(time: FadeTime) {
-    sleep(Duration::from_millis(time as u64));
-}
-
 //deltat in ms
 #[allow(dead_code)]
 fn test_fade(start_value: DmxValue, target_value: DmxValue, deltat: FadeTime, ticks_per_second: FadeTime, curve_fn: &Fn(f64) -> f64) {
@@ -46,6 +39,6 @@ fn test_fade(start_value: DmxValue, target_value: DmxValue, deltat: FadeTime, ti
     for step in 0..total_steps + 1 {
         let value = start_value as f64 + ((target_value-start_value) as f64 * curve_fn(step as f64/total_steps as f64) - y_offset) * y_scale;
         println!("{:?}: {:?}", step, value);
-        fake_delay(delay); //TODO add functional delay
+        sleep(Duration::from_millis(delay as u64));
     }
 }
