@@ -24,85 +24,62 @@
 #include <arpa/inet.h> // inet_addr
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <stdbool.h>
 
 #include "arduino-serial-lib.h"
 
-const char* port = "/dev/ttyACM0";
-const int buf_max = 128;
+const int buf_max = 10;
 
 int fd = -1;
+char buf[10];
+bool connected = false;
+uint16_t prev_channel;
 
-void error(char* msg) {
-    fprintf(stderr, "%s\n",msg);
-    if( fd!=-1 ) {
-        serialport_close(fd);
-        printf("closed port\n");
-    }
-    exit(EXIT_FAILURE);
-}
+bool open_port(int baudrate, char* port) {
+    printf("\n", port);
 
-int open_port() {
-    char serialport[buf_max];
-    int baudrate = 115200;
-
-    strcpy(serialport, port);
     fd = serialport_init(port, baudrate);
-    if( fd==-1 ) { printf("couldn't open port"); } else {
-        printf("opened port %s\n",serialport);
-        serialport_flush(fd);
-    }
+    serialport_read(buf, 10, 1000);
+    serialport_flush(fd);
+    if (fd != -1) { connected = true; return true; } else { return false; }
     return fd;
 }
 
-void write_to_serial(char* msg) {
-    if( fd==-1 ) printf("port not opened.");
-    char buf[strlen(msg)+1];
-    sprintf(buf, "%s\n", msg);
-    int rc = serialport_write(fd, buf);
-    if(rc == -1) {
-        printf("error writing");
-        while(1) { open_port(); usleep( 1000 * 1000 ); } //retry connecting every second
-        fd = -1;
-    }
+void close_port() {
+  serialport_flush(fd);
+  serialport_close(fd);
+  connected = false;
+  fd = -1;
 }
 
-void udp_server() {
-    int udpSocket/*, nBytes*/;
-    char buffer[128];
-    struct sockaddr_in serverAddr/*, clientAddr*/;
-    struct sockaddr_storage serverStorage;
-    socklen_t addr_size/*, client_addr_size*/;
-
-    /*Create UDP socket*/
-    udpSocket = socket(PF_INET, SOCK_DGRAM, 0);
-
-    /*Configure settings in address struct*/
-    serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(7777);
-    serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
-    memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);
-
-    /*Bind socket with address struct*/
-    bind(udpSocket, (struct sockaddr *) &serverAddr, sizeof(serverAddr));
-
-    /*Initialize size variable to be used later on*/
-    addr_size = sizeof serverStorage;
-
-    while(1) {
-        /* Try to receive any incoming UDP datagram. Address and port of
-          requesting client will be stored on serverStorage variable */
-        /*nBytes = */recvfrom(udpSocket,buffer,128,0,(struct sockaddr *)&serverStorage, &addr_size);
-
-        printf("%s\n", buffer);
-        write_to_serial(buffer);
-        memset(buffer, 0, sizeof buffer);
-    }
+bool is_connected() {
+  if (fd == -1 || connected == false) { return false; } else { return true; }
 }
 
-int main(int argc, char *argv[]) {
-    open_port();
+int write_to_serial(uint8_t b) {
+    memset(buf, 0, sizeof buf);
+    int result = serialport_writebyte(fd, b);
+    serialport_read(fd, buf, 1, 5000);
+    uint8_t response = ~buf[0];
+    if (response != b) {
+      connected = false;
+      result = -1;
+      printf("CHECKSUM MISMATCH");
+    }
 
-    udp_server();
+    return result; //-1 equals there was a write error
+}
 
-    exit(EXIT_SUCCESS);
+void write_dmx(uint16_t channel, uint8_t value) { //TODO: Write to file. Format: Byte 1 = Value of channel 1 ... Byte n = Value of channel n
+  if (channel != prev_channel) {
+    uint8_t clow = channel & 0xff;
+    uint8_t chigh = (channel >> 8);
+    write_to_serial(1); //get into channel mode
+    write_to_serial(chigh);
+    write_to_serial(clow);
+    prev_channel = channel;
+  }
+  write_to_serial(0); //get into value mode
+  write_to_serial(value);
+  //TODO: Return value
 }
