@@ -28,13 +28,13 @@ fn test_fade_curve() {
 //time in ms
 #[allow(dead_code)]
 #[allow(unused_variables)]
-fn fake_dalay(time: u64) {
+fn fake_delay(time: FadeTime) {
 
 }
 
 //deltat in ms
 #[allow(dead_code)]
-fn test_fade(start_value: u8, target_value: u8, deltat: u64, ticks_per_second: u64, curve_fn: &Fn(f64) -> f64) {
+fn test_fade(start_value: DmxValue, target_value: DmxValue, deltat: FadeTime, ticks_per_second: FadeTime, curve_fn: &Fn(f64) -> f64) {
     let delay = 1000/ticks_per_second;
     let total_steps = deltat/1000*ticks_per_second;
 
@@ -45,6 +45,6 @@ fn test_fade(start_value: u8, target_value: u8, deltat: u64, ticks_per_second: u
     for step in 0..total_steps + 1 {
         let value = start_value as f64 + ((target_value-start_value) as f64 * curve_fn(step as f64/total_steps as f64) - y_offset) * y_scale;
         println!("{:?}: {:?}", step, value);
-        fake_dalay(delay); //TODO add functional delay
+        fake_delay(delay); //TODO add functional delay
     }
 }
