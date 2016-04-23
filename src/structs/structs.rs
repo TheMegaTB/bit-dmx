@@ -3,7 +3,7 @@ extern crate meval;
 pub use meval::*;
 
 pub type FadeTime = u16;
-pub type DmxChannel = usize;
+pub type DmxChannel = u16;
 pub type DmxValue = u8;
 
 pub mod fixture;
