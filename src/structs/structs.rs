@@ -1,4 +1,7 @@
 
+use std::time::Duration;
+use std::thread::sleep;
+
 extern crate meval;
 pub use meval::*;
 
@@ -27,7 +30,7 @@ fn test_fade_curve() {
 #[allow(dead_code)]
 #[allow(unused_variables)]
 fn fake_delay(time: FadeTime) {
-
+    sleep(Duration::from_millis(time as u64));
 }
 
 //deltat in ms
