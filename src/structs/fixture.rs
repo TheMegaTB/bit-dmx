@@ -1,5 +1,7 @@
 use std::thread;
 use std::sync::mpsc;
+use std::cmp;
+use std::num;
 
 use FadeCurve;
 use FadeTime;
@@ -17,6 +19,49 @@ pub enum ChannelGroup {
     RGB(RGB),
     RGBA(RGBA)
 }
+
+
+fn max3(a: f64, b: f64, c: f64) -> f64 {
+    a.max(b).max(c)
+}
+
+fn min3(a: f64, b: f64, c: f64) -> f64 {
+    a.min(b).min(c)
+}
+
+
+fn rgb_to_hsv(r: DmxValue, g: DmxValue, b: DmxValue) -> (f64, f64, f64) {
+    let r2 = r as f64/255f64;
+    let g2 = g as f64/255f64;
+    let b2 = b as f64/255f64;
+
+    let cmax = max3(r2, g2, b2);
+    let cmin = min3(r2, g2, b2);
+    let delta = cmax-cmin;
+
+    let h = if delta == 0f64 {
+        0f64
+    }
+    else if cmax == r2 {
+        60f64 * ((g2-b2)/delta % 6f64)
+    }
+    else if cmax == g2 {
+        60f64 * ((b2-r2)/delta + 2f64)
+    }
+    else {
+        60f64 * ((r2-g2)/delta + 4f64)
+    };
+
+    let s = if cmax == 0f64 {
+        0f64
+    }
+    else {
+        delta/cmax
+    };
+
+    (h, s, cmax)
+}
+
 
 fn fade(channel: DmxChannel, curve: FadeCurve, start: DmxValue, end: DmxValue) {
     thread::spawn(move || {
