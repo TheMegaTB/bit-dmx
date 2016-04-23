@@ -20,7 +20,7 @@ pub use fade_curve::*;
 fn test_fade_curve() {
     // let curve_fn = &*(FadeCurve::Custom("sin(x)".to_string()).to_expression().unwrap());
     let curve_fn = &*FadeCurve::Linear.to_function();
-    let curve_fn = &*FadeCurve::Custom("x^20".to_string()).to_function();
+    let curve_fn = &*FadeCurve::Custom("sin(x*2)".to_string()).to_function();
     println!("curve value @ 3.0 {:?}", curve_fn(3f64));
     test_fade(100, 200, 5000, 30, curve_fn); //fade from 0 to 255 in 5s with 30fps
 }
