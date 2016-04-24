@@ -42,7 +42,7 @@ fn test_fade_curve() {
     //let curve = FadeCurve::Custom("sin(2*x)".to_string());
     let curve = FadeCurve::Squared;
     let stage = Stage::new();
-    let test_group = single::Single::new();
+    let test_group = single::Single::new(0, ); //TODO add interface
     let test_fixture = Fixture::new(vec![test_group]);
     stage.add_fixture(test_fixture);
 
