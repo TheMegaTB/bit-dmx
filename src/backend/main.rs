@@ -39,8 +39,8 @@ fn test_fade_curve() {
     let (tx, interrupt_tx) = interface.unwrap().to_thread();
     tx.send((1, 0)).unwrap();
 
-    // let curve = FadeCurve::Custom("sin(10*x)".to_string());
-    let curve = FadeCurve::Squared;
+    let curve = FadeCurve::Custom("sin(10*x)".to_string());
+    //let curve = FadeCurve::Squared;
     let mut stage = Stage::new();
     let mut test_group = ChannelGroup::Single(Single::new(1, tx.clone()));
     // let test_fixture = Fixture::new(vec![test_group]);
@@ -48,8 +48,7 @@ fn test_fade_curve() {
 
     match test_group {
         ChannelGroup::Single(mut group) => {
-            group.fade(curve.clone(), 1000, 255);
-            group.fade(curve.clone(), 1000, 0);
+            group.fade(curve.clone(), 10000, 255);
         },
         _ => {}
     }
