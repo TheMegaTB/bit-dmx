@@ -66,7 +66,7 @@ impl UDPSocket {
         let sock_addr = SocketAddrV4::new(self.local_addr, 0);
         let sock = UdpSocket::bind(sock_addr).unwrap();
         sock.join_multicast_v4(&self.multicast_addr, &self.local_addr).ok().expect("Failed to join multicast.");
-        let target_addr = SocketAddr::V4(SocketAddrV4::new(self.local_addr, self.port+1));
+        let target_addr = SocketAddr::V4(SocketAddrV4::new(self.multicast_addr, self.port+1));
         thread::Builder::new().name("WatchDog-Server".to_string()).spawn(move|| {
             loop {
                 println!("sending watchdog ping");

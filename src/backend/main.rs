@@ -9,7 +9,7 @@ use std::str::FromStr;
 use structures::*;
 
 fn main() {
-    let socket = UDPSocket::new();
+    let socket = UDPSocket::new().local_addr("192.168.178.47");
     let watchdog_server = socket.start_watchdog_server();
     let server = socket.start();
     //watchdog_server.send(&[9], SocketAddr::from_str("228.228.228.228:8001").unwrap());
