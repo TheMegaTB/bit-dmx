@@ -10,7 +10,7 @@ use net2::UdpSocketExt;
 
 const INPUT_BUFFER: usize = 8;
 const WATCHDOG_TTL: u64 = 5;
-const WATCHDOG_DATA: [u8; 4] = [255, 255, 255, 255];
+const WATCHDOG_DATA: [u8; 3] = [68, 77, 88]; // "DMX" as bytes
 
 pub struct UDPSocket {
     local_addr: Ipv4Addr,
