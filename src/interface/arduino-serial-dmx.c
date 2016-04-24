@@ -42,8 +42,7 @@ bool open_port(int baud, char* port) {
     baudrate = baud;
     fd = serialport_init(port, baudrate);
     serialport_flush(fd);
-    if (fd != -1) { connected = true; return true; } else { return false; }
-    return fd;
+    if (fd > -1) { connected = true; return true; } else { return false; }
 }
 
 void close_port() {
