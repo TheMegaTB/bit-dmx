@@ -17,8 +17,8 @@ pub fn connect_and_test() {
             println!("Connection established!");
             (0..255).chain((0..255).rev()).map(|i| {
                 write_dmx(1, i);
-                //println!("{}", i);
-                //sleep(Duration::from_millis(10));
+                // println!("{}", i);
+                // sleep(Duration::from_millis(50));
             }).collect::<Vec<_>>();
             println!("Data transmitted.");
             close_port();

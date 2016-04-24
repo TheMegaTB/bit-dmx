@@ -26,7 +26,6 @@ bool first_channel_byte = true;
 
 void setup() {
   Serial.begin(115200);
-  Serial.println(); //Required for some reason
   DmxSimple.usePin(11);
   DmxSimple.maxChannel(maxChannel);
   pinMode(13, OUTPUT);
@@ -39,43 +38,31 @@ void endCycle() {
 
 void loop() {
   if (Serial.available() > 0) {
-    incomingByte = Serial.read();
-    if (newCycle && incomingByte == 0) { //value
-      mode = false;
-      newCycle = false;
-    } else if (newCycle && incomingByte == 1) { //channel
-      mode = true;
-      newCycle = false;
-    } else {
-      if (mode && first_channel_byte) {
-        channel = incomingByte;
-        first_channel_byte = false;
-      } else if (mode) {
-        channel = channel * 256 + incomingByte; //Combine the two bytes to one big integer
-        if (channel > maxChannel) { maxChannel = channel; DmxSimple.maxChannel(channel); digitalWrite(13, HIGH); } //TODO: This may be causing issues if called
-        endCycle();
+    while (Serial.available()) {
+      incomingByte = Serial.read();
+      if (newCycle && incomingByte == 0) { //value
+        mode = false;
+        newCycle = false;
+      } else if (newCycle && incomingByte == 1) { //channel
+        mode = true;
+        newCycle = false;
       } else {
-        DmxSimple.write(channel, incomingByte);
-        endCycle();
+        if (mode && first_channel_byte) {
+          channel = 0;
+          channel = incomingByte;
+          first_channel_byte = false;
+        } else if (mode) {
+          channel = channel * 256 + incomingByte; //Combine the two bytes to one big integer
+          //if (channel > maxChannel) { maxChannel = channel; DmxSimple.maxChannel(channel); digitalWrite(13, HIGH); } //TODO: This may be causing issues if called
+          //if (channel == 1) { digitalWrite(13, HIGH); } else { digitalWrite(13, LOW); }
+          endCycle();
+        } else {
+          DmxSimple.write(channel, incomingByte);
+          endCycle();
+        }
       }
+      outgoingByte = ~incomingByte; //Negate the byte
+      Serial.write(outgoingByte);
     }
-    outgoingByte = ~incomingByte; //Negate the byte
-    Serial.write(outgoingByte);
-    Serial.flush();
   }
-
-//  int c;
-//
-//  while(!Serial.available());
-//  c = Serial.read();
-//  if ((c>='0') && (c<='9')) {
-//    value = 10*value + c - '0';
-//  } else {
-//    if (c=='c') channel = value;
-//    else if (c=='w') {
-//      DmxSimple.write(channel, value);
-//      Serial.println();
-//    }
-//    value = 0;
-//  }
 }

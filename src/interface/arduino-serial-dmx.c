@@ -31,18 +31,27 @@
 const int buf_max = 10;
 
 int fd = -1;
+int baudrate;
 char buf[10];
+char port_addr[100];
 bool connected = false;
 uint16_t prev_channel;
 
-bool open_port(int baudrate, char* port) {
-    printf("\n", port);
-
+bool open_port(int baud, char* port) {
+    strcpy(port_addr, port);
+    baudrate = baud;
     fd = serialport_init(port, baudrate);
-    serialport_read(buf, 10, 1000);
     serialport_flush(fd);
     if (fd != -1) { connected = true; return true; } else { return false; }
     return fd;
+}
+
+bool reconnect() {
+  close_port();
+  for (int i = 0; i < 10; i++) {
+    if (open_port(115200, "/dev/ttyACM0")) { return true; }
+  }
+  return false;
 }
 
 void close_port() {
@@ -57,21 +66,24 @@ bool is_connected() {
 }
 
 int write_to_serial(uint8_t b) {
-    memset(buf, 0, sizeof buf);
-    int result = serialport_writebyte(fd, b);
-    serialport_read(fd, buf, 1, 5000);
-    uint8_t response = ~buf[0];
-    if (response != b) {
-      connected = false;
-      result = -1;
-      printf("CHECKSUM MISMATCH");
-    }
+  memset(buf, 0, sizeof buf);
+  int result = serialport_writebyte(fd, b);
+  if (serialport_read(fd, buf, 1, 5000) < 0) { printf("READ FAILED\n"); }
+  uint8_t response = ~buf[0];
+  if (response != b) {
+    connected = false;
+    result = -1;
+    printf("CHECKSUM MISMATCH\n");
+    printf("%d\n", b);
+    printf("%d\n", response);
+  }
 
-    return result; //-1 equals there was a write error
+  return result; //-1 equals there was a write error
 }
 
 void write_dmx(uint16_t channel, uint8_t value) { //TODO: Write to file. Format: Byte 1 = Value of channel 1 ... Byte n = Value of channel n
   if (channel != prev_channel) {
+    // printf("Sending channel %d\n", channel);
     uint8_t clow = channel & 0xff;
     uint8_t chigh = (channel >> 8);
     write_to_serial(1); //get into channel mode
