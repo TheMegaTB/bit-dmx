@@ -1,0 +1,9 @@
+// Fixture {
+//     name("rgbtest")
+//     rgba(0, 1, 2, 3)
+//     single(4)
+//     preheat
+// }
+//
+//
+// rgbtest -> 5
