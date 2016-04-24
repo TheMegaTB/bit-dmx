@@ -39,7 +39,7 @@ fn test_fade_curve() {
     let (tx, interrupt_tx) = interface.unwrap().to_thread();
     tx.send((1, 0)).unwrap();
 
-    let curve = FadeCurve::Custom("sin(10*x)".to_string());
+    let curve = FadeCurve::Custom("sin(10*x)*0.5+0.5".to_string());
     //let curve = FadeCurve::Squared;
     let mut stage = Stage::new();
     let mut test_group = ChannelGroup::Single(Single::new(1, tx.clone()));
