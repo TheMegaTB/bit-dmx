@@ -33,17 +33,3 @@ pub use fixtures::single::*;
 //         println!("{:?}", a);
 //     } //fade from 0 to 255 in 5s with 30fps
 // }
-
-
-#[test]
-#[should_panic]
-fn test_fade_curve() {
-    //let curve = FadeCurve::Custom("sin(2*x)".to_string());
-    let curve = FadeCurve::Squared;
-    let stage = Stage::new();
-    let test_group = ChannelGroup::Single(Single::new(0, )); //TODO add interface
-    let test_fixture = Fixture::new(vec![test_group]);
-    stage.add_fixture(test_fixture);
-
-    test_group.fade(curve, 5000, 255);
-}

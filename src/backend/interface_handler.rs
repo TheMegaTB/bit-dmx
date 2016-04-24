@@ -1,6 +1,4 @@
 #![allow(dead_code)]
-use std::time::Duration;
-use std::thread::sleep;
 use std::sync::mpsc;
 use std::thread;
 
@@ -42,24 +40,24 @@ pub struct InterfaceHandle {
 }
 
 impl Interface {
-    fn new() -> Interface {
+    pub fn new() -> Interface {
         Interface {
             baudrate: 115200,
             port: "/dev/ttyACM0".to_string()
         }
     }
 
-    fn baudrate(mut self, baudrate: usize) -> Interface {
+    pub fn baudrate(mut self, baudrate: usize) -> Interface {
         self.baudrate = baudrate;
         self
     }
 
-    fn port(mut self, port: String) -> Interface {
+    pub fn port(mut self, port: String) -> Interface {
         self.port = port;
         self
     }
 
-    fn connect(self) -> Result<InterfaceHandle, &'static str> {
+    pub fn connect(self) -> Result<InterfaceHandle, &'static str> {
         match connect(self.baudrate, self.port.clone()) {
             true => Ok(InterfaceHandle {
                 values: Vec::new(),
@@ -82,7 +80,7 @@ impl InterfaceHandle {
     pub fn to_thread(self) -> (mpsc::Sender<(DmxChannel, DmxValue)>, mpsc::Sender<bool>) {
         let (tx, rx) = mpsc::channel();
         let (interrupt_tx, interrupt_rx) = mpsc::channel();
-        thread::spawn(move|| {
+        thread::Builder::new().name("DMX-IF".to_string()).spawn(move|| {
 
             let mut cache: Vec<DmxTouple> = Vec::with_capacity(16);
 
@@ -115,7 +113,7 @@ impl InterfaceHandle {
                     None => {} //This shouldn't happen regardless.
                 }
             }
-        });
+        }).unwrap();
         (tx, interrupt_tx)
     }
 
@@ -127,21 +125,4 @@ impl InterfaceHandle {
         disconnect();
         self.interface
     }
-}
-
-pub fn connect_and_test() {
-    let interface = Interface::new().connect();
-    if interface.is_err() { panic!(interface) }
-    let (tx, interrupt_tx) = interface.unwrap().to_thread();
-    (0..255).chain((0..255).rev()).map(|i| {
-        tx.send((1, i)).unwrap();
-        tx.send((2, i)).unwrap();
-        //tx.send((3, i)).unwrap();
-        sleep(Duration::from_millis(16));
-        // interface.write_to_dmx(1, i);
-        // println!("{}", i);
-    }).collect::<Vec<_>>();
-    sleep(Duration::from_millis(2000));
-    println!("Disconnecting...");
-    interrupt_tx.send(true).unwrap();
 }
