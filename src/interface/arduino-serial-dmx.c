@@ -35,7 +35,12 @@ int baudrate;
 char buf[10];
 char port_addr[100];
 bool connected = false;
+bool fake = false;
 uint16_t prev_channel;
+
+void set_fake_interface_mode(bool enabled) {
+  fake = enabled;
+}
 
 bool open_port(int baud, char* port) {
     strcpy(port_addr, port);
@@ -65,19 +70,21 @@ bool is_connected() {
 }
 
 int write_to_serial(uint8_t b) {
-  memset(buf, 0, sizeof buf);
-  int result = serialport_writebyte(fd, b);
-  if (serialport_read(fd, buf, 1, 5000) < 0) { printf("READ FAILED\n"); }
-  uint8_t response = ~buf[0];
-  if (response != b) {
-    connected = false;
-    result = -1;
-    printf("CHECKSUM MISMATCH\n");
-    printf("%d\n", b);
-    printf("%d\n", response);
-  }
+  if (!fake) {
+    memset(buf, 0, sizeof buf);
+    int result = serialport_writebyte(fd, b);
+    if (serialport_read(fd, buf, 1, 5000) < 0) { printf("READ FAILED\n"); }
+    uint8_t response = ~buf[0];
+    if (response != b) {
+      connected = false;
+      result = -1;
+      printf("CHECKSUM MISMATCH\n");
+      printf("%d\n", b);
+      printf("%d\n", response);
+    }
 
-  return result; //-1 equals there was a write error
+    return result; //-1 equals there was a write error
+  } else { return 0; }
 }
 
 void write_dmx(uint16_t channel, uint8_t value) { //TODO: Write to file. Format: Byte 1 = Value of channel 1 ... Byte n = Value of channel n

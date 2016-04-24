@@ -7,8 +7,7 @@ use structures::*;
 use std::sync::mpsc;
 
 fn main() {
-    //connect_and_test();
-    //test_fade_curve();
+
 }
 
 // pub fn connect_and_test() {
