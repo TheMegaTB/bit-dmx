@@ -83,7 +83,6 @@ int write_to_serial(uint8_t b) {
 
 void write_dmx(uint16_t channel, uint8_t value) { //TODO: Write to file. Format: Byte 1 = Value of channel 1 ... Byte n = Value of channel n
   if (channel != prev_channel) {
-    // printf("Sending channel %d\n", channel);
     uint8_t clow = channel & 0xff;
     uint8_t chigh = (channel >> 8);
     write_to_serial(1); //get into channel mode

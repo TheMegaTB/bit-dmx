@@ -16,10 +16,10 @@
 
 #include <DmxSimple.h>
 
-unsigned int channel = 0;
+unsigned int channel = 1;
 unsigned int incomingByte;
 unsigned char outgoingByte;
-unsigned int maxChannel = 32;
+unsigned int maxChannel = 16;
 bool newCycle = true;
 bool mode = false; // true = channel, false = value
 bool first_channel_byte = true;
@@ -29,11 +29,6 @@ void setup() {
   DmxSimple.usePin(11);
   DmxSimple.maxChannel(maxChannel);
   pinMode(13, OUTPUT);
-}
-
-void endCycle() {
-  newCycle = true;
-  first_channel_byte = false;
 }
 
 void loop() {
@@ -48,17 +43,16 @@ void loop() {
         newCycle = false;
       } else {
         if (mode && first_channel_byte) {
-          channel = 0;
           channel = incomingByte;
           first_channel_byte = false;
         } else if (mode) {
           channel = channel * 256 + incomingByte; //Combine the two bytes to one big integer
-          //if (channel > maxChannel) { maxChannel = channel; DmxSimple.maxChannel(channel); digitalWrite(13, HIGH); } //TODO: This may be causing issues if called
-          //if (channel == 1) { digitalWrite(13, HIGH); } else { digitalWrite(13, LOW); }
-          endCycle();
+          if (channel > maxChannel) { maxChannel = channel; DmxSimple.maxChannel(channel); digitalWrite(13, HIGH); } //TODO: This may be causing issues if called
+          newCycle = true;
+          first_channel_byte = true;
         } else {
           DmxSimple.write(channel, incomingByte);
-          endCycle();
+          newCycle = true;
         }
       }
       outgoingByte = ~incomingByte; //Negate the byte
