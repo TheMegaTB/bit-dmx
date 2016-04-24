@@ -10,7 +10,7 @@ fn min3(a: f64, b: f64, c: f64) -> f64 {
     a.min(b).min(c)
 }
 
-
+#[allow(dead_code)]
 pub fn rgb_to_hsv(r: DmxValue, g: DmxValue, b: DmxValue) -> (f64, f64, f64) {
     let r2 = r as f64/255f64;
     let g2 = g as f64/255f64;
@@ -43,7 +43,7 @@ pub fn rgb_to_hsv(r: DmxValue, g: DmxValue, b: DmxValue) -> (f64, f64, f64) {
     (h, s, cmax)
 }
 
-
+#[allow(dead_code)]
 pub fn hsv_to_rgb(h: f64, s: f64, v: f64) -> (DmxValue, DmxValue, DmxValue) {
     let c = v * s;
     let x = c * (1f64 - ((h/60f64) % 2f64 - 1f64).abs());
@@ -70,7 +70,6 @@ pub fn hsv_to_rgb(h: f64, s: f64, v: f64) -> (DmxValue, DmxValue, DmxValue) {
 }
 
 
-#[allow(dead_code)]
 pub fn get_fade_steps(start_value: DmxValue, target_value: DmxValue, steps: usize, curve: FadeCurve) -> Vec<DmxValue> {
     let curve_fn = &*curve.to_function();
     let y_offset = curve_fn(0f64);

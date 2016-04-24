@@ -6,7 +6,9 @@
 // use DmxChannel;
 // use DmxValue;
 
-use fixtures::*;
+use fixtures::single::*;
+use fixtures::rgb::*;
+use fixtures::rgba::*;
 
 
 
@@ -25,7 +27,7 @@ impl Fixture {
 
 #[derive(Debug)]
 pub enum ChannelGroup {
-    Single(single::Single),
-    RGB(rgb::RGB),
-    RGBA(rgba::RGBA)
+    Single(Single),
+    RGB(RGB),
+    RGBA(RGBA)
 }
