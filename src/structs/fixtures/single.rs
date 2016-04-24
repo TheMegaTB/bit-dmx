@@ -27,7 +27,6 @@ impl Single {
     pub fn fade(&mut self, curve: FadeCurve, time: FadeTime, end_value: DmxValue) {
         let steps = time*FADE_TICKS/1000;
         for value in get_fade_steps(self.value, end_value, steps, curve) {
-            println!("{:?}", value);
             self.dmx_tx.send((self.channel, value)).unwrap();
             self.value = value;
             sleep(Duration::from_millis((time/steps) as u64));

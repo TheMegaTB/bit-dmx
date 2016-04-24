@@ -84,7 +84,9 @@ int write_to_serial(uint8_t b) {
     }
 
     return result; //-1 equals there was a write error
-  } else { return 0; }
+  } else {
+    return 0;
+  }
 }
 
 void write_dmx(uint16_t channel, uint8_t value) { //TODO: Write to file. Format: Byte 1 = Value of channel 1 ... Byte n = Value of channel n
@@ -98,5 +100,6 @@ void write_dmx(uint16_t channel, uint8_t value) { //TODO: Write to file. Format:
   }
   write_to_serial(0); //get into value mode
   write_to_serial(value);
+  if (fake) { printf("FAKE-IF => set %d to %d\n", channel, value); }
   //TODO: Return value
 }
