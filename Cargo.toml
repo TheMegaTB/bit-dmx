@@ -18,10 +18,8 @@ name = "structures"
 path = "src/structs/structs.rs"
 
 [features] #TODO: Make this automagically and send it to the interface
-default = ["DMX256"]
-# DMX Channel lengths
-DMX256 = []
-DMX512 = []
+default = []
+fake_if = []
 
 [dependencies]
 conrod = "0.32.0"

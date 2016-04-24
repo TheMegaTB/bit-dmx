@@ -13,6 +13,7 @@ extern {
     fn close_port();
     fn write_dmx(channel: u16, value: u8);
     fn is_connected() -> bool;
+    fn set_fake_interface_mode(enabled: bool);
 }
 
 fn connect(baudrate: usize, port: String) -> bool {
@@ -58,12 +59,20 @@ impl Interface {
     }
 
     pub fn connect(self) -> Result<InterfaceHandle, &'static str> {
-        match connect(self.baudrate, self.port.clone()) {
-            true => Ok(InterfaceHandle {
+        if cfg!( feature = "fake_if" ) {
+            unsafe { set_fake_interface_mode(true); }
+            Ok(InterfaceHandle {
                 values: Vec::new(),
                 interface: self
-            }),
-            false => Err("Couldn't connect.")
+            })
+        } else {
+            match connect(self.baudrate, self.port.clone()) {
+                true => Ok(InterfaceHandle {
+                    values: Vec::new(),
+                    interface: self
+                }),
+                false => Err("Couldn't connect.")
+            }
         }
     }
 }
