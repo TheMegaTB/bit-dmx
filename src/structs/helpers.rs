@@ -1,4 +1,5 @@
 use DmxValue;
+use FadeCurve;
 
 
 fn max3(a: f64, b: f64, c: f64) -> f64 {
@@ -70,7 +71,8 @@ pub fn hsv_to_rgb(h: f64, s: f64, v: f64) -> (DmxValue, DmxValue, DmxValue) {
 
 
 #[allow(dead_code)]
-pub fn fade(start_value: DmxValue, target_value: DmxValue, steps: usize, curve_fn: &Fn(f64) -> f64) -> Vec<DmxValue> {
+pub fn get_fade_steps(start_value: DmxValue, target_value: DmxValue, steps: usize, curve: FadeCurve) -> Vec<DmxValue> {
+    let curve_fn = &*curve.to_function();
     let y_offset = curve_fn(0f64);
     let y_scale = 1f64/(curve_fn(1f64)-y_offset);
 

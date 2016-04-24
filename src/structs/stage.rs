@@ -11,4 +11,7 @@ impl Stage {
             fixtures: Vec::new()
         }
     }
+    pub fn add_fixture(&mut self, fixture: Fixture) {
+        self.fixtures.push(fixture);
+    }
 }
