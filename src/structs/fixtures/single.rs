@@ -6,6 +6,9 @@ use std::sync::mpsc;
 use get_fade_steps;
 use FADE_TICKS;
 
+use std::time::Duration;
+use std::thread::sleep;
+
 #[derive(Debug)]
 pub struct Single {
     channel: DmxChannel,
@@ -14,7 +17,18 @@ pub struct Single {
 }
 
 impl Single {
-    fn fade(&mut self, curve: FadeCurve, time: FadeTime, end_value: DmxValue) {
-        get_fade_steps(self.value, end_value, time*FADE_TICKS/1000, curve);
+    pub fn new(channel: DmxChannel, dmx_tx: mpsc::Sender<(DmxChannel, DmxValue)>) -> Single {
+        Single {
+            channel: channel,
+            value: 0,
+            dmx_tx: dmx_tx
+        }
+    }
+    pub fn fade(&mut self, curve: FadeCurve, time: FadeTime, end_value: DmxValue) {
+        let steps = time*FADE_TICKS/1000;
+        for value in get_fade_steps(self.value, end_value, steps, curve) {
+            println!("{:?}", value);
+            sleep(Duration::from_millis((time/steps) as u64));
+        }
     }
 }

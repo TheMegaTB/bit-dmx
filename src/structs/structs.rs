@@ -1,5 +1,4 @@
-// use std::time::Duration;
-// use std::thread::sleep;
+
 
 extern crate meval;
 pub use meval::*;
@@ -26,11 +25,26 @@ pub use fixtures::*;
 
 
 
+// #[test]
+// #[should_panic]
+// fn test_fade_curve() {
+//     //let curve = FadeCurve::Custom("sin(2*x)".to_string());
+//     let curve = FadeCurve::Squared;
+//     for a in helpers::get_fade_steps(0, 200, 150, curve) {
+//         println!("{:?}", a);
+//     } //fade from 0 to 255 in 5s with 30fps
+// }
+
+
 #[test]
 #[should_panic]
 fn test_fade_curve() {
-    let curve = FadeCurve::Custom("sin(2*x)".to_string());
-    for a in helpers::get_fade_steps(100, 200, 150, curve) {
-        println!("{:?}", a);
-    } //fade from 0 to 255 in 5s with 30fps
+    //let curve = FadeCurve::Custom("sin(2*x)".to_string());
+    let curve = FadeCurve::Squared;
+    let stage = Stage::new();
+    let test_group = single::Single::new();
+    let test_fixture = Fixture::new(vec![test_group]);
+    stage.add_fixture(test_fixture);
+
+    test_group.fade(curve, 5000, 255);
 }
