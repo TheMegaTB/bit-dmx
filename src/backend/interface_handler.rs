@@ -1,5 +1,8 @@
+#![allow(dead_code)]
 use std::time::Duration;
 use std::thread::sleep;
+use std::sync::mpsc;
+use std::thread;
 
 use std::ffi::CString;
 use std::os::raw::c_char;
@@ -67,7 +70,55 @@ impl Interface {
     }
 }
 
+type DmxTouple = (DmxChannel, DmxValue);
+fn insert_to_vector(cache: &mut Vec<DmxTouple>, elem: DmxTouple) {
+    match cache.iter().position(|&x| x.0 == elem.0 ) {
+        Some(index) => cache[index] = elem,
+        None => cache.push(elem)
+    }
+}
+
 impl InterfaceHandle {
+    pub fn to_thread(self) -> (mpsc::Sender<(DmxChannel, DmxValue)>, mpsc::Sender<bool>) {
+        let (tx, rx) = mpsc::channel();
+        let (interrupt_tx, interrupt_rx) = mpsc::channel();
+        thread::spawn(move|| {
+
+            let mut cache: Vec<DmxTouple> = Vec::with_capacity(16);
+
+            loop {
+                if interrupt_rx.try_recv().is_ok() {
+                    self.disconnect();
+                    return;
+                }
+
+                let mut rx_available = true;
+                while rx_available {
+                    match rx.try_recv() {
+                        Ok(elem) => {
+                            insert_to_vector(&mut cache, elem);
+                        },
+                        Err(_) => {
+                            if cache.len() == 0 {
+                                insert_to_vector(&mut cache, rx.recv().unwrap());
+                            } else {
+                                rx_available = false;
+                            }
+                        }
+                    }
+                }
+
+                match cache.drain(0..1).last() {
+                    Some(elem) => {
+                        self.write_to_dmx(elem.0, elem.1);
+                    },
+                    None => {} //This shouldn't happen regardless.
+                }
+            }
+        });
+        (tx, interrupt_tx)
+    }
+
     pub fn write_to_dmx(&self, channel: DmxChannel, value: DmxValue) {
         write_to_dmx(channel, value);
     }
@@ -81,10 +132,16 @@ impl InterfaceHandle {
 pub fn connect_and_test() {
     let interface = Interface::new().connect();
     if interface.is_err() { panic!(interface) }
-    let interface = interface.unwrap();
+    let (tx, interrupt_tx) = interface.unwrap().to_thread();
     (0..255).chain((0..255).rev()).map(|i| {
-        interface.write_to_dmx(1, i);
-        println!("{}", i);
+        tx.send((1, i)).unwrap();
+        tx.send((2, i)).unwrap();
+        //tx.send((3, i)).unwrap();
+        sleep(Duration::from_millis(16));
+        // interface.write_to_dmx(1, i);
+        // println!("{}", i);
     }).collect::<Vec<_>>();
-    interface.disconnect();
+    sleep(Duration::from_millis(2000));
+    println!("Disconnecting...");
+    interrupt_tx.send(true).unwrap();
 }
