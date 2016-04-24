@@ -107,7 +107,7 @@ impl InterfaceHandle {
                         },
                         Err(_) => {
                             if cache.len() == 0 {
-                                insert_to_vector(&mut cache, rx.recv().unwrap());
+                                insert_to_vector(&mut cache, rx.recv().unwrap()); //TODO: replace unwrap()
                             } else {
                                 rx_available = false;
                             }

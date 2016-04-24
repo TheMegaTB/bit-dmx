@@ -1,4 +1,6 @@
 
+extern crate net2;
+
 extern crate meval;
 pub use meval::*;
 
@@ -9,6 +11,9 @@ pub const FADE_TICKS: FadeTime = 30;
 
 pub mod helpers;
 pub use helpers::*;
+
+pub mod udp_socket;
+pub use udp_socket::*;
 
 pub mod fixture;
 pub use fixture::*;

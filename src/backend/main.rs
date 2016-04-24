@@ -1,9 +1,21 @@
 extern crate structures;
+extern crate net2;
 
 mod interface_handler;
 
-fn main() {
+use std::net::{ SocketAddr };
+use std::str::FromStr;
 
+use structures::*;
+
+fn main() {
+    let socket = UDPSocket::new();
+    let watchdog_server = socket.start_watchdog_server();
+    let server = socket.start();
+    //watchdog_server.send(&[9], SocketAddr::from_str("228.228.228.228:8001").unwrap());
+    server.send_to_multicast(&[1, 2, 3, 4, 5, 6, 7, 8]);
+    println!("{:?}", server.receive());
+    std::thread::sleep(std::time::Duration::from_secs(3000));
 }
 
 
@@ -30,14 +42,15 @@ fn test_fade_curve() {
 
     match test_group {
         ChannelGroup::Single(mut group) => {
-            group.fade(curve.clone(), 3000, 255);
-            group.fade(curve.clone(), 3000, 0);
+            group.fade(curve.clone(), 500, 255);
+            sleep(Duration::from_millis(1000));
+            group.fade(curve.clone(), 500, 0);
         },
         _ => {}
     }
 
 
-    sleep(Duration::from_millis(6000));
+    sleep(Duration::from_millis(500));
     println!("Disconnecting...");
     interrupt_tx.send(true).unwrap();
 }
