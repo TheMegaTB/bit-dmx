@@ -74,6 +74,12 @@ pub fn get_fade_steps(start_value: DmxValue, target_value: DmxValue, steps: usiz
     let curve_fn = &*curve.to_function();
     let y_offset = curve_fn(0f64);
     let y_scale = 1f64/(curve_fn(1f64)-y_offset);
+    // println!("fade from {:?}", start_value);
+    // println!("fade to {:?}", target_value);
+    // println!("fade to {:?}", target_value);
+    // for a in (1..steps + 1).map(|step| (start_value as f64 + ((target_value as f64 - start_value as f64)  * curve_fn(step as f64/steps as f64) - y_offset) * y_scale)) {
+    //     println!("nv: {:?}", a);
+    // }
 
-    (1..steps + 1).map(|step| (start_value as f64 + ((target_value-start_value) as f64 * curve_fn(step as f64/steps as f64) - y_offset) * y_scale) as DmxValue).collect()
+    (1..steps + 1).map(|step| (start_value as f64 + ((target_value as f64 - start_value as f64) * curve_fn(step as f64/steps as f64) - y_offset) * y_scale) as DmxValue).collect()
 }

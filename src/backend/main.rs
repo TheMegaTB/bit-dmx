@@ -4,6 +4,7 @@ mod interface_handler;
 
 use interface_handler::*;
 use structures::*;
+use std::sync::mpsc;
 
 fn main() {
     //connect_and_test();
@@ -57,4 +58,27 @@ fn test_fade_curve() {
     sleep(Duration::from_millis(6000));
     println!("Disconnecting...");
     interrupt_tx.send(true).unwrap();
+}
+
+#[test]
+#[should_panic]
+fn test_fade_curve_without_tx() {
+    use std::time::Duration;
+    use std::thread::sleep;
+
+    //let (tx, interrupt_tx): (std::sync::mpsc::Sender<_>, std::sync::mpsc::Sender<_>) = (mpsc::channel().0, mpsc::channel().0);
+    let tx: mpsc::Sender<(DmxChannel, DmxValue)> = mpsc::channel().0;
+
+    // let curve = FadeCurve::Custom("sin(10*x)".to_string());
+    let curve = FadeCurve::Squared;
+    let mut test_group = ChannelGroup::Single(Single::new(1, tx.clone()));
+
+
+    match test_group {
+        ChannelGroup::Single(mut group) => {
+            group.fade(curve.clone(), 1000, 255);
+            group.fade(curve.clone(), 1000, 0);
+        },
+        _ => {}
+    }
 }
