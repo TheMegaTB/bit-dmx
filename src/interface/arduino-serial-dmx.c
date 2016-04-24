@@ -46,19 +46,19 @@ bool open_port(int baud, char* port) {
     return fd;
 }
 
+void close_port() {
+  serialport_flush(fd);
+  serialport_close(fd);
+  connected = false;
+  fd = -1;
+}
+
 bool reconnect() {
   close_port();
   for (int i = 0; i < 10; i++) {
     if (open_port(115200, "/dev/ttyACM0")) { return true; }
   }
   return false;
-}
-
-void close_port() {
-  serialport_flush(fd);
-  serialport_close(fd);
-  connected = false;
-  fd = -1;
 }
 
 bool is_connected() {
