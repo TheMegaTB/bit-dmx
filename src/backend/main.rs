@@ -3,16 +3,12 @@ extern crate net2;
 
 mod interface_handler;
 
-use std::net::{ SocketAddr };
-use std::str::FromStr;
-
 use structures::*;
 
 fn main() {
     let socket = UDPSocket::new();
-    let watchdog_server = socket.start_watchdog_server();
     let server = socket.start();
-    //watchdog_server.send(&[9], SocketAddr::from_str("228.228.228.228:8001").unwrap());
+    socket.start_watchdog_server();
     server.send_to_multicast(&[1, 2, 3, 4, 5, 6, 7, 8]);
     println!("{:?}", server.receive());
     std::thread::sleep(std::time::Duration::from_secs(3000));
@@ -20,7 +16,6 @@ fn main() {
 
 
 #[test]
-//#[should_panic]
 fn test_fade_curve() {
     use std::time::Duration;
     use std::thread::sleep;
