@@ -6,6 +6,7 @@ use rgb_to_hsv;
 use hsv_to_rgb;
 use std::sync::mpsc;
 use get_fade_steps;
+use get_fade_steps_int;
 use FADE_TICKS;
 
 use std::time::Duration;
@@ -40,6 +41,23 @@ impl RGB {
             let s: f64 = *((it.1).0);
             let v: f64 = *((it.1).1);
             let (r, g, b) = hsv_to_rgb(h, s, v);
+
+            self.dmx_tx.send((self.channel + 0, r)).unwrap();
+            self.dmx_tx.send((self.channel + 1, g)).unwrap();
+            self.dmx_tx.send((self.channel + 2, b)).unwrap();
+            self.value_r = r;
+            self.value_g = g;
+            self.value_b = b;
+            sleep(Duration::from_millis((time/steps) as u64));
+        }
+    }
+
+    pub fn fade_simple(&mut self, curve: FadeCurve, time: FadeTime, end_r: DmxValue, end_g: DmxValue, end_b: DmxValue) {
+        let steps = time*FADE_TICKS/1000;
+        for it in get_fade_steps_int(self.value_r, end_r, steps, curve.clone()).iter().zip(get_fade_steps_int(self.value_g, end_g, steps, curve.clone()).iter().zip(get_fade_steps_int(self.value_b, end_b, steps, curve.clone()).iter())) {
+            let r: DmxValue = *(it.0);
+            let g: DmxValue = *((it.1).0);
+            let b: DmxValue = *((it.1).1);
 
             self.dmx_tx.send((self.channel + 0, r)).unwrap();
             self.dmx_tx.send((self.channel + 1, g)).unwrap();
