@@ -3,7 +3,7 @@ use DmxValue;
 use FadeCurve;
 use FadeTime;
 use std::sync::mpsc;
-use get_fade_steps;
+use get_fade_steps_int;
 use FADE_TICKS;
 
 use std::time::Duration;
@@ -26,7 +26,7 @@ impl Single {
     }
     pub fn fade(&mut self, curve: FadeCurve, time: FadeTime, end_value: DmxValue) {
         let steps = time*FADE_TICKS/1000;
-        for value in get_fade_steps(self.value, end_value, steps, curve) {
+        for value in get_fade_steps_int(self.value, end_value, steps, curve) {
             self.dmx_tx.send((self.channel, value)).unwrap();
             self.value = value;
             sleep(Duration::from_millis((time/steps) as u64));
