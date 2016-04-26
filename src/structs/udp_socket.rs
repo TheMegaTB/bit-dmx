@@ -61,14 +61,14 @@ impl UDPSocket {
     pub fn start_client(&self) -> UDPSocketHandle {
         UDPSocketHandle {
             socket: self.assemble_socket(self.port, true),
-            multicast_addr: SocketAddr::V4(SocketAddrV4::new(self.local_addr, self.port))
+            multicast_addr: SocketAddr::V4(SocketAddrV4::new(self.multicast_addr, self.port))
         }
     }
 
     pub fn start_backend_server(&self) -> UDPSocketHandle {
         UDPSocketHandle {
             socket: self.assemble_socket(self.port + 1, true),
-            multicast_addr: SocketAddr::V4(SocketAddrV4::new(self.local_addr, self.port))
+            multicast_addr: SocketAddr::V4(SocketAddrV4::new(self.multicast_addr, self.port))
         }
     }
 
