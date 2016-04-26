@@ -12,6 +12,8 @@ use structures::*;
 fn main() {
     env_logger::init().unwrap();
 
+    dmx_parser::read_file();
+
     let socket = UDPSocket::new();
     socket.start_watchdog_server();
     let server = socket.start_backend_server(); //receiving updates (DMX values etc. from frontend)

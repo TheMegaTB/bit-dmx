@@ -15,6 +15,9 @@ pub use helpers::*;
 pub mod udp_socket;
 pub use udp_socket::*;
 
+pub mod dmx_parser;
+pub use dmx_parser::*;
+
 pub mod fixture;
 pub use fixture::*;
 
