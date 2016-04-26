@@ -33,6 +33,8 @@ num = "0.1.30"
 rand = "0.3.13"
 time = "0.1.34"
 net2 = "0.2.23"
+log = "0.3.6"
+env_logger = "0.3.3"
 meval = { git = "https://github.com/rekka/meval-rs" }
 #vecmath = "0.2.0"
 
