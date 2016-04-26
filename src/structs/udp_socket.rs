@@ -52,24 +52,24 @@ impl UDPSocket {
         self
     }
 
-    pub fn start(&self) -> UDPSocketHandle {
-        let sock_addr = SocketAddrV4::new(self.local_addr, self.port);
-        let sock = UdpSocket::bind(sock_addr).unwrap();
-        sock.join_multicast_v4(&self.multicast_addr, &self.local_addr).ok().expect("Failed to join multicast.");
+    fn assemble_socket(&self, port: u16, multicast: bool) -> UdpSocket {
+        let sock = UdpSocket::bind(SocketAddrV4::new(self.local_addr, port)).unwrap();
+        if multicast { sock.join_multicast_v4(&self.multicast_addr, &self.local_addr).ok().expect("Failed to join multicast."); }
+        sock
+    }
+
+    pub fn start_backend_server(&self) -> UDPSocketHandle {
         UDPSocketHandle {
-            socket: sock,
+            socket: self.assemble_socket(self.port + 1, true),
             multicast_addr: SocketAddr::V4(SocketAddrV4::new(self.local_addr, self.port))
         }
     }
 
     pub fn start_watchdog_server(&self) {
-        let sock_addr = SocketAddrV4::new(self.local_addr, 0);
-        let sock = UdpSocket::bind(sock_addr).unwrap();
-        sock.join_multicast_v4(&self.multicast_addr, &self.local_addr).ok().expect("Failed to join multicast.");
-        let target_addr = SocketAddr::V4(SocketAddrV4::new(self.multicast_addr, self.port+1));
+        let sock = self.assemble_socket(0, true);
+        let target_addr = SocketAddr::V4(SocketAddrV4::new(self.multicast_addr, self.port+2));
         thread::Builder::new().name("WatchDog-Server".to_string()).spawn(move|| {
             loop {
-                println!("sending watchdog ping");
                 sock.send_to(&WATCHDOG_DATA, target_addr).unwrap();
                 sleep(Duration::from_secs(WATCHDOG_TTL));
             }
@@ -77,15 +77,13 @@ impl UDPSocket {
     }
 
     pub fn start_watchdog_client(&self) -> WatchDogClient {
-        let sock_addr = SocketAddrV4::new(self.local_addr, self.port+1);
-        let sock = UdpSocket::bind(sock_addr).unwrap();
-        sock.join_multicast_v4(&self.multicast_addr, &self.local_addr).ok().expect("Failed to join multicast.");
+        let sock = self.assemble_socket(self.port + 2, true);
         let state = Arc::new(Mutex::new([false]));
         let server_addr = Arc::new(Mutex::new([None]));
         {
             let s = state.clone();
             let s_addr = server_addr.clone();
-            thread::Builder::new().name("WatchDog-Server".to_string()).spawn(move|| {
+            thread::Builder::new().name("WatchDog-Client".to_string()).spawn(move|| {
                 sock.set_read_timeout(Some(Duration::from_secs(WATCHDOG_TTL + 1))).unwrap();
                 loop {
                     let mut buf = WATCHDOG_DATA;

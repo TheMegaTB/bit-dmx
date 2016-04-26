@@ -7,11 +7,16 @@ use structures::*;
 
 fn main() {
     let socket = UDPSocket::new();
-    let server = socket.start();
     socket.start_watchdog_server();
-    server.send_to_multicast(&[1, 2, 3, 4, 5, 6, 7, 8]);
-    println!("{:?}", server.receive());
-    std::thread::sleep(std::time::Duration::from_secs(3000));
+    let server = socket.start_backend_server(); //receiving updates (DMX values etc. from frontend)
+
+    let (d, _) = server.receive();
+    //do something with the data
+    server.send_to_multicast(&d);
+
+    // server.send_to_multicast(&[1, 2, 3, 4, 5, 6, 7, 8]);
+    // println!("{:?}", server.receive());
+    // std::thread::sleep(std::time::Duration::from_secs(3000));
 }
 
 
