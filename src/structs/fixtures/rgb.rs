@@ -36,10 +36,7 @@ impl RGB {
         let (start_h, start_s, start_v) = rgb_to_hsv(self.value_r, self.value_g, self.value_b);
         let (end_h, end_s, end_v) = rgb_to_hsv(end_r, end_g, end_b);
         let steps = time*FADE_TICKS/1000;
-        for it in get_fade_steps(start_h, end_h, steps, curve.clone()).iter().zip(get_fade_steps(start_s, end_s, steps, curve.clone()).iter().zip(get_fade_steps(start_v, end_v, steps, curve.clone()).iter())) {
-            let h: f64 = *(it.0);
-            let s: f64 = *((it.1).0);
-            let v: f64 = *((it.1).1);
+        for ((&h, &s), &v) in get_fade_steps(start_h, end_h, steps, curve.clone()).iter().zip(get_fade_steps(start_s, end_s, steps, curve.clone()).iter()).zip(get_fade_steps(start_v, end_v, steps, curve.clone()).iter()) {
             let (r, g, b) = hsv_to_rgb(h, s, v);
 
             self.dmx_tx.send((self.channel + 0, r)).unwrap();
@@ -54,11 +51,7 @@ impl RGB {
 
     pub fn fade_simple(&mut self, curve: FadeCurve, time: FadeTime, end_r: DmxValue, end_g: DmxValue, end_b: DmxValue) {
         let steps = time*FADE_TICKS/1000;
-        for it in get_fade_steps_int(self.value_r, end_r, steps, curve.clone()).iter().zip(get_fade_steps_int(self.value_g, end_g, steps, curve.clone()).iter().zip(get_fade_steps_int(self.value_b, end_b, steps, curve.clone()).iter())) {
-            let r: DmxValue = *(it.0);
-            let g: DmxValue = *((it.1).0);
-            let b: DmxValue = *((it.1).1);
-
+        for ((&r, &g), &b) in get_fade_steps_int(self.value_r, end_r, steps, curve.clone()).iter().zip(get_fade_steps_int(self.value_g, end_g, steps, curve.clone()).iter()).zip(get_fade_steps_int(self.value_b, end_b, steps, curve.clone()).iter()) {
             self.dmx_tx.send((self.channel + 0, r)).unwrap();
             self.dmx_tx.send((self.channel + 1, g)).unwrap();
             self.dmx_tx.send((self.channel + 2, b)).unwrap();
