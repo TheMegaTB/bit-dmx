@@ -28,6 +28,7 @@ pub mod fixtures;
 pub use fixtures::single::*;
 pub use fixtures::rgb::*;
 pub use fixtures::rgba::*;
+pub use fixtures::moving_2d::*;
 
 
 

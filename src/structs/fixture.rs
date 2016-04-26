@@ -9,6 +9,7 @@
 use fixtures::single::*;
 use fixtures::rgb::*;
 use fixtures::rgba::*;
+use fixtures::moving_2d::*;
 
 
 
@@ -29,5 +30,6 @@ impl Fixture {
 pub enum ChannelGroup {
     Single(Single),
     RGB(RGB),
-    RGBA(RGBA)
+    RGBA(RGBA),
+    Moving2D(Moving2D)
 }

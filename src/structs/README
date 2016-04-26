@@ -1,9 +1,8 @@
-// Fixture {
-//     name("rgbtest")
-//     rgba(0, 1, 2, 3)
-//     single(4)
-//     preheat
-// }
-//
-//
-// rgbtest -> 5
+PRESET {
+   name("rgbtest")
+   rgba(0, 1, 2, 3)
+   single(4); preheat(10)
+}
+rgbtest("<name>) -> 5
+rgbtest("<name>") -> 20
+rgbtest("<name>") -> 30

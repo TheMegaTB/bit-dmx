@@ -35,15 +35,16 @@ fn test_fade_curve() {
     // let curve = FadeCurve::SquareRoot;
     let mut stage = Stage::new();
     // let mut test_group = ChannelGroup::Single(Single::new(1, tx.clone()));
+    // let mut test_group = ChannelGroup::RGB(RGB::new(1, tx.clone()));
     let mut test_group = ChannelGroup::RGB(RGB::new(1, tx.clone()));
     // let test_fixture = Fixture::new(vec![test_group]);
     // stage.add_fixture(test_fixture);
 
     match test_group {
         ChannelGroup::Single(mut group) => {
-            group.fade(curve.clone(), 500, 255);
+            group.fade_simple(curve.clone(), 500, 255);
             sleep(Duration::from_millis(1000));
-            group.fade(curve.clone(), 500, 0);
+            group.fade_simple(curve.clone(), 500, 0);
         },
         ChannelGroup::RGB(mut group) => {
             group.fade_rgb(curve.clone(), 1000, 255, 0, 0);
@@ -60,6 +61,11 @@ fn test_fade_curve() {
             sleep(Duration::from_millis(1000));
             group.fade_rgb(curve.clone(), 1000, 0, 0, 255, 1);
             sleep(Duration::from_millis(1000));
+        },
+        ChannelGroup::Moving2D(mut group) => {
+            group.fade_simple(curve.clone(), 1000, 255, 255);
+            sleep(Duration::from_millis(1000));
+            group.fade_simple(curve.clone(), 1000, 0, 0);
         }//,
         //_ => {}
     }

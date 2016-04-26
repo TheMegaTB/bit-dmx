@@ -24,7 +24,7 @@ impl Single {
             dmx_tx: dmx_tx
         }
     }
-    pub fn fade(&mut self, curve: FadeCurve, time: FadeTime, end_value: DmxValue) {
+    pub fn fade_simple(&mut self, curve: FadeCurve, time: FadeTime, end_value: DmxValue) {
         let steps = time*FADE_TICKS/1000;
         for value in get_fade_steps_int(self.value, end_value, steps, curve) {
             self.dmx_tx.send((self.channel, value)).unwrap();
