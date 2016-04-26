@@ -1,3 +1,5 @@
+#[macro_use] extern crate log;
+extern crate env_logger;
 extern crate structures;
 extern crate net2;
 
@@ -8,6 +10,8 @@ use std::thread;
 use structures::*;
 
 fn main() {
+    env_logger::init().unwrap();
+
     let socket = UDPSocket::new();
     socket.start_watchdog_server();
     let server = socket.start_backend_server(); //receiving updates (DMX values etc. from frontend)
@@ -15,7 +19,7 @@ fn main() {
     thread::spawn(move || {
         loop {
             let (d, _) = server.receive();
-            println!("{:?}", d); //TODO: do something with the data that isn't completely useless
+            debug!("{:?}", d); //TODO: do something with the data that isn't completely useless
             server.send_to_multicast(&d);
         }
     });
@@ -25,7 +29,7 @@ fn main() {
         use std::net::TcpListener;
 
         let listener = TcpListener::bind("0.0.0.0:8000").unwrap();
-        println!("listening started, ready to accept");
+        info!("listening started, ready to accept");
         for stream in listener.incoming() {
             thread::spawn(|| {
                 let mut stream = stream.unwrap();

@@ -97,14 +97,17 @@ impl UDPSocket {
                     match sock.recv_from(&mut buf) {
                         Ok((_, addr)) => {
                             if buf == WATCHDOG_DATA {
+                                trace!("received valid watchdog data");
                                 s.lock().unwrap()[0] = true;
                                 s_addr.lock().unwrap()[0] = Some(addr.ip());
                             } else {
+                                trace!("received invalid watchdog data");
                                 s.lock().unwrap()[0] = false;
                                 s_addr.lock().unwrap()[0] = None;
                             }
                         },
                         Err(_) => {
+                            trace!("watchdog timeout");
                             s.lock().unwrap()[0] = false;
                             s_addr.lock().unwrap()[0] = None;
                         }
@@ -121,6 +124,7 @@ impl UDPSocket {
 
 impl UDPSocketHandle {
     pub fn send(&self, data: &[u8], target: SocketAddr) -> usize {
+        trace!("SEND {:?} -> {:?}", data, target);
         self.socket.send_to(data, target).ok().expect("Failed to send transmission")
     }
 
@@ -131,6 +135,7 @@ impl UDPSocketHandle {
     pub fn receive(&self) -> ([u8; INPUT_BUFFER], SocketAddr) {
         let mut buf = [0; INPUT_BUFFER];
         let src = self.socket.recv_from(&mut buf).ok().expect("Failed to receive package.").1;
+        trace!("RECV {:?} <- {:?}", buf, src);
         (buf, src)
     }
 }
