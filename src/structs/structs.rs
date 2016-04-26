@@ -26,6 +26,8 @@ pub use fade_curve::*;
 
 pub mod fixtures;
 pub use fixtures::single::*;
+pub use fixtures::rgb::*;
+pub use fixtures::rgba::*;
 
 
 
