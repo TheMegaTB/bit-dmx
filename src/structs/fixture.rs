@@ -6,10 +6,10 @@
 // use DmxChannel;
 // use DmxValue;
 
-use fixtures::single::*;
-use fixtures::rgb::*;
-use fixtures::rgba::*;
-use fixtures::moving_2d::*;
+use channel_groups::single::*;
+use channel_groups::rgb::*;
+use channel_groups::rgba::*;
+use channel_groups::moving_2d::*;
 
 
 

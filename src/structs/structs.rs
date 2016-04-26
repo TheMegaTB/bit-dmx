@@ -24,20 +24,8 @@ pub use stage::*;
 pub mod fade_curve;
 pub use fade_curve::*;
 
-pub mod fixtures;
-pub use fixtures::single::*;
-pub use fixtures::rgb::*;
-pub use fixtures::rgba::*;
-pub use fixtures::moving_2d::*;
-
-
-
-// #[test]
-// #[should_panic]
-// fn test_fade_curve() {
-//     //let curve = FadeCurve::Custom("sin(2*x)".to_string());
-//     let curve = FadeCurve::Squared;
-//     for a in helpers::get_fade_steps(0, 200, 150, curve) {
-//         println!("{:?}", a);
-//     } //fade from 0 to 255 in 5s with 30fps
-// }
+pub mod channel_groups;
+pub use channel_groups::single::*;
+pub use channel_groups::rgb::*;
+pub use channel_groups::rgba::*;
+pub use channel_groups::moving_2d::*;
