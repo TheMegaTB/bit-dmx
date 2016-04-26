@@ -75,7 +75,15 @@ fn test_fade_curve() {
             group.fade_rgb(curve.clone(), 1000, 0, 0, 255);
             sleep(Duration::from_millis(1000));
         },
-        _ => {}
+        ChannelGroup::RGBA(mut group) => {
+            group.fade_rgb(curve.clone(), 1000, 255, 0, 0, 1);
+            sleep(Duration::from_millis(1000));
+            group.fade_rgb(curve.clone(), 1000, 0, 255, 0, 1);
+            sleep(Duration::from_millis(1000));
+            group.fade_rgb(curve.clone(), 1000, 0, 0, 255, 1);
+            sleep(Duration::from_millis(1000));
+        }//,
+        //_ => {}
     }
 
 
