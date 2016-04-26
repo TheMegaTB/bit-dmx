@@ -1,4 +1,4 @@
-
+#[macro_use] extern crate log;
 extern crate net2;
 
 extern crate meval;

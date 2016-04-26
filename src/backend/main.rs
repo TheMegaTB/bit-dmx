@@ -1,20 +1,42 @@
+#[macro_use] extern crate log;
+extern crate env_logger;
 extern crate structures;
 extern crate net2;
 
 mod interface_handler;
 
+use std::thread;
+
 use structures::*;
 
 fn main() {
+    env_logger::init().unwrap();
+
     let socket = UDPSocket::new();
     socket.start_watchdog_server();
     let server = socket.start_backend_server(); //receiving updates (DMX values etc. from frontend)
 
-    loop {
-        let (d, _) = server.receive();
-        println!("{:?}", d); //TODO: do something with the data that isn't completely useless
-        server.send_to_multicast(&d);
-    }
+    thread::spawn(move || {
+        loop {
+            let (d, _) = server.receive();
+            debug!("{:?}", d); //TODO: do something with the data that isn't completely useless
+            server.send_to_multicast(&d);
+        }
+    });
+
+    thread::spawn(|| {
+        use std::io::Write;
+        use std::net::TcpListener;
+
+        let listener = TcpListener::bind("0.0.0.0:8000").unwrap();
+        info!("listening started, ready to accept");
+        for stream in listener.incoming() {
+            thread::spawn(|| {
+                let mut stream = stream.unwrap();
+                stream.write(b"Hello World\r\n").unwrap();
+            });
+        }
+    }).join().unwrap();
 }
 
 
