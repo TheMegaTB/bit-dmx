@@ -7,11 +7,14 @@ use structures::*;
 
 fn main() {
     let socket = UDPSocket::new();
-    let server = socket.start();
     socket.start_watchdog_server();
-    server.send_to_multicast(&[1, 2, 3, 4, 5, 6, 7, 8]);
-    println!("{:?}", server.receive());
-    std::thread::sleep(std::time::Duration::from_secs(3000));
+    let server = socket.start_backend_server(); //receiving updates (DMX values etc. from frontend)
+
+    loop {
+        let (d, _) = server.receive();
+        println!("{:?}", d); //TODO: do something with the data that isn't completely useless
+        server.send_to_multicast(&d);
+    }
 }
 
 
@@ -31,7 +34,8 @@ fn test_fade_curve() {
     let curve = FadeCurve::Squared;
     // let curve = FadeCurve::SquareRoot;
     let mut stage = Stage::new();
-    let mut test_group = ChannelGroup::Single(Single::new(1, tx.clone()));
+    // let mut test_group = ChannelGroup::Single(Single::new(1, tx.clone()));
+    let mut test_group = ChannelGroup::RGB(RGB::new(1, tx.clone()));
     // let test_fixture = Fixture::new(vec![test_group]);
     // stage.add_fixture(test_fixture);
 
@@ -40,6 +44,14 @@ fn test_fade_curve() {
             group.fade(curve.clone(), 500, 255);
             sleep(Duration::from_millis(1000));
             group.fade(curve.clone(), 500, 0);
+        },
+        ChannelGroup::RGB(mut group) => {
+            group.fade_rgb(curve.clone(), 1000, 255, 0, 0);
+            sleep(Duration::from_millis(1000));
+            group.fade_rgb(curve.clone(), 1000, 0, 255, 0);
+            sleep(Duration::from_millis(1000));
+            group.fade_rgb(curve.clone(), 1000, 0, 0, 255);
+            sleep(Duration::from_millis(1000));
         },
         _ => {}
     }
