@@ -3,9 +3,6 @@ extern crate net2;
 
 mod interface_handler;
 
-use std::net::{ SocketAddr };
-use std::str::FromStr;
-
 use structures::*;
 
 fn main() {
@@ -13,18 +10,15 @@ fn main() {
     socket.start_watchdog_server();
     let server = socket.start_backend_server(); //receiving updates (DMX values etc. from frontend)
 
-    let (d, _) = server.receive();
-    //do something with the data
-    server.send_to_multicast(&d);
-
-    // server.send_to_multicast(&[1, 2, 3, 4, 5, 6, 7, 8]);
-    // println!("{:?}", server.receive());
-    // std::thread::sleep(std::time::Duration::from_secs(3000));
+    loop {
+        let (d, _) = server.receive();
+        println!("{:?}", d); //TODO: do something with the data that isn't completely useless
+        server.send_to_multicast(&d);
+    }
 }
 
 
 #[test]
-//#[should_panic]
 fn test_fade_curve() {
     use std::time::Duration;
     use std::thread::sleep;

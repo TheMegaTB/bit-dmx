@@ -8,7 +8,7 @@ use std::thread;
 
 use net2::UdpSocketExt;
 
-const INPUT_BUFFER: usize = 8;
+const INPUT_BUFFER: usize = 4;
 const WATCHDOG_TTL: u64 = 5;
 const WATCHDOG_DATA: [u8; 3] = [68, 77, 88]; // "DMX" as bytes
 
@@ -56,6 +56,13 @@ impl UDPSocket {
         let sock = UdpSocket::bind(SocketAddrV4::new(self.local_addr, port)).unwrap();
         if multicast { sock.join_multicast_v4(&self.multicast_addr, &self.local_addr).ok().expect("Failed to join multicast."); }
         sock
+    }
+
+    pub fn start_client(&self) -> UDPSocketHandle {
+        UDPSocketHandle {
+            socket: self.assemble_socket(self.port, true),
+            multicast_addr: SocketAddr::V4(SocketAddrV4::new(self.local_addr, self.port))
+        }
     }
 
     pub fn start_backend_server(&self) -> UDPSocketHandle {
