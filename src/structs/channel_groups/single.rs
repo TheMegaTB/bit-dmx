@@ -11,7 +11,7 @@ use std::thread::sleep;
 
 #[derive(Debug)]
 pub struct Single {
-    channel: DmxChannel,
+    pub channel: DmxChannel,
     value: DmxValue,
     dmx_tx: mpsc::Sender<(DmxChannel, DmxValue)>
 }
