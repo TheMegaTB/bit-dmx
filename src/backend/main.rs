@@ -2,8 +2,6 @@
 extern crate env_logger;
 extern crate structures;
 extern crate net2;
-use std::time::Duration;
-use std::thread::sleep;
 
 mod interface_handler;
 
@@ -39,6 +37,7 @@ fn main() {
             else if address_type == 2 {
                 // Switch
             }
+            println!("{:?}, {:?}", address, value);
 
 
 
@@ -82,7 +81,7 @@ fn test_fade_curve() {
     // let mut test_group = ChannelGroup::Single(Single::new(stage.get_channel_object(1)));
     // let mut test_group = ChannelGroup::Moving2D(Moving2D::new(stage.get_channel_object(1), stage.get_channel_object(2)));
     // let mut test_group = ChannelGroup::RGB(RGB::new(stage.get_channel_object(1), stage.get_channel_object(2), stage.get_channel_object(3)));
-    let mut test_group = ChannelGroup::RGBA(RGBA::new(stage.get_channel_object(1), stage.get_channel_object(2), stage.get_channel_object(3), stage.get_channel_object(4)));
+    let test_group = ChannelGroup::RGBA(RGBA::new(stage.get_channel_object(1), stage.get_channel_object(2), stage.get_channel_object(3), stage.get_channel_object(4)));
 
     match test_group {
         ChannelGroup::Single(mut group) => {
