@@ -11,7 +11,7 @@ use structures::DmxValue;
 extern {
     fn open_port(baudrate: usize, port: *const c_char) -> bool;
     fn close_port();
-    fn write_dmx(channel: u16, value: u8);
+    fn write_dmx(address: u16, value: u8);
     fn is_connected() -> bool;
     fn set_fake_interface_mode(enabled: bool);
 }
@@ -26,8 +26,8 @@ fn disconnect() {
     unsafe { close_port() }
 }
 
-fn write_to_dmx(channel: DmxAddress, value: DmxValue) {
-    unsafe { write_dmx(channel, value) }
+fn write_to_dmx(address: DmxAddress, value: DmxValue) {
+    unsafe { write_dmx(address, value) }
 }
 
 pub struct Interface {
@@ -126,8 +126,8 @@ impl InterfaceHandle {
         (tx, interrupt_tx)
     }
 
-    pub fn write_to_dmx(&self, channel: DmxAddress, value: DmxValue) {
-        write_to_dmx(channel, value);
+    pub fn write_to_dmx(&self, address: DmxAddress, value: DmxValue) {
+        write_to_dmx(address, value);
     }
 
     pub fn disconnect(self) -> Interface {
