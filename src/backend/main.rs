@@ -76,19 +76,13 @@ fn test_fade_curve() {
 
     //let curve = FadeCurve::Custom("-cos(1.5*6.28318530718*x)*0.5+0.5".to_string());
     let curve = FadeCurve::Squared;
-
-
     let mut stage = Stage::new(tx);
 
 
-    // let mut test_group = ChannelGroup::Single(Single::new(stage.get_channel_object(3)));
-    let mut test_group = ChannelGroup::Moving2D(Moving2D::new(stage.get_channel_object(3), stage.get_channel_object(4)));
-    // println!("set to 10");
-    // let a = stage.get_channel_object(3);
-    // a.lock().unwrap().set(10);
-    // a.lock().unwrap().set(20);
-    //
-    // println!("start fade");
+    // let mut test_group = ChannelGroup::Single(Single::new(stage.get_channel_object(1)));
+    // let mut test_group = ChannelGroup::Moving2D(Moving2D::new(stage.get_channel_object(1), stage.get_channel_object(2)));
+    // let mut test_group = ChannelGroup::RGB(RGB::new(stage.get_channel_object(1), stage.get_channel_object(2), stage.get_channel_object(3)));
+    let mut test_group = ChannelGroup::RGBA(RGBA::new(stage.get_channel_object(1), stage.get_channel_object(2), stage.get_channel_object(3), stage.get_channel_object(4)));
 
     match test_group {
         ChannelGroup::Single(mut group) => {

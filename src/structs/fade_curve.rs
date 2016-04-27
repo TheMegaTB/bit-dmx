@@ -1,4 +1,3 @@
-
 use meval::Expr;
 
 #[derive(Debug, Clone)]
@@ -6,6 +5,7 @@ pub enum FadeCurve {
     Linear,
     Squared,
     SquareRoot,
+    Sin(u8),
     Custom(String)
 }
 
@@ -27,6 +27,7 @@ impl FadeCurve {
             FadeCurve::Linear => Box::new(linear),
             FadeCurve::Squared => Box::new(squared),
             FadeCurve::SquareRoot => Box::new(square_root),
+            FadeCurve::Sin(i) => Expr::from_str("-cos(".to_string() + &i.to_string() + &".5*6.28318530718*x)*0.5+0.5".to_string()).unwrap().bind("x").unwrap(),
             FadeCurve::Custom(e) => Expr::from_str(e).unwrap().bind("x").unwrap()
         }
 
