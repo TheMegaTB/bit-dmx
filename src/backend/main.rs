@@ -81,19 +81,24 @@ fn test_fade_curve() {
     let mut stage = Stage::new(tx);
 
 
-    let mut test_group = ChannelGroup::Single(Single::new(stage.get_channel_object(3)));
-    println!("set to 10");
-    let a = stage.get_channel_object(3);
-    a.lock().unwrap().set(10);
-    a.lock().unwrap().set(20);
-
-    println!("start fade");
+    // let mut test_group = ChannelGroup::Single(Single::new(stage.get_channel_object(3)));
+    let mut test_group = ChannelGroup::Moving2D(Moving2D::new(stage.get_channel_object(3), stage.get_channel_object(4)));
+    // println!("set to 10");
+    // let a = stage.get_channel_object(3);
+    // a.lock().unwrap().set(10);
+    // a.lock().unwrap().set(20);
+    //
+    // println!("start fade");
 
     match test_group {
         ChannelGroup::Single(mut group) => {
             group.fade_simple(curve.clone(), 500, 255);
-            sleep(Duration::from_millis(1000));
-            group.fade_simple(curve.clone(), 500, 0);
+            println!("fade up");
+            sleep(Duration::from_millis(2000));
+            group.activate_preheat(curve.clone(), 500);
+            println!("pre");
+            sleep(Duration::from_millis(2000));
+            group.fade_simple(curve.clone(), 1000, 0);
         },
         ChannelGroup::RGB(mut group) => {
             group.fade_rgb(curve.clone(), 1000, 255, 0, 0);
