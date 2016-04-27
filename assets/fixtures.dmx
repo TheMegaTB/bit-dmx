@@ -1,0 +1,17 @@
+Fixture {
+   name("ledpar");
+   rgba(0, 1, 2, 3);
+   single(4) preheat(10);
+}
+
+Fixture {
+  name("hz200");
+  single(0);
+  single(1);
+}
+
+Stage {
+  1 -> ledpar("LED-FL");
+  6 -> hz200("Hazer");
+  8 -> ledpar("LED-FR");
+}

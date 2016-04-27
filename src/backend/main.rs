@@ -14,6 +14,8 @@ use structures::*;
 fn main() {
     env_logger::init().unwrap();
 
+    dmx_parser::read_file();
+
     let socket = UDPSocket::new();
     socket.start_watchdog_server();
     let server = socket.start_backend_server(); //receiving updates (DMX values etc. from frontend)
@@ -77,13 +79,13 @@ fn test_fade_curve() {
 
 
     let mut stage = Stage::new(tx);
+
+
     let mut test_group = ChannelGroup::Single(Single::new(stage.get_channel_object(3)));
     println!("set to 10");
     let a = stage.get_channel_object(3);
     a.lock().unwrap().set(10);
     a.lock().unwrap().set(20);
-    // let test_fixture = Fixture::new(vec![test_group]);
-    // stage.add_fixture(test_fixture);
 
     println!("start fade");
 

@@ -18,6 +18,9 @@ pub use udp_socket::*;
 pub mod channel;
 pub use channel::*;
 
+pub mod dmx_parser;
+pub use dmx_parser::*;
+
 pub mod fixture;
 pub use fixture::*;
 
