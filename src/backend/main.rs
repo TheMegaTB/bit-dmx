@@ -42,7 +42,7 @@ fn main() {
 }
 
 
-#[test]
+//#[test]
 fn test_fade_curve() {
     use std::time::Duration;
     use std::thread::sleep;

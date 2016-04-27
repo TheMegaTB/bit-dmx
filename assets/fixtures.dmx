@@ -1,7 +1,7 @@
 Fixture {
    name("ledpar");
    rgba(0, 1, 2, 3);
-   single(4), preheat(10);
+   single(4) preheat(10);
 }
 
 Fixture {
