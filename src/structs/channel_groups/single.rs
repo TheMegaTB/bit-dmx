@@ -1,35 +1,43 @@
-use DmxChannel;
 use DmxValue;
+use Channel;
 use FadeCurve;
 use FadeTime;
-use std::sync::mpsc;
 use get_fade_steps_int;
 use FADE_TICKS;
+use std::sync::{Arc, Mutex};
 
 use std::time::Duration;
 use std::thread::sleep;
 
 #[derive(Debug)]
 pub struct Single {
-    channel: DmxChannel,
-    value: DmxValue,
-    dmx_tx: mpsc::Sender<(DmxChannel, DmxValue)>
+    channel1: Arc<Mutex<Channel>>
 }
 
 impl Single {
-    pub fn new(channel: DmxChannel, dmx_tx: mpsc::Sender<(DmxChannel, DmxValue)>) -> Single {
+    pub fn new(channel1: Arc<Mutex<Channel>>) -> Single {
         Single {
-            channel: channel,
-            value: 0,
-            dmx_tx: dmx_tx
+            channel1: channel1
         }
     }
     pub fn fade_simple(&mut self, curve: FadeCurve, time: FadeTime, end_value: DmxValue) {
         let steps = time*FADE_TICKS/1000;
-        for value in get_fade_steps_int(self.value, end_value, steps, curve) {
-            self.dmx_tx.send((self.channel, value)).unwrap();
-            self.value = value;
+        let start_value;
+        {start_value = self.channel1.lock().unwrap().get();}
+        for value in get_fade_steps_int(start_value, end_value, steps, curve) {
+            println!("{}", value);
+            {self.channel1.lock().unwrap().set(value);}
             sleep(Duration::from_millis((time/steps) as u64));
         }
+    }
+
+    pub fn activate_preheat(&mut self, curve: FadeCurve, time: FadeTime) {
+        let new_value = self.channel1.lock().unwrap().preheat_value;
+        self.fade_simple(curve, time, new_value);
+        self.channel1.lock().unwrap().preheat_state = true;
+    }
+
+    pub fn deactivate_preheat(&mut self, curve: FadeCurve, time: FadeTime) {
+        self.channel1.lock().unwrap().preheat_state = false;
     }
 }

@@ -1,11 +1,3 @@
-// use std::thread;
-// use std::sync::mpsc;
-//
-// use FadeCurve;
-// use FadeTime;
-// use DmxChannel;
-// use DmxValue;
-
 use channel_groups::single::*;
 use channel_groups::rgb::*;
 use channel_groups::rgba::*;

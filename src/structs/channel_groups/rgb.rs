@@ -1,4 +1,4 @@
-use DmxChannel;
+use DmxAddress;
 use DmxValue;
 use FadeCurve;
 use FadeTime;
@@ -14,15 +14,15 @@ use std::thread::sleep;
 
 #[derive(Debug)]
 pub struct RGB {
-    channel: DmxChannel,
+    channel: DmxAddress,
     value_r: DmxValue,
     value_g: DmxValue,
     value_b: DmxValue,
-    dmx_tx: mpsc::Sender<(DmxChannel, DmxValue)>
+    dmx_tx: mpsc::Sender<(DmxAddress, DmxValue)>
 }
 
 impl RGB {
-    pub fn new(channel: DmxChannel, dmx_tx: mpsc::Sender<(DmxChannel, DmxValue)>) -> RGB {
+    pub fn new(channel: DmxAddress, dmx_tx: mpsc::Sender<(DmxAddress, DmxValue)>) -> RGB {
         RGB {
             channel: channel,
             value_r: 0,

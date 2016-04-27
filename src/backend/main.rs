@@ -2,6 +2,8 @@
 extern crate env_logger;
 extern crate structures;
 extern crate net2;
+use std::time::Duration;
+use std::thread::sleep;
 
 mod interface_handler;
 
@@ -15,11 +17,30 @@ fn main() {
     let socket = UDPSocket::new();
     socket.start_watchdog_server();
     let server = socket.start_backend_server(); //receiving updates (DMX values etc. from frontend)
+    // let stage = Stage::new(tx);
 
     thread::spawn(move || {
         loop {
             let (d, _) = server.receive();
             debug!("{:?}", d); //TODO: do something with the data that isn't completely useless
+
+            let address_type:u8 = d[0];
+            let address: u16 = (d[1] as u16) << 8 + d[2] as u16;
+            let value: u8 = d[3];
+
+            if address_type == 0 {
+                // Channel
+            }
+            else if address_type == 1 {
+                // Scene
+            }
+            else if address_type == 2 {
+                // Switch
+            }
+
+
+
+            //stage.fixtures.push();
             server.send_to_multicast(&d);
         }
     });
@@ -50,17 +71,21 @@ fn test_fade_curve() {
     let interface = Interface::new().connect();
     if interface.is_err() { panic!(interface) }
     let (tx, interrupt_tx) = interface.unwrap().to_thread();
-    tx.send((1, 0)).unwrap();
 
     //let curve = FadeCurve::Custom("-cos(1.5*6.28318530718*x)*0.5+0.5".to_string());
     let curve = FadeCurve::Squared;
-    // let curve = FadeCurve::SquareRoot;
-    let mut stage = Stage::new();
-    // let mut test_group = ChannelGroup::Single(Single::new(1, tx.clone()));
-    // let mut test_group = ChannelGroup::RGB(RGB::new(1, tx.clone()));
-    let mut test_group = ChannelGroup::RGB(RGB::new(1, tx.clone()));
+
+
+    let mut stage = Stage::new(tx);
+    let mut test_group = ChannelGroup::Single(Single::new(stage.get_channel_object(3)));
+    println!("set to 10");
+    let a = stage.get_channel_object(3);
+    a.lock().unwrap().set(10);
+    a.lock().unwrap().set(20);
     // let test_fixture = Fixture::new(vec![test_group]);
     // stage.add_fixture(test_fixture);
+
+    println!("start fade");
 
     match test_group {
         ChannelGroup::Single(mut group) => {

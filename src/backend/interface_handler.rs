@@ -5,7 +5,7 @@ use std::thread;
 use std::ffi::CString;
 use std::os::raw::c_char;
 
-use structures::DmxChannel;
+use structures::DmxAddress;
 use structures::DmxValue;
 
 extern {
@@ -26,7 +26,7 @@ fn disconnect() {
     unsafe { close_port() }
 }
 
-fn write_to_dmx(channel: DmxChannel, value: DmxValue) {
+fn write_to_dmx(channel: DmxAddress, value: DmxValue) {
     unsafe { write_dmx(channel, value) }
 }
 
@@ -77,7 +77,7 @@ impl Interface {
     }
 }
 
-type DmxTouple = (DmxChannel, DmxValue);
+type DmxTouple = (DmxAddress, DmxValue);
 fn insert_to_vector(cache: &mut Vec<DmxTouple>, elem: DmxTouple) {
     match cache.iter().position(|&x| x.0 == elem.0 ) {
         Some(index) => cache[index] = elem,
@@ -86,7 +86,7 @@ fn insert_to_vector(cache: &mut Vec<DmxTouple>, elem: DmxTouple) {
 }
 
 impl InterfaceHandle {
-    pub fn to_thread(self) -> (mpsc::Sender<(DmxChannel, DmxValue)>, mpsc::Sender<bool>) {
+    pub fn to_thread(self) -> (mpsc::Sender<(DmxAddress, DmxValue)>, mpsc::Sender<bool>) {
         let (tx, rx) = mpsc::channel();
         let (interrupt_tx, interrupt_rx) = mpsc::channel();
         thread::Builder::new().name("DMX-IF".to_string()).spawn(move|| {
@@ -126,7 +126,7 @@ impl InterfaceHandle {
         (tx, interrupt_tx)
     }
 
-    pub fn write_to_dmx(&self, channel: DmxChannel, value: DmxValue) {
+    pub fn write_to_dmx(&self, channel: DmxAddress, value: DmxValue) {
         write_to_dmx(channel, value);
     }
 

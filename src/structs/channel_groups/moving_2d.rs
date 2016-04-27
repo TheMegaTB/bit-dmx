@@ -1,11 +1,8 @@
-use DmxChannel;
+use DmxAddress;
 use DmxValue;
 use FadeCurve;
 use FadeTime;
-use rgb_to_hsv;
-use hsv_to_rgb;
 use std::sync::mpsc;
-use get_fade_steps;
 use get_fade_steps_int;
 use FADE_TICKS;
 
@@ -14,14 +11,14 @@ use std::thread::sleep;
 
 #[derive(Debug)]
 pub struct Moving2D {
-    channel: DmxChannel,
+    channel: DmxAddress,
     x: DmxValue,
     y: DmxValue,
-    dmx_tx: mpsc::Sender<(DmxChannel, DmxValue)>
+    dmx_tx: mpsc::Sender<(DmxAddress, DmxValue)>
 }
 
 impl Moving2D {
-    pub fn new(channel: DmxChannel, dmx_tx: mpsc::Sender<(DmxChannel, DmxValue)>) -> Moving2D {
+    pub fn new(channel: DmxAddress, dmx_tx: mpsc::Sender<(DmxAddress, DmxValue)>) -> Moving2D {
         Moving2D {
             channel: channel,
             x: 0,
