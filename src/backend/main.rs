@@ -35,6 +35,8 @@ fn main() {
     //let test_switch2 = ValueCollection::new(test_values2);
     //let id2 = stage.add_switch(test_switch2);
 
+    stage.activate_switch(id1, 255.0);
+    sleep(Duration::from_millis(2000));
     match stage.fixtures[0].channel_groups[1] {
         ChannelGroup::Single(ref mut group) => {
             group.activate_preheat(FadeCurve::Squared, 1000);
@@ -44,12 +46,17 @@ fn main() {
     sleep(Duration::from_millis(2000));
 
     println!("pre");
-    stage.activate_switch(id1, 255.0);
-    sleep(Duration::from_millis(2000));
+
     println!("on");
     stage.deactivate_switch(id1);
+    sleep(Duration::from_millis(2000));
 
-
+    match stage.fixtures[0].channel_groups[1] {
+        ChannelGroup::Single(ref mut group) => {
+            group.deactivate_preheat(FadeCurve::Squared, 1000);
+        },
+        _ => {}
+    }
 
 
 

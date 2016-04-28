@@ -49,14 +49,25 @@ impl Single {
     }
 
     pub fn activate_preheat(&mut self, curve: FadeCurve, time: FadeTime) {
-        let start_value = {self.channel1.lock().unwrap().preheat_value};
-        let end_value = {self.channel1.lock().unwrap().max_preheat_value};
-        self.fade(curve, time, start_value, end_value, true);
+        let preheat_value = {self.channel1.lock().unwrap().preheat_value};
+        let max_preheat_value = {self.channel1.lock().unwrap().max_preheat_value};
+        let value = {self.channel1.lock().unwrap().value};
+        if max_preheat_value > value {
+            self.fade(curve, time, preheat_value, max_preheat_value, true);
+        }
+        else {
+            self.channel1.lock().unwrap().set_preheat(max_preheat_value);
+        }
     }
 
     pub fn deactivate_preheat(&mut self, curve: FadeCurve, time: FadeTime) {
-        let start_value = {self.channel1.lock().unwrap().preheat_value};
-        let end_value = 0;
-        self.fade(curve, time, start_value, end_value, true);
+        let preheat_value = {self.channel1.lock().unwrap().preheat_value};
+        let value = {self.channel1.lock().unwrap().value};
+        if preheat_value > value {
+            self.fade(curve, time, preheat_value, 0, true);
+        }
+        else {
+            self.channel1.lock().unwrap().set_preheat(0);
+        }
     }
 }
