@@ -15,7 +15,6 @@ use FadeTime;
 pub struct Stage {
     pub channels: Vec<Arc<Mutex<Channel>>>,
     pub fixtures: Vec<Fixture>,
-    scenes: Vec<ValueCollection>,
     switches: Vec<ValueCollection>,
     dmx_tx: mpsc::Sender<(DmxAddress, DmxValue)>
 }
@@ -25,7 +24,6 @@ impl Stage {
         Stage {
             channels: Vec::new(),
             fixtures: Vec::new(),
-            scenes: Vec::new(),
             switches: Vec::new(),
             dmx_tx: dmx_tx
         }
@@ -35,22 +33,9 @@ impl Stage {
         self.fixtures.len() - 1
     }
 
-    pub fn add_scene(&mut self, scene: ValueCollection) -> usize {
-        self.scenes.push(scene);
-        self.scenes.len() - 1
-    }
-
     pub fn add_switch(&mut self, switch: ValueCollection) -> usize {
         self.switches.push(switch);
         self.switches.len() - 1
-    }
-
-    pub fn activate_scenes(&mut self, scene_id: usize, dimmer_value: u8) {
-
-    }
-
-    pub fn deactivate_all_scenes(&mut self) {
-
     }
 
     pub fn activate_switch(&mut self, switch_id: usize, dimmer_value: f64) {

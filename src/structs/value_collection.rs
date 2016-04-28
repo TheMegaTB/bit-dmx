@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
 use ChannelGroupValue;
-use ChannelGroup;
 use DmxValue;
 use FadeTime;
 use FadeCurve;
