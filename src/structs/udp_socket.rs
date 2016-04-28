@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 use std::net::{ UdpSocket, IpAddr, Ipv4Addr, SocketAddr, SocketAddrV4 };
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
