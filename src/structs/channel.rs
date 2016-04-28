@@ -17,13 +17,13 @@ pub struct Channel {
 }
 
 impl Channel {
-    pub fn new(address: DmxAddress, old_value: DmxValue, preheat_value: DmxValue, dmx_tx: mpsc::Sender<(DmxAddress, DmxValue)>) -> Channel {
+    pub fn new(address: DmxAddress, old_value: DmxValue, max_preheat_value: DmxValue, dmx_tx: mpsc::Sender<(DmxAddress, DmxValue)>) -> Channel {
         dmx_tx.send((address, old_value)).unwrap();
         Channel {
             current_value: old_value,
             value: old_value,
-            preheat_value: preheat_value,
-            max_preheat_value: preheat_value,
+            preheat_value: 0,
+            max_preheat_value: max_preheat_value,
             address: address,
             dmx_tx: dmx_tx
         }
