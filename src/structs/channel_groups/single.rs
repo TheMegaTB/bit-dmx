@@ -51,34 +51,11 @@ impl Single {
         let start_value = {self.channel1.lock().unwrap().preheat_value};
         let end_value = {self.channel1.lock().unwrap().max_preheat_value};
         self.fade(curve, time, start_value, end_value, true);
-
-
-
-        // channel1_locked.preheat_state = 1;
-        // let new_value = channel1_locked.preheat_value;
-        // let current_value = channel1_locked.get();
-        // println!("{:?}", current_value);
-        // println!("{:?}", new_value);
-        // if new_value > current_value {
-        //     self.fade(curve, time, current_value, new_value);
-        // }
-        // sleep(Duration::from_millis(time as u64));
-        // sleep(Duration::from_millis(2000));
-        // println!("fade finished: {:?}: {:?}", time as u64, Duration::from_millis(time as u64));
-        // channel1_locked.preheat_state = 2;
     }
 
     pub fn deactivate_preheat(&mut self, curve: FadeCurve, time: FadeTime) {
         let start_value = {self.channel1.lock().unwrap().preheat_value};
         let end_value = 0;
         self.fade(curve, time, start_value, end_value, true);
-        // let channel1 = self.channel1.clone();
-        // let mut channel1_locked = channel1.lock().unwrap();
-        // channel1_locked.preheat_state = 1;
-        // let new_value = channel1_locked.value;
-        // let current_value = channel1_locked.get();
-        // self.fade(curve, time, current_value, new_value);
-        // sleep(Duration::from_millis(time as u64));
-        // channel1_locked.preheat_state = 0;
     }
 }
