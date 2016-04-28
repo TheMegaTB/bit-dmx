@@ -12,8 +12,9 @@ fn main() {
     println!("{:?}", watchdog.get_server_addr());
 
     if watchdog.is_alive() {
-        client.send(&[0,0,5,101], SocketAddr::new(watchdog.get_server_addr().unwrap(), 8001));
-        client.send(&[0,0,4,101], SocketAddr::new(watchdog.get_server_addr().unwrap(), 8001));
+        let shift: u8 = 128;
+        client.send(&[1,0,5,101], SocketAddr::new(watchdog.get_server_addr().unwrap(), 8001));
+        client.send(&[shift + 1,0,4,13], SocketAddr::new(watchdog.get_server_addr().unwrap(), 8001));
         println!("{:?}", client.receive());
     }
 }

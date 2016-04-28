@@ -74,18 +74,17 @@ fn main() {
             let (d, _) = server.receive();
             debug!("{:?}", d); //TODO: do something with the data that isn't completely useless
 
-            let address_type:u8 = d[0];
+            let address_type:u8 = d[0] & (2u8.pow(7)-1);
+            let shift: bool = d[0] & (2u8.pow(7)) != 0;
             let address: u16 = ((d[1] as u16) << 8) + (d[2] as u16);
             let value: u8 = d[3];
 
             if address_type == 0 {
-                {stage.channels[address as usize].lock().unwrap().set(value);}
+                stage.channels[address as usize].lock().unwrap().set(value);
             }
             else if address_type == 1 {
-                // Scene
-            }
-            else if address_type == 2 {
                 // Switch
+                println!("Set switch with address {:?} to {:?} (shifted: {:?})", address, value, shift);
             }
             println!("{:?}, {:?}", address, value);
 
