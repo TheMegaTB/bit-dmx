@@ -35,7 +35,6 @@ pub struct Interface {
 }
 
 pub struct InterfaceHandle {
-    values: Vec<DmxValue>,
     interface: Interface
 }
 
@@ -61,13 +60,11 @@ impl Interface {
         if cfg!( feature = "fake_if" ) {
             unsafe { set_fake_interface_mode(true); }
             Ok(InterfaceHandle {
-                values: Vec::new(),
                 interface: self
             })
         } else {
             match connect(self.baudrate, self.port.clone()) {
                 true => Ok(InterfaceHandle {
-                    values: Vec::new(),
                     interface: self
                 }),
                 false => Err("Couldn't connect.")
