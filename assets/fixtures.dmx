@@ -1,7 +1,7 @@
 Fixture {
    name("ledpar");
-   rgba(0, 1, 2, 3);
-   single(4) preheat(10);
+   rgb(0, 1, 2);
+   single(4); preheat(10);
 }
 
 Fixture {
@@ -14,4 +14,5 @@ Stage {
   1 -> ledpar("LED-FL");
   6 -> hz200("Hazer");
   8 -> ledpar("LED-FR");
+  13 -> ledpar("LED-BR");
 }

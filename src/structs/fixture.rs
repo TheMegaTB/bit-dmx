@@ -7,13 +7,15 @@ use channel_groups::moving_2d::*;
 
 #[derive(Debug)]
 pub struct Fixture {
-    channel_groups: Vec<ChannelGroup>
+    pub channel_groups: Vec<ChannelGroup>,
+    name: String
 }
 
 impl Fixture {
-    pub fn new(channel_groups: Vec<ChannelGroup>) -> Fixture {
+    pub fn new(name: String, channel_groups: Vec<ChannelGroup>) -> Fixture {
         Fixture {
-            channel_groups: channel_groups
+            channel_groups: channel_groups,
+            name: name
         }
     }
 }

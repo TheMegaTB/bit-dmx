@@ -4,20 +4,64 @@ extern crate structures;
 extern crate net2;
 
 mod interface_handler;
+// use std::thread;
 
-use std::thread;
+use std::time::Duration;
+use std::thread::{self, sleep};
 
 use structures::*;
+use interface_handler::*;
+use std::collections::HashMap;
 
 fn main() {
     env_logger::init().unwrap();
 
-    dmx_parser::read_file();
+    let interface = Interface::new().connect();
+    if interface.is_err() { panic!(interface) }
+    let (tx, _interrupt_tx) = interface.unwrap().to_thread();
+    let mut stage = Parser::new(Stage::new(tx)).parse();
+    //println!("{:?}", stage);
+
+
+    let mut test_values1 = HashMap::new();
+    test_values1.insert((0, 1), (vec![255], FadeCurve::Squared, 1000));
+    // test_values1.insert((0, 0), (vec![255, 100, 100], FadeCurve::Squared, 1000));
+    // test_values1.insert((2, 0), (vec![100, 50, 255], FadeCurve::Squared, 10000));
+    let test_switch1 = ValueCollection::new(test_values1);
+    let id1 = stage.add_switch(test_switch1);
+
+    //let mut test_values2 = HashMap::new();
+    //test_values1.insert((2, 0), (vec![255, 255, 255, 100], FadeCurve::Squared, 1000));
+    //test_values2.insert((0, 1), (vec![255], FadeCurve::Squared, 1000));
+    //let test_switch2 = ValueCollection::new(test_values2);
+    //let id2 = stage.add_switch(test_switch2);
+
+    match stage.fixtures[0].channel_groups[1] {
+        ChannelGroup::Single(ref mut group) => {
+            group.activate_preheat(FadeCurve::Squared, 1000);
+        },
+        _ => {}
+    }
+    sleep(Duration::from_millis(2000));
+
+    println!("pre");
+    stage.activate_switch(id1, 255.0);
+    sleep(Duration::from_millis(2000));
+    println!("on");
+    stage.deactivate_switch(id1);
+
+
+
+
+
 
     let socket = UDPSocket::new();
     socket.start_watchdog_server();
     let server = socket.start_backend_server(); //receiving updates (DMX values etc. from frontend)
     // let stage = Stage::new(tx);
+
+
+
 
     thread::spawn(move || {
         loop {
@@ -25,11 +69,11 @@ fn main() {
             debug!("{:?}", d); //TODO: do something with the data that isn't completely useless
 
             let address_type:u8 = d[0];
-            let address: u16 = (d[1] as u16) << 8 + d[2] as u16;
+            let address: u16 = ((d[1] as u16) << 8) + (d[2] as u16);
             let value: u8 = d[3];
 
             if address_type == 0 {
-                // Channel
+                {stage.channels[address as usize].lock().unwrap().set(value);}
             }
             else if address_type == 1 {
                 // Scene

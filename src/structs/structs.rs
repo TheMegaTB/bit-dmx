@@ -7,6 +7,7 @@ pub use meval::*;
 pub type FadeTime = usize;
 pub type DmxAddress = u16;
 pub type DmxValue = u8;
+pub type ChannelGroupValue = (Vec<DmxValue>, FadeCurve, FadeTime);
 pub const FADE_TICKS: FadeTime = 30;
 
 pub mod helpers;
@@ -24,11 +25,8 @@ pub use dmx_parser::*;
 pub mod fixture;
 pub use fixture::*;
 
-pub mod scene;
-pub use scene::*;
-
-pub mod switch;
-pub use switch::*;
+pub mod value_collection;
+pub use value_collection::*;
 
 pub mod stage;
 pub use stage::*;
