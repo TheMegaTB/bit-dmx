@@ -27,9 +27,8 @@ impl Moving2D {
 
     pub fn fade_simple(&mut self, curve: FadeCurve, time: FadeTime, end_x: DmxValue, end_y: DmxValue) {
         let steps = time*FADE_TICKS/1000;
-        let (start_x, start_y);
-        {start_x = self.channel_x.lock().unwrap().get()}
-        {start_y = self.channel_y.lock().unwrap().get()}
+        let start_x = {self.channel_x.lock().unwrap().get()};
+        let start_y = {self.channel_y.lock().unwrap().get()};
         for (&x, &y) in get_fade_steps_int(start_x, end_x, steps, curve.clone()).iter().zip(get_fade_steps_int(start_y, end_y, steps, curve.clone()).iter()) {
             {self.channel_x.lock().unwrap().set(x);}
             {self.channel_y.lock().unwrap().set(y);}

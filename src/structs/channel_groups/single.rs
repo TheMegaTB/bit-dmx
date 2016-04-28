@@ -23,9 +23,12 @@ impl Single {
         }
     }
     pub fn fade_simple(&mut self, curve: FadeCurve, time: FadeTime, end_value: DmxValue) {
+        let start_value = {self.channel1.lock().unwrap().value};
+        self.fade(curve, time, start_value, end_value);
+    }
+
+    pub fn fade(&mut self, curve: FadeCurve, time: FadeTime, start_value: DmxValue, end_value: DmxValue) {
         let steps = time*FADE_TICKS/1000;
-        let start_value;
-        {start_value = self.channel1.lock().unwrap().get();}
         for value in get_fade_steps_int(start_value, end_value, steps, curve) {
             {self.channel1.lock().unwrap().set(value);}
             sleep(Duration::from_millis((time/steps) as u64));
@@ -33,14 +36,22 @@ impl Single {
     }
 
     pub fn activate_preheat(&mut self, curve: FadeCurve, time: FadeTime) {
-        let new_value = self.channel1.lock().unwrap().preheat_value;
-        self.fade_simple(curve, time, new_value);
-        self.channel1.lock().unwrap().preheat_state = true;
+        {self.channel1.lock().unwrap().preheating = true};
+        let new_value = {self.channel1.lock().unwrap().preheat_value};
+        let current_value = {self.channel1.lock().unwrap().get()};
+        if new_value > current_value {
+            self.fade(curve, time, current_value, new_value);
+        }
+        {self.channel1.lock().unwrap().preheat_state = true;}
+        {self.channel1.lock().unwrap().preheating = false};
     }
 
     pub fn deactivate_preheat(&mut self, curve: FadeCurve, time: FadeTime) {
-        let new_value = self.channel1.lock().unwrap().preheat_value;
-        self.channel1.lock().unwrap().preheat_state = false;
-        self.fade_simple(curve, time, new_value);
+        {self.channel1.lock().unwrap().preheat_state = false;}
+        {self.channel1.lock().unwrap().preheating = true};
+        let new_value = self.channel1.lock().unwrap().value;
+        let current_value = {self.channel1.lock().unwrap().get()};
+        self.fade(curve, time, current_value, new_value);
+        {self.channel1.lock().unwrap().preheating = false};
     }
 }

@@ -53,10 +53,9 @@ impl RGB {
 
     pub fn fade_simple(&mut self, curve: FadeCurve, time: FadeTime, end_r: DmxValue, end_g: DmxValue, end_b: DmxValue) {
         let steps = time*FADE_TICKS/1000;
-        let (start_r, start_g, start_b);
-        {start_r = self.channel_r.lock().unwrap().get();}
-        {start_g = self.channel_g.lock().unwrap().get();}
-        {start_b = self.channel_b.lock().unwrap().get();}
+        let start_r = {self.channel_r.lock().unwrap().get()};
+        let start_g = {self.channel_g.lock().unwrap().get()};
+        let start_b = {self.channel_b.lock().unwrap().get()};
         for ((&r, &g), &b) in get_fade_steps_int(start_r, end_r, steps, curve.clone()).iter().zip(get_fade_steps_int(start_g, end_g, steps, curve.clone()).iter()).zip(get_fade_steps_int(start_b, end_b, steps, curve.clone()).iter()) {
             {self.channel_r.lock().unwrap().set(r);}
             {self.channel_g.lock().unwrap().set(g);}

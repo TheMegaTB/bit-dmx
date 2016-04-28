@@ -75,23 +75,25 @@ fn test_fade_curve() {
 
     //let curve = FadeCurve::Custom("-cos(1.5*6.28318530718*x)*0.5+0.5".to_string());
     let curve = FadeCurve::Squared;
+    let curve = FadeCurve::Sin(0);
     let mut stage = Stage::new(tx);
 
 
-    // let mut test_group = ChannelGroup::Single(Single::new(stage.get_channel_object(1)));
+    let mut test_group = ChannelGroup::Single(Single::new(stage.get_channel_object(1)));
     // let mut test_group = ChannelGroup::Moving2D(Moving2D::new(stage.get_channel_object(1), stage.get_channel_object(2)));
     // let mut test_group = ChannelGroup::RGB(RGB::new(stage.get_channel_object(1), stage.get_channel_object(2), stage.get_channel_object(3)));
-    let test_group = ChannelGroup::RGBA(RGBA::new(stage.get_channel_object(1), stage.get_channel_object(2), stage.get_channel_object(3), stage.get_channel_object(4)));
+    //let test_group = ChannelGroup::RGBA(RGBA::new(stage.get_channel_object(1), stage.get_channel_object(2), stage.get_channel_object(3), stage.get_channel_object(4)));
 
     match test_group {
         ChannelGroup::Single(mut group) => {
-            group.fade_simple(curve.clone(), 500, 255);
-            println!("fade up");
-            sleep(Duration::from_millis(2000));
-            group.activate_preheat(curve.clone(), 500);
-            println!("pre");
-            sleep(Duration::from_millis(2000));
-            group.fade_simple(curve.clone(), 1000, 0);
+            //group.fade_simple(curve.clone(), 500, 255);
+            //sleep(Duration::from_millis(2000));
+            //group.activate_preheat(curve.clone(), 500);
+            //println!("pre");
+            group.fade_simple(curve.clone(), 5000, 255);
+            //group.deactivate_preheat(curve.clone(), 500);
+            //sleep(Duration::from_millis(2000));
+            //group.fade_simple(curve.clone(), 1000, 0);
         },
         ChannelGroup::RGB(mut group) => {
             group.fade_rgb(curve.clone(), 1000, 255, 0, 0);

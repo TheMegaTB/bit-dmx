@@ -35,14 +35,14 @@ impl RGBA {
 
     pub fn fade_rgb(&mut self, curve: FadeCurve, time: FadeTime, end_r: DmxValue, end_g: DmxValue, end_b: DmxValue, end_a: DmxValue) {
         let steps = time*FADE_TICKS/1000;
-        let (start_h, start_s, start_v, start_a);
+        let (start_h, start_s, start_v);
         {
             let tuple = rgb_to_hsv(self.channel_r.lock().unwrap().get(), self.channel_g.lock().unwrap().get(), self.channel_b.lock().unwrap().get());
             start_h = tuple.0;
             start_s = tuple.1;
             start_v = tuple.2;
         }
-        {start_a = self.channel_a.lock().unwrap().get();}
+        let start_a = {self.channel_a.lock().unwrap().get()};
         let (end_h, end_s, end_v) = rgb_to_hsv(end_r, end_g, end_b);
         for (((&h, &s), &v), &a) in get_fade_steps(start_h, end_h, steps, curve.clone()).iter().zip(get_fade_steps(start_s, end_s, steps, curve.clone()).iter()).zip(get_fade_steps(start_v, end_v, steps, curve.clone()).iter()).zip(get_fade_steps_int(start_a, end_a, steps, curve.clone()).iter()) {
             let (r, g, b) = hsv_to_rgb(h, s, v);
@@ -57,11 +57,10 @@ impl RGBA {
 
     pub fn fade_simple(&mut self, curve: FadeCurve, time: FadeTime, end_r: DmxValue, end_g: DmxValue, end_b: DmxValue, end_a: DmxValue) {
         let steps = time*FADE_TICKS/1000;
-        let (start_r, start_g, start_b, start_a);
-        {start_r = self.channel_r.lock().unwrap().get();}
-        {start_g = self.channel_g.lock().unwrap().get();}
-        {start_b = self.channel_b.lock().unwrap().get();}
-        {start_a = self.channel_a.lock().unwrap().get();}
+        let start_r = {self.channel_r.lock().unwrap().get()};
+        let start_g = {self.channel_g.lock().unwrap().get()};
+        let start_b = {self.channel_b.lock().unwrap().get()};
+        let start_a = {self.channel_a.lock().unwrap().get()};
         for (((&r, &g), &b), &a) in get_fade_steps_int(start_r, end_r, steps, curve.clone()).iter().zip(get_fade_steps_int(start_g, end_g, steps, curve.clone()).iter()).zip(get_fade_steps_int(start_b, end_b, steps, curve.clone()).iter()).zip(get_fade_steps_int(start_a, end_a, steps, curve.clone()).iter()) {
             {self.channel_r.lock().unwrap().set(r);}
             {self.channel_g.lock().unwrap().set(g);}
