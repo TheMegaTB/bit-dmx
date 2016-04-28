@@ -5,11 +5,12 @@ use std::fs::File;
 
 use std::collections::HashMap;
 
-use Stage;
-use Fixture;
 use ChannelGroup;
 use DmxAddress;
 use DmxValue;
+
+use Stage;
+use Fixture;
 
 use RGB;
 use RGBA;

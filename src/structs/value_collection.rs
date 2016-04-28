@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use ChannelGroupValue;
 use DmxValue;
 use FadeTime;
+
 use FadeCurve;
 
 #[derive(Debug)]

@@ -1,15 +1,19 @@
 use std::sync::{Arc, Mutex};
 use std::sync::mpsc;
 
-use Fixture;
-use ValueCollection;
-use Channel;
 use DmxAddress;
 use DmxValue;
+use FadeTime;
+
+use Fixture;
 use ChannelGroup;
+use Channel;
+
+use ValueCollection;
 use ChannelGroupValue;
 use FadeCurve;
-use FadeTime;
+
+
 
 #[derive(Debug)]
 pub struct Stage {

@@ -3,15 +3,14 @@ extern crate env_logger;
 extern crate structures;
 extern crate net2;
 
-mod interface_handler;
-// use std::thread;
-
 use std::time::Duration;
 use std::thread::{self, sleep};
+use std::collections::HashMap;
+
+mod interface_handler;
+use interface_handler::*;
 
 use structures::*;
-use interface_handler::*;
-use std::collections::HashMap;
 
 fn main() {
     env_logger::init().unwrap();

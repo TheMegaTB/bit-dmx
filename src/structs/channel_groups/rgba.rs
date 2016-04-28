@@ -5,10 +5,10 @@ use std::thread::{self, sleep};
 use DmxValue;
 use FadeTime;
 use FADE_TICKS;
+use ChannelGroupValue;
 
 use Channel;
 use FadeCurve;
-use ChannelGroupValue;
 
 use rgb_to_hsv;
 use hsv_to_rgb;
