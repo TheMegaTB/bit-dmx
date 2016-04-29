@@ -50,7 +50,6 @@ fn main() {
 // Draw the Ui.
 fn set_widgets(ref mut ui: UiCell) {
     use conrod::{Button, Colorable, Labelable, Positionable, Sizeable, Tabs, Text, WidgetMatrix};
-
     // Construct our main `Canvas` tree.
     Canvas::new().flow_down(&[
         (HEADER, Canvas::new().color(color::BLUE).pad_bottom(20.0)),

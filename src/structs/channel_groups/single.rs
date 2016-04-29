@@ -12,6 +12,7 @@ use Channel;
 use FadeCurve;
 
 use get_fade_steps_int;
+use stop_fade;
 
 #[derive(Debug)]
 pub struct Single {
@@ -35,18 +36,13 @@ impl Single {
         let steps = time*FADE_TICKS/1000;
         let (tx, rx) = mpsc::channel();
         let channel1 = self.channel1.clone();
-        {
-            let mut channel1_locked = channel1.lock().unwrap();
-            channel1_locked.stop_fade();
-            channel1_locked.current_thread = Some(tx);
-        }
+        stop_fade(channel1.clone(), tx.clone());
         thread::spawn(move || {
 
             for value in get_fade_steps_int(start_value, end_value, steps, curve) {
                 {
                     if rx.try_recv().is_ok() { return }
                     let mut channel1_locked = channel1.lock().unwrap();
-                    channel1_locked.stop_fade();
 
                     if preheat {
                             channel1_locked.set_preheat(value);
@@ -57,6 +53,7 @@ impl Single {
                 }
                 sleep(Duration::from_millis((time/steps) as u64));
             }
+            channel1.lock().unwrap().current_thread = None;
         });
     }
 

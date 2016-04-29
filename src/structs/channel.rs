@@ -48,7 +48,7 @@ impl Channel {
     pub fn stop_fade(&mut self) {
         match self.current_thread {
             Some(ref tx) => {
-                tx.send(()).unwrap();
+                if tx.send(()).is_ok() {println!("fade killed")}
             },
             None => {}
         }
