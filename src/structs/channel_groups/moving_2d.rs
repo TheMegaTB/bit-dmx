@@ -18,7 +18,7 @@ use stop_fade;
 pub struct Moving2D {
     channel_x: Arc<Mutex<Channel>>,
     channel_y: Arc<Mutex<Channel>>,
-    pub active_value_collections: Vec<(usize, ChannelGroupValue)>
+    pub active_switches: Vec<(usize, ChannelGroupValue)>
 }
 
 impl Moving2D {
@@ -26,7 +26,7 @@ impl Moving2D {
         Moving2D {
             channel_x: channel_x,
             channel_y: channel_y,
-            active_value_collections: Vec::new()
+            active_switches: Vec::new()
         }
     }
 

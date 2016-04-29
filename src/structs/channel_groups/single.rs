@@ -17,14 +17,14 @@ use stop_fade;
 #[derive(Debug)]
 pub struct Single {
     pub channel1: Arc<Mutex<Channel>>,
-    pub active_value_collections: Vec<(usize, ChannelGroupValue)>
+    pub active_switches: Vec<(usize, ChannelGroupValue)>
 }
 
 impl Single {
     pub fn new(channel1: Arc<Mutex<Channel>>) -> Single {
         Single {
             channel1: channel1,
-            active_value_collections: Vec::new()
+            active_switches: Vec::new()
         }
     }
     pub fn fade_simple(&mut self, curve: FadeCurve, time: FadeTime, end_value: DmxValue) {

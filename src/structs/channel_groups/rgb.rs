@@ -23,7 +23,7 @@ pub struct RGB {
     channel_r: Arc<Mutex<Channel>>,
     channel_g: Arc<Mutex<Channel>>,
     channel_b: Arc<Mutex<Channel>>,
-    pub active_value_collections: Vec<(usize, ChannelGroupValue)>
+    pub active_switches: Vec<(usize, ChannelGroupValue)>
 }
 
 impl RGB {
@@ -32,7 +32,7 @@ impl RGB {
             channel_r: channel_r,
             channel_g: channel_g,
             channel_b: channel_b,
-            active_value_collections: Vec::new()
+            active_switches: Vec::new()
         }
     }
 

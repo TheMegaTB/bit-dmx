@@ -24,7 +24,7 @@ pub struct RGBA{
     channel_g: Arc<Mutex<Channel>>,
     channel_b: Arc<Mutex<Channel>>,
     channel_a: Arc<Mutex<Channel>>,
-    pub active_value_collections: Vec<(usize, ChannelGroupValue)>
+    pub active_switches: Vec<(usize, ChannelGroupValue)>
 }
 
 impl RGBA {
@@ -34,7 +34,7 @@ impl RGBA {
             channel_g: channel_g,
             channel_b: channel_b,
             channel_a: channel_a,
-            active_value_collections: Vec::new()
+            active_switches: Vec::new()
         }
     }
 

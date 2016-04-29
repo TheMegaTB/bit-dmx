@@ -20,23 +20,62 @@ fn main() {
     let (tx, _interrupt_tx) = interface.unwrap().to_thread();
     let mut stage = Parser::new(Stage::new(tx)).parse();
 
+    let mut v1 = HashMap::new();
+    v1.insert((0, 0), (vec![100], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 5000)));
+    let s1 = stage.add_switch(Switch::new(v1, 0));
+
+    let mut v2 = HashMap::new();
+    v2.insert((1, 0), (vec![100], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 5000)));
+    let s2 = stage.add_switch(Switch::new(v2, 0));
+
+    let mut test_v = HashMap::new();
+    test_v.insert((2, 0), (vec![100], (FadeCurve::Squared, 5000), (FadeCurve::Linear, 5000)));
+    let s3 = stage.add_switch(Switch::new(test_v, 0));
+
+
+
+    // for fixture in stage.fixtures.iter_mut() {
+    //     match fixture.channel_groups[0] {
+    //         ChannelGroup::Single(ref mut group) => {
+    //             group.activate_preheat(FadeCurve::Squared, 1000);
+    //             sleep(Duration::from_millis(1500));
+    //             group.fade_simple(FadeCurve::Linear, 5000, 255);
+    //             sleep(Duration::from_millis(2500));
+    //             group.fade_simple(FadeCurve::Linear, 2500, 0);
+    //         },
+    //         ChannelGroup::RGB(ref mut group) => {
+    //             group.fade_simple(FadeCurve::Linear, 2500, 255, 255, 0);
+    //             sleep(Duration::from_millis(2500));
+    //             group.fade_simple(FadeCurve::Linear, 2500, 0, 0, 255);
+    //         }
+    //         _ => {}
+    //     }
+    // }
+
+    //{stage.channels[2].lock().unwrap().set(100);}
+
     for fixture in stage.fixtures.iter_mut() {
         match fixture.channel_groups[0] {
             ChannelGroup::Single(ref mut group) => {
                 group.activate_preheat(FadeCurve::Squared, 1000);
-                sleep(Duration::from_millis(1500));
-                group.fade_simple(FadeCurve::Linear, 5000, 255);
-                sleep(Duration::from_millis(2500));
-                group.fade_simple(FadeCurve::Linear, 2500, 0);
             },
-            ChannelGroup::RGB(ref mut group) => {
-                group.fade_simple(FadeCurve::Linear, 2500, 255, 255, 0);
-                sleep(Duration::from_millis(2500));
-                group.fade_simple(FadeCurve::Linear, 2500, 0, 0, 255);
-            }
             _ => {}
         }
     }
+
+    // stage.activate_switch(the_switch, 255.0);
+    // sleep(Duration::from_millis(2500));
+    // stage.deactivate_switch(the_switch);
+
+
+    sleep(Duration::from_millis(5000));
+
+    stage.activate_switch(s1, 255.0);
+    stage.activate_switch(s2, 255.0);
+    sleep(Duration::from_millis(2500));
+    stage.deactivate_group_of_switch(s3);
+    stage.activate_switch(s3, 255.0);
+
 
     let socket = UDPSocket::new();
     socket.start_watchdog_server();

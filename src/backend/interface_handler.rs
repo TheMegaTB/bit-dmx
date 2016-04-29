@@ -7,6 +7,7 @@ use std::os::raw::c_char;
 use structures::DmxAddress;
 use structures::DmxValue;
 
+#[allow(dead_code)]
 extern {
     fn open_port(baudrate: usize, port: *const c_char) -> bool;
     fn close_port();
@@ -46,11 +47,13 @@ impl Interface {
         }
     }
 
+    #[allow(dead_code)]
     pub fn baudrate(mut self, baudrate: usize) -> Interface {
         self.baudrate = baudrate;
         self
     }
 
+    #[allow(dead_code)]
     pub fn port(mut self, port: String) -> Interface {
         self.port = port;
         self
