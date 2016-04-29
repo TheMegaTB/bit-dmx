@@ -175,24 +175,11 @@ fn main() {
             _ => {}
         }
     }
-    // sleep(Duration::from_millis(2000));
-    // stage.activate_switch(id1, 255.0);
-    // sleep(Duration::from_millis(2000));
-    // //
-    // // println!("pre");
-    // //
-    // println!("on");
-    // stage.deactivate_switch(id1);
-
-
 
 
     let socket = UDPSocket::new();
     socket.start_watchdog_server();
     let server = socket.start_backend_server(); //receiving updates (DMX values etc. from frontend)
-    // let stage = Stage::new(tx);
-
-
 
 
     thread::spawn(move || {
