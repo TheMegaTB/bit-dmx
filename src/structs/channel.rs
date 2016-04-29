@@ -13,7 +13,8 @@ pub struct Channel {
     pub max_preheat_value: DmxValue,
 
     address: DmxAddress,
-    dmx_tx: mpsc::Sender<(DmxAddress, DmxValue)>
+    dmx_tx: mpsc::Sender<(DmxAddress, DmxValue)>,
+    pub current_thread: Option<mpsc::Sender<()>>
 }
 
 impl Channel {
@@ -25,7 +26,8 @@ impl Channel {
             preheat_value: 0,
             max_preheat_value: max_preheat_value,
             address: address,
-            dmx_tx: dmx_tx
+            dmx_tx: dmx_tx,
+            current_thread: None
         }
     }
     pub fn get(&self) -> DmxValue {
@@ -42,5 +44,14 @@ impl Channel {
     fn update(&mut self) {
         self.current_value = cmp::max(self.preheat_value, self.value);
         self.dmx_tx.send((self.address, self.current_value)).unwrap();
+    }
+    pub fn stop_fade(&mut self) {
+        match self.current_thread {
+            Some(ref tx) => {
+                tx.send(()).unwrap();
+            },
+            None => {}
+        }
+        self.current_thread = None;
     }
 }

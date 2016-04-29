@@ -1,6 +1,7 @@
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 use std::thread::{self, sleep};
+use std::sync::mpsc;
 
 use DmxValue;
 use FadeTime;
@@ -32,16 +33,27 @@ impl Single {
 
     pub fn fade(&mut self, curve: FadeCurve, time: FadeTime, start_value: DmxValue, end_value: DmxValue, preheat: bool) {
         let steps = time*FADE_TICKS/1000;
+        let (tx, rx) = mpsc::channel();
         let channel1 = self.channel1.clone();
-
-        thread::spawn(move || {
+        {
             let mut channel1_locked = channel1.lock().unwrap();
+            channel1_locked.stop_fade();
+            channel1_locked.current_thread = Some(tx);
+        }
+        thread::spawn(move || {
+
             for value in get_fade_steps_int(start_value, end_value, steps, curve) {
-                if preheat {
-                        channel1_locked.set_preheat(value);
-                }
-                else {
-                    channel1_locked.set(value);
+                {
+                    if rx.try_recv().is_ok() { return }
+                    let mut channel1_locked = channel1.lock().unwrap();
+                    channel1_locked.stop_fade();
+
+                    if preheat {
+                            channel1_locked.set_preheat(value);
+                    }
+                    else {
+                        channel1_locked.set(value);
+                    }
                 }
                 sleep(Duration::from_millis((time/steps) as u64));
             }
