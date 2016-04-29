@@ -46,7 +46,30 @@ widget_ids! {
 }
 
 fn create_output_window(tx: mpsc::Sender<Vec<u8>>) {
-    let window: PistonWindow = WindowSettings::new("Sushi Reloaded!", [1100, 560])
+    // let mut window: PistonWindow =
+    //     WindowSettings::new("Canvas Demo", [800, 600])
+    //         .exit_on_esc(true).vsync(true).build().unwrap();
+    //
+    // // construct our `Ui`.
+    // let mut ui = {
+    //     let assets = find_folder::Search::ParentsThenKids(3, 3)
+    //         .for_folder("assets").unwrap();
+    //     let font_path = assets.join("fonts/NotoSans/NotoSans-Regular.ttf");
+    //     let theme = Theme::default();
+    //     let glyph_cache = Glyphs::new(&font_path, window.factory.clone());
+    //     Ui::new(glyph_cache.unwrap(), theme)
+    // };
+    //
+    // window.set_ups(60);
+    //
+    // // Poll events from the window.
+    // while let Some(event) = window.next() {
+    //     ui.handle_event(&event);
+    //     // event.update(|_| ui.set_widgets(set_widgets));
+    //     window.draw_2d(&event, |c, g| ui.draw_if_changed(c, g));
+    // }
+
+    let mut window: PistonWindow = WindowSettings::new("Sushi Reloaded!", [1100, 560])
                                     .exit_on_esc(true).vsync(true).build().unwrap();
 
     let mut ui = {
@@ -54,7 +77,7 @@ fn create_output_window(tx: mpsc::Sender<Vec<u8>>) {
             .for_folder("assets").unwrap();
         let font_path = assets.join("fonts/NotoSans/NotoSans-Regular.ttf");
         let theme = Theme::default();
-        let glyph_cache = Glyphs::new(&font_path, window.factory.borrow().clone());
+        let glyph_cache = Glyphs::new(&font_path, window.factory.clone());
         Ui::new(glyph_cache.unwrap(), theme)
     };
 
@@ -79,10 +102,19 @@ fn create_output_window(tx: mpsc::Sender<Vec<u8>>) {
     buttons.push((17, false, "Scene 15.1".to_string()));
     buttons.push((18, false, "Scene 15.2".to_string()));
 
-    for event in window.ups(60) {
+    // for event in window.ups(60) {
+    //     ui.handle_event(&event);
+    //     event.update(|_| ui.set_widgets(|mut ui| set_widgets(&mut ui, &mut buttons, tx.clone())));
+    //     event.draw_2d(|c, g| ui.draw_if_changed(c, g));
+    // }
+
+    window.set_ups(60);
+
+    // Poll events from the window.
+    while let Some(event) = window.next() {
         ui.handle_event(&event);
         event.update(|_| ui.set_widgets(|mut ui| set_widgets(&mut ui, &mut buttons, tx.clone())));
-        event.draw_2d(|c, g| ui.draw_if_changed(c, g));
+        window.draw_2d(&event, |c, g| ui.draw_if_changed(c, g));
     }
 }
 
@@ -160,11 +192,11 @@ fn main() {
             }
         });
 
-        let output_thread = thread::spawn(move || {
+        //let output_thread = thread::spawn(move || {
             println!("Hello world from output window thread!");
             create_output_window(tx);
-        });
+        //});
 
-        output_thread.join().unwrap();
+        //output_thread.join().unwrap();
     }
 }

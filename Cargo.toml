@@ -13,6 +13,10 @@ path = "src/frontend/main.rs"
 name = "backend"
 path = "src/backend/main.rs"
 
+[[bin]]
+name = "test_frontend"
+path = "src/test_frontend/main.rs"
+
 [lib]
 name = "structures"
 path = "src/structs/structs.rs"
@@ -22,12 +26,12 @@ default = []
 fake_if = []
 
 [dependencies]
-conrod = "0.32.0"
+conrod = "0.34.0"
 daggy = "0.4.0"
 piston = "0.17.0"
-piston_window = "0.37.0"
-pistoncore-input = "0.8.0"
-piston2d-graphics = "0.15.0"
+piston_window = "0.43.0"
+pistoncore-input = "0.10.0"
+piston2d-graphics = "0.16.0"
 find_folder = "0.3.0"
 num = "0.1.30"
 rand = "0.3.13"
@@ -36,7 +40,7 @@ net2 = "0.2.23"
 log = "0.3.6"
 env_logger = "0.3.3"
 meval = { git = "https://github.com/rekka/meval-rs" }
-#vecmath = "0.2.0"
+vecmath = "0.2.0"
 
 [build-dependencies]
 gcc = "0.3"
