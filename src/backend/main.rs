@@ -84,8 +84,8 @@ fn main() {
     scene4_1_values.insert((11, 0), (vec![127], FadeCurve::Squared, 3000));
     scene4_1_values.insert((12, 0), (vec![64], FadeCurve::Squared, 3000));
     scene4_1_values.insert((14, 0), (vec![255], FadeCurve::Squared, 3000));
-    scene4_1_values.insert((16, 0), (vec![74], FadeCurve::Squared, 3000));
-    scene4_1_values.insert((1, 0), (vec![191], FadeCurve::Squared, 3000));
+    scene4_1_values.insert((15, 0), (vec![74], FadeCurve::Squared, 3000));
+    scene4_1_values.insert((1, 0), (vec![192], FadeCurve::Squared, 3000));
     scene4_1_values.insert((2, 0), (vec![165], FadeCurve::Squared, 3000));
     scene4_1_values.insert((4, 0), (vec![140], FadeCurve::Squared, 3000));
     scene4_1_values.insert((6, 0), (vec![127], FadeCurve::Squared, 3000));
@@ -150,16 +150,41 @@ fn main() {
     scene8_1_values.insert((0, 0), (vec![255], FadeCurve::Squared, 3000));
     scene8_1_values.insert((3, 0), (vec![191], FadeCurve::Squared, 3000));
     scene8_1_values.insert((5, 0), (vec![127], FadeCurve::Squared, 3000));
-    scene8_1_values.insert((16, 0), (vec![0, 191, 64], FadeCurve::Squared, 200));
-    scene8_1_values.insert((17, 0), (vec![0, 191, 64], FadeCurve::Squared, 200));
-    scene8_1_values.insert((18, 0), (vec![0, 64, 191], FadeCurve::Squared, 200));
-    scene8_1_values.insert((19, 0), (vec![0, 64, 191], FadeCurve::Squared, 200));
+    scene8_1_values.insert((16, 0), (vec![0, 191, 64], FadeCurve::Squared, 3000));
+    scene8_1_values.insert((17, 0), (vec![0, 191, 64], FadeCurve::Squared, 3000));
+    scene8_1_values.insert((18, 0), (vec![0, 64, 191], FadeCurve::Squared, 3000));
+    scene8_1_values.insert((19, 0), (vec![0, 64, 191], FadeCurve::Squared, 3000));
     stage.add_switch(ValueCollection::new(scene8_1_values));
 
     let mut scene8_2_values = HashMap::new();
     scene8_2_values.insert((0, 0), (vec![0], FadeCurve::Squared, 3000));
     scene8_2_values.insert((5, 0), (vec![0], FadeCurve::Squared, 3000));
     stage.add_switch(ValueCollection::new(scene8_2_values));
+
+
+    //SCENE 15 - Besuch bei Hora
+    let mut scene15_values = HashMap::new();
+    scene15_values.insert((8, 0), (vec![127], FadeCurve::Squared, 3000));
+    scene15_values.insert((9, 0), (vec![127], FadeCurve::Squared, 3000));
+    scene15_values.insert((10, 0), (vec![64], FadeCurve::Squared, 3000));
+    scene15_values.insert((12, 0), (vec![127], FadeCurve::Squared, 3000));
+    scene15_values.insert((13, 0), (vec![127], FadeCurve::Squared, 3000));
+    scene15_values.insert((14, 0), (vec![64], FadeCurve::Squared, 3000));
+    scene15_values.insert((1, 0), (vec![192], FadeCurve::Squared, 3000));
+    scene15_values.insert((2, 0), (vec![165], FadeCurve::Squared, 3000));
+    scene15_values.insert((4, 0), (vec![140], FadeCurve::Squared, 3000));
+    scene15_values.insert((6, 0), (vec![127], FadeCurve::Squared, 3000));
+    scene15_values.insert((16, 0), (vec![90, 10, 90], FadeCurve::Squared, 10000));
+    scene15_values.insert((18, 0), (vec![90, 10, 90], FadeCurve::Squared, 10000));
+    stage.add_switch(ValueCollection::new(scene15_values));
+
+    //SCENE 15.1 - Stundenblumen
+    let mut scene15_1_values = HashMap::new();
+    // scene15_1_values.insert((20, 0), (vec![255], FadeCurve::Squared, 500));
+    // scene15_1_values.insert((20, 1), (vec![255], FadeCurve::Squared, 500));
+    scene15_1_values.insert((16, 0), (vec![150, 150, 0], FadeCurve::Squared, 10000));
+    scene15_1_values.insert((18, 0), (vec![150, 150, 0], FadeCurve::Squared, 10000));
+    stage.add_switch(ValueCollection::new(scene15_1_values));
 
     //let mut test_values2 = HashMap::new();
     //test_values1.insert((2, 0), (vec![255, 255, 255, 100], FadeCurve::Squared, 1000));
