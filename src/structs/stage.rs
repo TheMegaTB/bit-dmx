@@ -98,7 +98,7 @@ impl Stage {
 
     pub fn get_channel_object(&mut self, channel: DmxAddress) -> Arc<Mutex<Channel>> {
         for i in self.channels.len() as u16..channel as u16 {
-            self.channels.push(Arc::new(Mutex::new(Channel::new(i + 1, 0, 10, self.dmx_tx.clone()))));
+            self.channels.push(Arc::new(Mutex::new(Channel::new(i + 1, 0, 0, self.dmx_tx.clone()))));
             trace!("Create channel {}", i + 1);
         }
         self.channels[channel as usize - 1].clone()
@@ -106,10 +106,12 @@ impl Stage {
 }
 
 fn remove_from_value_collections(active_value_collections: &mut Vec<(usize, ChannelGroupValue)>, switch_id: usize) -> bool {
-    let last_index = active_value_collections.len() - 1;
-    let last_id = active_value_collections[last_index].0;
-    active_value_collections.retain(|&(x, _)| x != switch_id);
-    last_id == switch_id
+    if active_value_collections.len() > 0 { //TODO: Replace this workaround.
+        let last_index = active_value_collections.len() - 1;
+        let last_id = active_value_collections[last_index].0;
+        active_value_collections.retain(|&(x, _)| x != switch_id);
+        last_id == switch_id
+    } else { false }
 }
 
 fn extract_new_values(active_value_collections: &mut Vec<(usize, ChannelGroupValue)>, default_values: Vec<DmxValue>, old_curve: FadeCurve, old_time: FadeTime) -> (Vec<DmxValue>, FadeCurve, FadeTime) {

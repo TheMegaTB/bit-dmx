@@ -113,6 +113,7 @@ impl InterfaceHandle {
 
                 match cache.drain(0..1).last() {
                     Some(elem) => {
+                        trace!("Setting channel {:?} to value {:?}", elem.0, elem.1);
                         self.write_to_dmx(elem.0, elem.1);
                     },
                     None => {} //This shouldn't happen regardless.
