@@ -103,7 +103,12 @@ impl InterfaceHandle {
                         },
                         Err(_) => {
                             if cache.len() == 0 {
-                                insert_to_vector(&mut cache, rx.recv().unwrap()); //TODO: replace unwrap()
+                                match rx.recv() {
+                                    Ok(elem) => {
+                                        insert_to_vector(&mut cache, elem); //TODO: replace unwrap()
+                                    },
+                                    Err(e) => {println!("Receive error: {:?}", e)}
+                                }
                             } else {
                                 rx_available = false;
                             }

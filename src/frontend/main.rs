@@ -74,7 +74,10 @@ fn create_output_window(tx: mpsc::Sender<Vec<u8>>) {
     buttons.push((12, false, "Scene 5.3".to_string()));
     buttons.push((13, false, "Scene 6 (2x)".to_string()));
     buttons.push((14, false, "Scene 7".to_string()));
-    buttons.push((15, false, "Scene 8".to_string()));
+    buttons.push((15, false, "Scene 8.1".to_string()));
+    buttons.push((16, false, "Scene 8.2".to_string()));
+    buttons.push((17, false, "Scene 15.1".to_string()));
+    buttons.push((18, false, "Scene 15.2".to_string()));
 
     for event in window.ups(60) {
         ui.handle_event(&event);
