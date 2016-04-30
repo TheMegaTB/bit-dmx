@@ -47,7 +47,8 @@ widget_ids! {
 
 struct UI {
     pub watchdog: WatchDogClient,
-    tx: mpsc::Sender<Vec<u8>>
+    tx: mpsc::Sender<Vec<u8>>,
+    
 }
 
 impl UI {

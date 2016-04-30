@@ -17,6 +17,8 @@ use rustc_serialize::json;
 use structures::*;
 
 fn main() {
+    println!("{}", VERSION);
+
     env_logger::init().unwrap();
 
     let interface = Interface::new().port("/dev/tty.usbmodem40131".to_string()).connect();

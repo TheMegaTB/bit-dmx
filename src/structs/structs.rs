@@ -5,6 +5,7 @@ extern crate net2;
 extern crate meval;
 pub use meval::*;
 
+pub const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
 pub type FadeTime = usize;
 pub type DmxAddress = u16;
