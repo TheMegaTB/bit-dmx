@@ -1,6 +1,7 @@
 use meval::Expr;
 
 #[derive(Debug, Clone)]
+#[derive(RustcDecodable, RustcEncodable)]
 pub enum FadeCurve {
     Linear,
     Squared,

@@ -4,6 +4,7 @@ use std::thread::{self, sleep};
 use std::sync::mpsc;
 
 use DmxValue;
+use DmxAddress;
 use FadeTime;
 use FADE_TICKS;
 use ChannelGroupValue;
@@ -98,5 +99,14 @@ impl RGBA {
                 sleep(Duration::from_millis((time/steps) as u64));
             }
         });
+    }
+
+    pub fn get_addresses(&self) -> Vec<DmxAddress> {
+        vec![
+            self.channel_r.lock().unwrap().address,
+            self.channel_g.lock().unwrap().address,
+            self.channel_b.lock().unwrap().address,
+            self.channel_a.lock().unwrap().address
+        ]
     }
 }

@@ -58,7 +58,11 @@ fn create_output_window(tx: mpsc::Sender<Vec<u8>>) {
         Ui::new(glyph_cache.unwrap(), theme)
     };
 
-    let mut buttons: Vec<(usize, bool, String)> = Vec::new();
+    let mut buttons: Vec<(usize, bool, bool, String)> = Vec::new();
+
+    buttons.push((0, false, false, "Switch 0".to_string()));
+    buttons.push((1, false, false, "Switch 1".to_string()));
+    buttons.push((2, false, true, "Switch 2".to_string()));
 
     window.set_ups(60);
 
@@ -70,7 +74,7 @@ fn create_output_window(tx: mpsc::Sender<Vec<u8>>) {
     }
 }
 
-fn set_widgets(mut ui: &mut UiCell, buttons: &mut Vec<(usize, bool, String)>, tx: mpsc::Sender<Vec<u8>>) {
+fn set_widgets(mut ui: &mut UiCell, buttons: &mut Vec<(usize, bool, bool, String)>, tx: mpsc::Sender<Vec<u8>>) {
     let bg_color = color::rgb(0.236, 0.239, 0.241);
 
     Canvas::new()
@@ -86,39 +90,41 @@ fn set_widgets(mut ui: &mut UiCell, buttons: &mut Vec<(usize, bool, String)>, tx
         .color(bg_color.plain_contrast())
         .set(TITLE, ui);
 
-    // let mut i = 0;
-    // let mut id = TITLE;
-    // for button in buttons.iter_mut() {
-    //     Button::new()
-    //         .w_h(200.0, 50.0)
-    //         .and(|b| {
-    //             if i > 0 {
-    //                 b.right_from(id, 5.0)
-    //             } else { b.down(25.0) }
-    //         })
-    //         .and(|b| {
-    //             if button.1 {
-    //                 b.rgb(0.1, 0.9, 0.1)
-    //             } else {
-    //                 b.rgb(0.9, 0.1, 0.1)
-    //             }
-    //         })
-    //         .frame(1.0)
-    //         .label(&(button.2.clone()))
-    //         .react(|| {
-    //             button.1 = !button.1;
-    //             if button.1 {
-    //                 tx.send(vec![1, 0, button.0 as u8, 255]).unwrap()
-    //                 // client.send(&[1, 0, button.0 as u8, 255], server);
-    //             } else {
-    //                 tx.send(vec![1, 0, button.0 as u8, 0]).unwrap()
-    //                 // client.send(&[1, 0, button.0 as u8, 0], server);
-    //             }
-    //         })
-    //         .set(BUTTON + i, ui);
-    //     id = BUTTON + i;
-    //     i += 1;
-    // }
+    let mut i = 0;
+    let mut id = TITLE;
+    for button in buttons.iter_mut() {
+        Button::new()
+            .w_h(200.0, 50.0)
+            .and(|b| {
+                if i > 0 {
+                    b.right_from(id, 5.0)
+                } else { b.down(25.0) }
+            })
+            .and(|b| {
+                if button.1 {
+                    b.rgb(0.1, 0.9, 0.1)
+                } else {
+                    b.rgb(0.9, 0.1, 0.1)
+                }
+            })
+            .frame(1.0)
+            .label(&(button.3.clone()))
+            .react(|| {
+                button.1 = !button.1;
+                let address_type = if button.2 {129} else {1};
+
+                if button.1 {
+                    tx.send(vec![address_type, 0, button.0 as u8, 255]).unwrap()
+                    // client.send(&[1, 0, button.0 as u8, 255], server);
+                } else {
+                    tx.send(vec![address_type, 0, button.0 as u8, 0]).unwrap()
+                    // client.send(&[1, 0, button.0 as u8, 0], server);
+                }
+            })
+            .set(BUTTON + i, ui);
+        id = BUTTON + i;
+        i += 1;
+    }
 }
 
 fn main() {
@@ -131,8 +137,10 @@ fn main() {
 
     if watchdog.is_alive() {
         let shift: u8 = 128;
-        // client.send(&[0,0,11,255], SocketAddr::new(watchdog.get_server_addr().unwrap(), 8001));
-        // client.send(&[0,0,15,255], SocketAddr::new(watchdog.get_server_addr().unwrap(), 8001));
+        // client.send(&[1,0,0,255], SocketAddr::new(watchdog.get_server_addr().unwrap(), 8001));
+        // client.send(&[1,0,1,255], SocketAddr::new(watchdog.get_server_addr().unwrap(), 8001));
+        // std::thread::sleep(std::time::Duration::from_millis(2500));
+        // client.send(&[shift + 1,0,2,255], SocketAddr::new(watchdog.get_server_addr().unwrap(), 8001));
         // client.send(&[shift + 1,0,4,13], SocketAddr::new(watchdog.get_server_addr().unwrap(), 8001));
         // println!("{:?}", client.receive());
 

@@ -4,6 +4,7 @@ use std::thread::{self, sleep};
 use std::sync::mpsc;
 
 use DmxValue;
+use DmxAddress;
 use FadeTime;
 use FADE_TICKS;
 use ChannelGroupValue;
@@ -13,7 +14,7 @@ use FadeCurve;
 
 // use rgb_to_hsv;
 // use hsv_to_rgb;
-// 
+//
 // use get_fade_steps;
 use get_fade_steps_int;
 use stop_fade;
@@ -87,5 +88,13 @@ impl RGB {
                 sleep(Duration::from_millis((time/steps) as u64));
             }
         });
+    }
+
+    pub fn get_addresses(&self) -> Vec<DmxAddress> {
+        vec![
+            self.channel_r.lock().unwrap().address,
+            self.channel_g.lock().unwrap().address,
+            self.channel_b.lock().unwrap().address
+        ]
     }
 }

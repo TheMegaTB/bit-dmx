@@ -1,8 +1,10 @@
 #[macro_use] extern crate log;
+extern crate rustc_serialize;
 extern crate net2;
 
 extern crate meval;
 pub use meval::*;
+
 
 pub type FadeTime = usize;
 pub type DmxAddress = u16;

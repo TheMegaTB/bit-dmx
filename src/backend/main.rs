@@ -2,6 +2,7 @@
 extern crate env_logger;
 extern crate structures;
 extern crate net2;
+extern crate rustc_serialize;
 
 use std::time::Duration;
 use std::thread::{self, sleep};
@@ -9,6 +10,8 @@ use std::collections::HashMap;
 
 mod interface_handler;
 use interface_handler::*;
+
+use rustc_serialize::json;
 
 use structures::*;
 
@@ -29,30 +32,9 @@ fn main() {
     let s2 = stage.add_switch(Switch::new(v2, 0));
 
     let mut test_v = HashMap::new();
-    test_v.insert((2, 0), (vec![100], (FadeCurve::Squared, 5000), (FadeCurve::Linear, 5000)));
+    test_v.insert((2, 0), (vec![255], (FadeCurve::Squared, 5000), (FadeCurve::Linear, 5000)));
     let s3 = stage.add_switch(Switch::new(test_v, 0));
 
-
-
-    // for fixture in stage.fixtures.iter_mut() {
-    //     match fixture.channel_groups[0] {
-    //         ChannelGroup::Single(ref mut group) => {
-    //             group.activate_preheat(FadeCurve::Squared, 1000);
-    //             sleep(Duration::from_millis(1500));
-    //             group.fade_simple(FadeCurve::Linear, 5000, 255);
-    //             sleep(Duration::from_millis(2500));
-    //             group.fade_simple(FadeCurve::Linear, 2500, 0);
-    //         },
-    //         ChannelGroup::RGB(ref mut group) => {
-    //             group.fade_simple(FadeCurve::Linear, 2500, 255, 255, 0);
-    //             sleep(Duration::from_millis(2500));
-    //             group.fade_simple(FadeCurve::Linear, 2500, 0, 0, 255);
-    //         }
-    //         _ => {}
-    //     }
-    // }
-
-    //{stage.channels[2].lock().unwrap().set(100);}
 
     for fixture in stage.fixtures.iter_mut() {
         match fixture.channel_groups[0] {
@@ -63,18 +45,22 @@ fn main() {
         }
     }
 
-    // stage.activate_switch(the_switch, 255.0);
-    // sleep(Duration::from_millis(2500));
-    // stage.deactivate_switch(the_switch);
+    let data = stage.get_frontend_data();
 
+    println!("{:?}", (json::encode(&data).unwrap()));
 
-    sleep(Duration::from_millis(5000));
-
-    stage.activate_switch(s1, 255.0);
-    stage.activate_switch(s2, 255.0);
+    stage.set_switch(s2, 100.0);
     sleep(Duration::from_millis(2500));
-    stage.deactivate_group_of_switch(s3);
-    stage.activate_switch(s3, 255.0);
+    stage.set_switch(s2, 255.0);
+    sleep(Duration::from_millis(2500));
+    stage.set_switch(s2, 0.0);
+
+
+    // stage.set_switch(s1, 255.0);
+    // stage.set_switch(s2, 255.0);
+    // sleep(Duration::from_millis(2500));
+    // stage.deactivate_group_of_switch(s3);
+    // stage.set_switch(s3, 255.0);
 
 
     let socket = UDPSocket::new();
@@ -100,12 +86,10 @@ fn main() {
             else if address_type == 1 {
                 // Switch
                 println!("Set switch with address {:?} to {:?} (shifted: {:?})", address, value, shift);
-                if value == 0 {
-                    stage.deactivate_switch(address as usize);
+                if shift {
+                    stage.deactivate_group_of_switch(address as usize);
                 }
-                else {
-                    stage.activate_switch(address as usize, value as f64);
-                }
+                stage.set_switch(address as usize, value as f64);
             }
             println!("{:?}, {:?}", address, value);
 

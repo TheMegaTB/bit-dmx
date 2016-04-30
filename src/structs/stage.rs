@@ -7,13 +7,22 @@ use DmxValue;
 use FadeTime;
 
 use Fixture;
+use EmptyFixture;
 use ChannelGroup;
 use Channel;
 
 use Switch;
 use ChannelGroupValue;
 use FadeCurve;
+use JsonSwitch;
 
+
+#[derive(Debug, RustcDecodable, RustcEncodable)]
+pub struct FrontendData {
+    max_dmx_address: DmxAddress,
+    fixtures: Vec<EmptyFixture>,
+    switches: Vec<JsonSwitch>
+}
 
 
 #[derive(Debug)]
@@ -35,6 +44,15 @@ impl Stage {
             dmx_tx: dmx_tx
         }
     }
+
+    pub fn get_frontend_data(&self) -> FrontendData {
+        FrontendData {
+            max_dmx_address: self.channels.len() as DmxAddress,
+            fixtures: self.fixtures.iter().map(|x| x.to_empty_fixture()).collect(),
+            switches: self.switches.iter().map(|x| x.with_json_hashmap()).collect()
+        }
+    }
+
     pub fn add_fixture(&mut self, fixture: Fixture) -> usize {
         self.fixtures.push(fixture);
         self.fixtures.len() - 1
@@ -62,30 +80,36 @@ impl Stage {
         }
     }
 
-    pub fn activate_switch(&mut self, switch_id: usize, dimmer_value: f64) {
-        for (&(fixture_id, channel_group_id), &(ref values, (ref curve_in, time_in), (ref curve_out, time_out))) in self.switches[switch_id].channel_groups.iter() {
-            match self.fixtures[fixture_id].channel_groups[channel_group_id] {
-                ChannelGroup::Single(ref mut group) => {
-                    group.active_switches.push((switch_id, (values.iter().map(|a| (*a as f64 * (dimmer_value / 255.0)) as DmxValue).collect(), (curve_in.clone(), time_in), (curve_out.clone(), time_out))));
-                    group.fade_simple(curve_in.clone(), time_in, values[0]);
-                },
-                ChannelGroup::RGB(ref mut group) => {
-                    group.active_switches.push((switch_id, (values.iter().map(|a| (*a as f64 * (dimmer_value / 255.0)) as DmxValue).collect(), (curve_in.clone(), time_in), (curve_out.clone(), time_out))));
-                    group.fade_simple(curve_in.clone(), time_in, values[0], values[1], values[2]);
-                },
-                ChannelGroup::RGBA(ref mut group) => {
-                    group.active_switches.push((switch_id, (values.iter().map(|a| (*a as f64 * (dimmer_value / 255.0)) as DmxValue).collect(), (curve_in.clone(), time_in), (curve_out.clone(), time_out))));
-                    group.fade_simple(curve_in.clone(), time_in, values[0], values[1], values[2], values[3]);
-                },
-                ChannelGroup::Moving2D(ref mut group) => {
-                    group.active_switches.push((switch_id, (values.iter().map(|a| (*a as f64 * (dimmer_value / 255.0)) as DmxValue).collect(), (curve_in.clone(), time_in), (curve_out.clone(), time_out))));
-                    group.fade_simple(curve_in.clone(), time_in, values[0], values[1]);
+    pub fn set_switch(&mut self, switch_id: usize, dimmer_value: f64) {
+        if dimmer_value == 0.0 {
+            self.deactivate_switch(switch_id);
+        }
+        else {
+            for (&(fixture_id, channel_group_id), &(ref values, (ref curve_in, time_in), (ref curve_out, time_out))) in self.switches[switch_id].channel_groups.iter() {
+                let new_values: Vec<_> = values.iter().map(|a| (*a as f64 * (dimmer_value / 255.0)) as DmxValue).collect();
+                match self.fixtures[fixture_id].channel_groups[channel_group_id] {
+                    ChannelGroup::Single(ref mut group) => {
+                        group.active_switches.push((switch_id, (new_values.clone(), (curve_in.clone(), time_in), (curve_out.clone(), time_out))));
+                        group.fade_simple(curve_in.clone(), time_in, new_values[0]);
+                    },
+                    ChannelGroup::RGB(ref mut group) => {
+                        group.active_switches.push((switch_id, (new_values.clone(), (curve_in.clone(), time_in), (curve_out.clone(), time_out))));
+                        group.fade_simple(curve_in.clone(), time_in, new_values[0], new_values[1], new_values[2]);
+                    },
+                    ChannelGroup::RGBA(ref mut group) => {
+                        group.active_switches.push((switch_id, (new_values.clone(), (curve_in.clone(), time_in), (curve_out.clone(), time_out))));
+                        group.fade_simple(curve_in.clone(), time_in, new_values[0], new_values[1], new_values[2], new_values[3]);
+                    },
+                    ChannelGroup::Moving2D(ref mut group) => {
+                        group.active_switches.push((switch_id, (new_values.clone(), (curve_in.clone(), time_in), (curve_out.clone(), time_out))));
+                        group.fade_simple(curve_in.clone(), time_in, new_values[0], new_values[1]);
+                    }
                 }
             }
         }
     }
 
-    pub fn deactivate_switch(&mut self, switch_id: usize) {
+    fn deactivate_switch(&mut self, switch_id: usize) {
         for (&(fixture_id, channel_group_id), &(_, _, (ref curve_out, time_out))) in self.switches[switch_id].channel_groups.iter() {
             match self.fixtures[fixture_id].channel_groups[channel_group_id] {
                 ChannelGroup::Single(ref mut group) => {

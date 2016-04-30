@@ -4,6 +4,7 @@ use std::thread::{self, sleep};
 use std::sync::mpsc;
 
 use DmxValue;
+use DmxAddress;
 use FadeTime;
 use FADE_TICKS;
 use ChannelGroupValue;
@@ -50,5 +51,12 @@ impl Moving2D {
                 sleep(Duration::from_millis((time/steps) as u64));
             }
         });
+    }
+
+    pub fn get_addresses(&self) -> Vec<DmxAddress> {
+        vec![
+            self.channel_x.lock().unwrap().address,
+            self.channel_y.lock().unwrap().address
+        ]
     }
 }

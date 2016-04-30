@@ -4,6 +4,7 @@ use std::thread::{self, sleep};
 use std::sync::mpsc;
 
 use DmxValue;
+use DmxAddress;
 use FadeTime;
 use FADE_TICKS;
 use ChannelGroupValue;
@@ -78,5 +79,11 @@ impl Single {
         else {
             self.channel1.lock().unwrap().set_preheat(0);
         }
+    }
+
+    pub fn get_addresses(&self) -> Vec<DmxAddress> {
+        vec![
+            self.channel1.lock().unwrap().address
+        ]
     }
 }

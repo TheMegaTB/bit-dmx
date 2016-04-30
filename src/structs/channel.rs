@@ -12,7 +12,7 @@ pub struct Channel {
     pub preheat_value: DmxValue,
     pub max_preheat_value: DmxValue,
 
-    address: DmxAddress,
+    pub address: DmxAddress,
     dmx_tx: mpsc::Sender<(DmxAddress, DmxValue)>,
     pub current_thread: Option<mpsc::Sender<()>>
 }
