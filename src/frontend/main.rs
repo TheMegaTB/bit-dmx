@@ -142,42 +142,6 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
         })
         .react(|| {})
         .set(CONNECTED_BUTTON, conrod_ui);
-
-    let mut i = 0;
-    let mut id = TITLE;
-    for button in buttons.iter_mut() {
-        Button::new()
-            .w_h(200.0, 50.0)
-            .and(|b| {
-                if i > 0 {
-                    b.right_from(id, 5.0)
-                } else { b.down(25.0) }
-            })
-            .and(|b| {
-                if button.1 {
-                    b.rgb(0.1, 0.9, 0.1)
-                } else {
-                    b.rgb(0.9, 0.1, 0.1)
-                }
-            })
-            .frame(1.0)
-            .label(&(button.3.clone()))
-            .react(|| {
-                button.1 = !button.1;
-                let address_type = if button.2 {129} else {1};
-
-                if button.1 {
-                    tx.send(vec![address_type, 0, button.0 as u8, 255]).unwrap()
-                    // client.send(&[1, 0, button.0 as u8, 255], server);
-                } else {
-                    tx.send(vec![address_type, 0, button.0 as u8, 0]).unwrap()
-                    // client.send(&[1, 0, button.0 as u8, 0], server);
-                }
-            })
-            .set(BUTTON + i, ui);
-        id = BUTTON + i;
-        i += 1;
-    }
 }
 
 fn main() {
