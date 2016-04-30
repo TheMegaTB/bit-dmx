@@ -3,9 +3,11 @@ extern crate piston_window;
 extern crate find_folder;
 extern crate rand;
 extern crate structures;
+extern crate rustc_serialize;
 use structures::*;
+use std::io::Read;
 
-use std::net::SocketAddr;
+use std::net::{TcpStream, SocketAddr};
 use std::thread;
 use std::sync::mpsc;
 use conrod::{
@@ -34,6 +36,8 @@ use conrod::{
 };
 use piston_window::{ EventLoop, Glyphs, PistonWindow, UpdateEvent, WindowSettings, PressEvent };
 
+use rustc_serialize::json;
+
 type Backend = (<piston_window::G2d<'static> as conrod::Graphics>::Texture, Glyphs);
 type Ui = conrod::Ui<Backend>;
 type UiCell<'a> = conrod::UiCell<'a, Backend>;
@@ -53,7 +57,14 @@ struct UI {
 impl UI {
     fn new() -> UI {
         let socket = UDPSocket::new();
-        let watchdog = socket.start_watchdog_client();
+        let watchdog = socket.start_watchdog_client(|ip_addr| {
+            println!("{:?}", ip_addr.to_string());
+            let mut stream = TcpStream::connect((&*ip_addr.to_string(), 8000)).unwrap();
+            let mut buffer = String::new();
+            let _ = stream.read_to_string(&mut buffer);
+            let frontend_data: FrontendData = json::decode(&buffer).unwrap();
+            println!("{:?}", frontend_data);
+        });
         let client = socket.start_client();
         let (tx, rx) = mpsc::channel::<Vec<u8>>();
         {
