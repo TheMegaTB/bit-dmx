@@ -17,7 +17,7 @@ use rustc_serialize::json;
 use structures::*;
 
 fn main() {
-    println!("{}", VERSION);
+    println!("BitDMX backend v{}-{}", VERSION, GIT_HASH);
 
     env_logger::init().unwrap();
 

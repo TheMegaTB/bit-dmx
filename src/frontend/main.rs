@@ -47,8 +47,7 @@ widget_ids! {
 
 struct UI {
     pub watchdog: WatchDogClient,
-    tx: mpsc::Sender<Vec<u8>>,
-    
+    tx: mpsc::Sender<Vec<u8>>
 }
 
 impl UI {
@@ -146,6 +145,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
 }
 
 fn main() {
+    println!("BitDMX frontend v{}-{}", VERSION, GIT_HASH);
     // let socket = UDPSocket::new();
     // let watchdog = socket.start_watchdog_client();
     // let client = socket.start_client();

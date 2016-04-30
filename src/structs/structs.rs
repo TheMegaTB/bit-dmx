@@ -13,6 +13,9 @@ pub type DmxValue = u8;
 pub type ChannelGroupValue = (Vec<DmxValue>, (FadeCurve, FadeTime), (FadeCurve, FadeTime));
 pub const FADE_TICKS: FadeTime = 30;
 
+pub mod git_hash;
+pub use git_hash::*;
+
 pub mod helpers;
 pub use helpers::*;
 

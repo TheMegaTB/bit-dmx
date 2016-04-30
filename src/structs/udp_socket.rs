@@ -7,9 +7,12 @@ use std::thread;
 
 use net2::UdpSocketExt;
 
+use VERSION;
+use GIT_HASH;
+
 const INPUT_BUFFER: usize = 4;
 const WATCHDOG_TTL: u64 = 5;
-const WATCHDOG_DATA: [u8; 3] = [68, 77, 88]; // "DMX" as bytes
+// const WATCHDOG_DATA: [u8; 3] = [68, 77, 88]; // "DMX" as bytes
 
 pub struct UDPSocket {
     local_addr: Ipv4Addr,
@@ -76,8 +79,9 @@ impl UDPSocket {
         let sock = self.assemble_socket(0, true);
         let target_addr = SocketAddr::V4(SocketAddrV4::new(self.multicast_addr, self.port+2));
         thread::Builder::new().name("WatchDog-Server".to_string()).spawn(move|| {
+            let payload = VERSION.to_string() + &GIT_HASH.to_string();
             loop {
-                sock.send_to(&WATCHDOG_DATA, target_addr).unwrap();
+                sock.send_to(payload.as_bytes(), target_addr).unwrap();
                 sleep(Duration::from_secs(WATCHDOG_TTL));
             }
         }).unwrap();
@@ -92,15 +96,17 @@ impl UDPSocket {
             let s_addr = server_addr.clone();
             thread::Builder::new().name("WatchDog-Client".to_string()).spawn(move|| {
                 sock.set_read_timeout(Some(Duration::from_secs(WATCHDOG_TTL + 1))).unwrap();
+                let payload = VERSION.to_string() + &GIT_HASH.to_string();
+                let mut buf = (0..(payload.as_bytes().len())).map(|_| 0).collect::<Vec<_>>();
                 loop {
-                    let mut buf = WATCHDOG_DATA;
                     match sock.recv_from(&mut buf) {
                         Ok((_, addr)) => {
-                            if buf == WATCHDOG_DATA {
+                            if buf == payload.as_bytes() {
                                 trace!("received valid watchdog data");
                                 s.lock().unwrap()[0] = true;
                                 s_addr.lock().unwrap()[0] = Some(addr.ip());
                             } else {
+                                println!("RECEIVED INVALID WATCHDOG DATA");
                                 trace!("received invalid watchdog data");
                                 s.lock().unwrap()[0] = false;
                                 s_addr.lock().unwrap()[0] = None;
