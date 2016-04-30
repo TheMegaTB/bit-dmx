@@ -6,10 +6,11 @@ extern crate structures;
 extern crate rustc_serialize;
 use structures::*;
 use std::io::Read;
+use std::time::Duration;
+use std::thread::{self, sleep};
 
 use std::net::{TcpStream, SocketAddr};
-use std::thread;
-use std::sync::mpsc;
+use std::sync::{Arc, Mutex, mpsc};
 use conrod::{
     color,
     Canvas,
@@ -51,20 +52,14 @@ widget_ids! {
 
 struct UI {
     pub watchdog: WatchDogClient,
-    tx: mpsc::Sender<Vec<u8>>
+    tx: mpsc::Sender<Vec<u8>>,
+    frontend_data: FrontendData
 }
 
 impl UI {
     fn new() -> UI {
         let socket = UDPSocket::new();
-        let watchdog = socket.start_watchdog_client(|ip_addr| {
-            println!("{:?}", ip_addr.to_string());
-            let mut stream = TcpStream::connect((&*ip_addr.to_string(), 8000)).unwrap();
-            let mut buffer = String::new();
-            let _ = stream.read_to_string(&mut buffer);
-            let frontend_data: FrontendData = json::decode(&buffer).unwrap();
-            println!("{:?}", frontend_data);
-        });
+        let watchdog = socket.start_watchdog_client();
         let client = socket.start_client();
         let (tx, rx) = mpsc::channel::<Vec<u8>>();
         {
@@ -84,13 +79,36 @@ impl UI {
 
         UI {
             watchdog: watchdog,
-            tx: tx
+            tx: tx,
+            frontend_data: FrontendData::new()
+        }
+    }
+
+    fn fetch_data(&mut self) {
+        if self.watchdog.get_server_addr().is_some() {
+            match TcpStream::connect((&*self.watchdog.get_server_addr().unwrap().to_string(), 8000)) {
+                Ok(mut stream) => {
+                    let mut buffer = String::new();
+                    let _ = stream.read_to_string(&mut buffer);
+
+                    self.frontend_data = json::decode(&buffer).unwrap();
+                    println!("{:?}", self.frontend_data);
+                }
+                Err(_) => {
+                    println!("Error while connecting");
+                }
+            }
+        }
+        else {
+            println!("No server ip");
         }
     }
 }
 
 fn create_output_window() {
     let mut ui = UI::new();
+    sleep(Duration::from_millis(6000));
+    ui.fetch_data();
 
     let mut window: PistonWindow = WindowSettings::new("Sushi Reloaded!", [1100, 560])
                                     .exit_on_esc(false).vsync(true).build().unwrap();
@@ -156,19 +174,5 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
 }
 
 fn main() {
-    // let socket = UDPSocket::new();
-    // let watchdog = socket.start_watchdog_client();
-    // let client = socket.start_client();
-    // std::thread::sleep(std::time::Duration::from_secs(6));
-    // println!("{}", watchdog.is_alive());
-    // println!("{:?}", watchdog.get_server_addr());
-
-    // if watchdog.is_alive() {
-        // let shift: u8 = 128;
-        // client.send(&[0,0,11,255], SocketAddr::new(watchdog.get_server_addr().unwrap(), 8001));
-        // client.send(&[0,0,15,255], SocketAddr::new(watchdog.get_server_addr().unwrap(), 8001));
-        // client.send(&[shift + 1,0,4,13], SocketAddr::new(watchdog.get_server_addr().unwrap(), 8001));
-        // println!("{:?}", client.receive());
-        create_output_window();
-    // }
+    create_output_window();
 }

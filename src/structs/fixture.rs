@@ -12,6 +12,15 @@ pub struct EmptyFixture {
     name: String,
 }
 
+impl EmptyFixture {
+    pub fn new() -> EmptyFixture {
+        EmptyFixture {
+            channel_groups: Vec::new(),
+            name: String::new()
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct Fixture {
     pub channel_groups: Vec<ChannelGroup>,

@@ -53,8 +53,8 @@ fn main() {
     stage.set_switch(s2, 100.0);
     sleep(Duration::from_millis(2500));
     stage.set_switch(s2, 255.0);
-    // sleep(Duration::from_millis(2500));
-    // stage.set_switch(s2, 0.0);
+    sleep(Duration::from_millis(2500));
+    stage.set_switch(s2, 0.0);
 
 
     // stage.set_switch(s1, 255.0);

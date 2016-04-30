@@ -24,6 +24,16 @@ pub struct FrontendData {
     switches: Vec<JsonSwitch>
 }
 
+impl FrontendData {
+    pub fn new() -> FrontendData {
+        FrontendData {
+            max_dmx_address: 0,
+            fixtures: Vec::new(),
+            switches: Vec::new()
+        }
+    }
+}
+
 
 #[derive(Debug)]
 pub struct Stage {
