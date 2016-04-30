@@ -174,5 +174,6 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
 }
 
 fn main() {
+    println!("BitDMX frontend v{}-{}", VERSION, GIT_HASH);
     create_output_window();
 }
