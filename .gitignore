@@ -18,3 +18,5 @@ Cargo.lock
 
 #DS_Store for Mac Users
 .DS_Store
+
+git_hash.rs
