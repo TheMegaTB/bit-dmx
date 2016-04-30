@@ -22,6 +22,7 @@ pub struct UDPSocketHandle {
     multicast_addr: SocketAddr
 }
 
+#[derive(Clone)]
 pub struct WatchDogClient {
     server_addr: Arc<Mutex<[Option<IpAddr>; 1]>>,
     state: Arc<Mutex<[bool; 1]>>
