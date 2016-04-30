@@ -6,10 +6,11 @@ extern crate structures;
 extern crate rustc_serialize;
 use structures::*;
 use std::io::Read;
+use std::time::Duration;
+use std::thread::{self, sleep};
 
 use std::net::{TcpStream, SocketAddr};
-use std::thread;
-use std::sync::mpsc;
+use std::sync::{Arc, Mutex, mpsc};
 use conrod::{
     color,
     Canvas,
@@ -34,7 +35,7 @@ use conrod::{
     // WidgetMatrix,
     // XYPad,
 };
-use piston_window::{ EventLoop, Glyphs, PistonWindow, UpdateEvent, WindowSettings, PressEvent };
+use piston_window::{ EventLoop, Glyphs, PistonWindow, UpdateEvent, WindowSettings, PressEvent, ReleaseEvent };
 
 use rustc_serialize::json;
 
@@ -46,25 +47,21 @@ type UiCell<'a> = conrod::UiCell<'a, Backend>;
 widget_ids! {
     CANVAS,
     TITLE,
-    CONNECTED_BUTTON
+    CONNECTED_BUTTON,
+    BUTTON with 4000
 }
 
 struct UI {
     pub watchdog: WatchDogClient,
-    tx: mpsc::Sender<Vec<u8>>
+    tx: mpsc::Sender<Vec<u8>>,
+    frontend_data: FrontendData,
+    shift_state: bool
 }
 
 impl UI {
     fn new() -> UI {
         let socket = UDPSocket::new();
-        let watchdog = socket.start_watchdog_client(|ip_addr| {
-            println!("{:?}", ip_addr.to_string());
-            let mut stream = TcpStream::connect((&*ip_addr.to_string(), 8000)).unwrap();
-            let mut buffer = String::new();
-            let _ = stream.read_to_string(&mut buffer);
-            let frontend_data: FrontendData = json::decode(&buffer).unwrap();
-            println!("{:?}", frontend_data);
-        });
+        let watchdog = socket.start_watchdog_client();
         let client = socket.start_client();
         let (tx, rx) = mpsc::channel::<Vec<u8>>();
         {
@@ -84,13 +81,37 @@ impl UI {
 
         UI {
             watchdog: watchdog,
-            tx: tx
+            tx: tx,
+            frontend_data: FrontendData::new(),
+            shift_state: false
+        }
+    }
+
+    fn fetch_data(&mut self) {
+        if self.watchdog.get_server_addr().is_some() {
+            match TcpStream::connect((&*self.watchdog.get_server_addr().unwrap().to_string(), 8000)) {
+                Ok(mut stream) => {
+                    let mut buffer = String::new();
+                    let _ = stream.read_to_string(&mut buffer);
+
+                    self.frontend_data = json::decode(&buffer).unwrap();
+                    //println!("{:?}", self.frontend_data);
+                }
+                Err(_) => {
+                    println!("Error while connecting");
+                }
+            }
+        }
+        else {
+            println!("No server ip");
         }
     }
 }
 
 fn create_output_window() {
     let mut ui = UI::new();
+    sleep(Duration::from_millis(6000));
+    ui.fetch_data();
 
     let mut window: PistonWindow = WindowSettings::new("Sushi Reloaded!", [1100, 560])
                                     .exit_on_esc(false).vsync(true).build().unwrap();
@@ -104,14 +125,20 @@ fn create_output_window() {
         Ui::new(glyph_cache.unwrap(), theme)
     };
 
-    window.set_ups(60);
+    window.set_ups(30);
 
     // Poll events from the window.
     while let Some(event) = window.next() {
         if let Some(button) = event.press_args() {
             println!("button {:?} pressed", button);
-            if button == piston_window::Button::Mouse(piston_window::MouseButton::Left) {
-                println!("HI");
+            if button == piston_window::Button::Keyboard(piston_window::Key::LShift){    //Button::Mouse(piston_window::MouseButton::Left) {
+                ui.shift_state = true;
+            }
+        };
+        if let Some(button) = event.release_args() {
+            println!("button {:?} pressed", button);
+            if button == piston_window::Button::Keyboard(piston_window::Key::LShift){    //Button::Mouse(piston_window::MouseButton::Left) {
+                ui.shift_state = false;
             }
         };
         conrod_ui.handle_event(&event);
@@ -153,23 +180,46 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
         })
         .react(|| {})
         .set(CONNECTED_BUTTON, conrod_ui);
+
+    let mut id = TITLE;
+    let tx = ui.tx.clone();
+    for (i, button) in ui.frontend_data.switches.iter().enumerate() {
+        let label = i.to_string();
+        Button::new()
+            .w_h(200.0, 50.0)
+            .and(|b| {
+                if i > 0 {
+                    b.right_from(id, 5.0)
+                } else { b.down(25.0) }
+            })
+            .and(|b| {
+                if button.dimmer_value != 0.0 {
+                    b.rgb(0.1, 0.9, 0.1)
+                } else {
+                    b.rgb(0.9, 0.1, 0.1)
+                }
+            })
+            .frame(1.0)
+            .label(&label)
+            .react(|| {
+                let new_value = if button.dimmer_value == 0.0 {255} else {0};
+                tx.send(vec![if ui.shift_state {129} else {1}, 0, i as u8, new_value]).unwrap();
+                // button.1 = !button.1;
+                // if button.1 {
+                //     tx.send(vec![1, 0, button.0 as u8, 255]).unwrap()
+                //     // client.send(&[1, 0, button.0 as u8, 255], server);
+                // } else {
+                //     tx.send(vec![1, 0, button.0 as u8, 0]).unwrap()
+                //     // client.send(&[1, 0, button.0 as u8, 0], server);
+                // }
+            })
+            .set(BUTTON + i, conrod_ui);
+        id = BUTTON + i;
+    }
+    ui.fetch_data(); //TODO replace with udp
 }
 
 fn main() {
     println!("BitDMX frontend v{}-{}", VERSION, GIT_HASH);
-    // let socket = UDPSocket::new();
-    // let watchdog = socket.start_watchdog_client();
-    // let client = socket.start_client();
-    // std::thread::sleep(std::time::Duration::from_secs(6));
-    // println!("{}", watchdog.is_alive());
-    // println!("{:?}", watchdog.get_server_addr());
-
-    // if watchdog.is_alive() {
-        // let shift: u8 = 128;
-        // client.send(&[0,0,11,255], SocketAddr::new(watchdog.get_server_addr().unwrap(), 8001));
-        // client.send(&[0,0,15,255], SocketAddr::new(watchdog.get_server_addr().unwrap(), 8001));
-        // client.send(&[shift + 1,0,4,13], SocketAddr::new(watchdog.get_server_addr().unwrap(), 8001));
-        // println!("{:?}", client.receive());
-        create_output_window();
-    // }
+    create_output_window();
 }

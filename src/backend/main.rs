@@ -27,16 +27,22 @@ fn main() {
     let mut stage = Parser::new(Stage::new(tx)).parse();
 
     let mut v1 = HashMap::new();
-    v1.insert((0, 0), (vec![100], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 5000)));
+    v1.insert((0, 0), (vec![255], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
+    v1.insert((1, 0), (vec![255], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
+    v1.insert((2, 0), (vec![255], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
     let s1 = stage.add_switch(Switch::new(v1, 0));
 
     let mut v2 = HashMap::new();
-    v2.insert((1, 0), (vec![100], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 5000)));
-    let s2 = stage.add_switch(Switch::new(v2, 0));
+    v2.insert((0, 0), (vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
+    let s2 = stage.add_switch(Switch::new(v2, 1));
 
     let mut test_v = HashMap::new();
-    test_v.insert((2, 0), (vec![255], (FadeCurve::Squared, 5000), (FadeCurve::Linear, 5000)));
-    let s3 = stage.add_switch(Switch::new(test_v, 0));
+    test_v.insert((1, 0), (vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
+    let s3 = stage.add_switch(Switch::new(test_v, 1));
+
+    let mut test_v2 = HashMap::new();
+    test_v2.insert((2, 0), (vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
+    let s4 = stage.add_switch(Switch::new(test_v2, 1));
 
 
     for fixture in stage.fixtures.iter_mut() {
@@ -55,8 +61,8 @@ fn main() {
     stage.set_switch(s2, 100.0);
     sleep(Duration::from_millis(2500));
     stage.set_switch(s2, 255.0);
-    // sleep(Duration::from_millis(2500));
-    // stage.set_switch(s2, 0.0);
+    sleep(Duration::from_millis(2500));
+    stage.set_switch(s2, 0.0);
 
 
     // stage.set_switch(s1, 255.0);
@@ -65,7 +71,7 @@ fn main() {
     // stage.deactivate_group_of_switch(s3);
     // stage.set_switch(s3, 255.0);
 
-    let serialized_stage = Arc::new(Mutex::new(json::encode(&stage.get_frontend_data()).unwrap()));
+    let serialized_stage = Arc::new(Mutex::new([json::encode(&stage.get_frontend_data()).unwrap()]));
     let stage = Arc::new(Mutex::new(stage));
 
     let socket = UDPSocket::new();
@@ -74,6 +80,7 @@ fn main() {
 
     {
         let stage = stage.clone();
+        let serialized_stage = serialized_stage.clone();
         thread::spawn(move || {
             loop {
                 let (d, _) = server.receive();
@@ -97,6 +104,8 @@ fn main() {
                         stage_locked.deactivate_group_of_switch(address as usize);
                     }
                     stage_locked.set_switch(address as usize, value as f64);
+                    let mut serialized_stage_locked = serialized_stage.lock().unwrap();
+                    serialized_stage_locked[0] = json::encode(&stage_locked.get_frontend_data()).unwrap();
                 }
                 println!("{:?}, {:?}", address, value);
 
@@ -123,7 +132,8 @@ fn main() {
                     let serialized_stage_locked = serialized_stage.lock().unwrap();
                     let mut stream = stream.unwrap();
                     //TODO: receive data and update stage
-                    stream.write(serialized_stage_locked.as_bytes()).unwrap();
+
+                    stream.write(serialized_stage_locked[0].as_bytes()).unwrap();
                 });
             }
         }).join().unwrap();
