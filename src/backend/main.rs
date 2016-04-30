@@ -7,6 +7,7 @@ extern crate rustc_serialize;
 use std::time::Duration;
 use std::thread::{self, sleep};
 use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
 
 mod interface_handler;
 use interface_handler::*;
@@ -45,15 +46,15 @@ fn main() {
         }
     }
 
-    let data = stage.get_frontend_data();
-
-    println!("{:?}", (json::encode(&data).unwrap()));
+    // let data = stage.get_frontend_data();
+    //
+    // println!("{:?}", (json::encode(&stage.get_frontend_data()).unwrap()));
 
     stage.set_switch(s2, 100.0);
     sleep(Duration::from_millis(2500));
     stage.set_switch(s2, 255.0);
-    sleep(Duration::from_millis(2500));
-    stage.set_switch(s2, 0.0);
+    // sleep(Duration::from_millis(2500));
+    // stage.set_switch(s2, 0.0);
 
 
     // stage.set_switch(s1, 255.0);
@@ -62,57 +63,69 @@ fn main() {
     // stage.deactivate_group_of_switch(s3);
     // stage.set_switch(s3, 255.0);
 
+    let serialized_stage = Arc::new(Mutex::new(json::encode(&stage.get_frontend_data()).unwrap()));
+    let stage = Arc::new(Mutex::new(stage));
 
     let socket = UDPSocket::new();
     socket.start_watchdog_server();
     let server = socket.start_backend_server(); //receiving updates (DMX values etc. from frontend)
 
+    {
+        let stage = stage.clone();
+        thread::spawn(move || {
+            loop {
+                let (d, _) = server.receive();
+                debug!("{:?}", d); //TODO: do something with the data that isn't completely useless
 
-    thread::spawn(move || {
-        loop {
-            let (d, _) = server.receive();
-            debug!("{:?}", d); //TODO: do something with the data that isn't completely useless
+                let address_type:u8 = d[0] & (2u8.pow(7)-1);
+                let shift: bool = d[0] & (2u8.pow(7)) != 0;
+                let address: u16 = ((d[1] as u16) << 8) + (d[2] as u16);
+                let value: u8 = d[3];
 
-            let address_type:u8 = d[0] & (2u8.pow(7)-1);
-            let shift: bool = d[0] & (2u8.pow(7)) != 0;
-            let address: u16 = ((d[1] as u16) << 8) + (d[2] as u16);
-            let value: u8 = d[3];
-
-            if address_type == 0 {
-                let mut channel_locked = stage.channels[address as usize].lock().unwrap();
-                channel_locked.stop_fade();
-                channel_locked.set(value);
-            }
-            else if address_type == 1 {
-                // Switch
-                println!("Set switch with address {:?} to {:?} (shifted: {:?})", address, value, shift);
-                if shift {
-                    stage.deactivate_group_of_switch(address as usize);
+                let mut stage_locked = stage.lock().unwrap();
+                if address_type == 0 {
+                    let mut channel_locked = stage_locked.channels[address as usize].lock().unwrap();
+                    channel_locked.stop_fade();
+                    channel_locked.set(value);
                 }
-                stage.set_switch(address as usize, value as f64);
+                else if address_type == 1 {
+                    // Switch
+                    println!("Set switch with address {:?} to {:?} (shifted: {:?})", address, value, shift);
+                    if shift {
+                        stage_locked.deactivate_group_of_switch(address as usize);
+                    }
+                    stage_locked.set_switch(address as usize, value as f64);
+                }
+                println!("{:?}, {:?}", address, value);
+
+                //stage.fixtures.push();
+                server.send_to_multicast(&d);
             }
-            println!("{:?}, {:?}", address, value);
+        });
+    }
 
+    {
+        let stage = stage.clone();
+        let serialized_stage = serialized_stage.clone();
+        thread::spawn(move || {
+            use std::io::Write;
+            use std::net::TcpListener;
 
-
-            //stage.fixtures.push();
-            server.send_to_multicast(&d);
-        }
-    });
-
-    thread::spawn(|| {
-        use std::io::Write;
-        use std::net::TcpListener;
-
-        let listener = TcpListener::bind("0.0.0.0:8000").unwrap();
-        info!("listening started, ready to accept");
-        for stream in listener.incoming() {
-            thread::spawn(|| {
-                let mut stream = stream.unwrap();
-                stream.write(b"Hello World\r\n").unwrap();
-            });
-        }
-    }).join().unwrap();
+            let listener = TcpListener::bind("0.0.0.0:8000").unwrap();
+            info!("listening started, ready to accept");
+            for stream in listener.incoming() {
+                let stage = stage.clone();
+                let serialized_stage = serialized_stage.clone();
+                thread::spawn(move || {
+                    let _stage_locked = stage.lock().unwrap();
+                    let serialized_stage_locked = serialized_stage.lock().unwrap();
+                    let mut stream = stream.unwrap();
+                    //TODO: receive data and update stage
+                    stream.write(serialized_stage_locked.as_bytes()).unwrap();
+                });
+            }
+        }).join().unwrap();
+    }
 }
 
 

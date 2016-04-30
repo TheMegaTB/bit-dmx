@@ -81,6 +81,7 @@ impl Stage {
     }
 
     pub fn set_switch(&mut self, switch_id: usize, dimmer_value: f64) {
+        self.switches[switch_id].dimmer_value = dimmer_value;
         if dimmer_value == 0.0 {
             self.deactivate_switch(switch_id);
         }
