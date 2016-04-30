@@ -1,5 +1,8 @@
 use DmxValue;
 use FadeCurve;
+use Channel;
+use std::sync::mpsc;
+use std::sync::{Arc, Mutex};
 
 
 fn max3(a: f64, b: f64, c: f64) -> f64 {
@@ -81,4 +84,10 @@ pub fn get_fade_steps(start_value: f64, target_value: f64, steps: usize, curve: 
     else {
         (1..steps + 1).map(|step| (target_value + ((target_value - start_value) * curve_fn((steps as f64 - step as f64)/steps as f64) - y_offset) * -y_scale).max(0f64).min(255f64)).collect()
     }
+}
+
+pub fn stop_fade(channel: Arc<Mutex<Channel>>, tx: mpsc::Sender<()>) {
+    let mut channel_locked = channel.lock().unwrap();
+    channel_locked.stop_fade();
+    channel_locked.current_thread = Some(tx);
 }

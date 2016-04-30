@@ -1,54 +1,16 @@
 Fixture {
-    name("ledpar");
-    rgb(0, 1, 2);
+    name("DPAR");
+    single(0);
 }
 
 Fixture {
     name("PAR");
-    single(0);
+    rgb(0, 1, 2);
 }
 
-Fixture {
-    name("DPAR");
-    single(0); preheat(10);
-}
-
-Fixture {
-    name("baustrahl");
-    single(0);
-}
-
-Fixture {
-    name("hz200");
-    single(0);
-    single(1);
-}
 
 Stage {
-    7 -> DPAR("Trav1");
-    1 -> PAR("Trav2");
-    2 -> PAR("Trav3");
-    3 -> PAR("Trav4");
-    4 -> PAR("Trav5");
-    5 -> PAR("Trav6");
-    6 -> PAR("Trav7");
-    8 -> DPAR("Trav8");
-
-    9 -> DPAR("LT-BCK");
-    10 -> DPAR("LT-MDL");
-    11 -> DPAR("LT-FRT");
-    12 -> baustrahl("L-BSTR");
-
-    13 -> DPAR("RT-BCK");
-    14 -> DPAR("RT-MDL");
-    15 -> DPAR("RT-FRT");
-    16 -> baustrahl("R-BSTR");
-
-    17 -> ledpar("LED-LF");
-    23 -> ledpar("LED-LB");
-
-    20 -> ledpar("LED-RF");
-    26 -> ledpar("LED-RB");
-
-    29 -> hz200("Hazer");
+    1 -> DPAR("Trav1");
+    2 -> DPAR("Trav2");
+    3 -> DPAR("Trav3");
 }

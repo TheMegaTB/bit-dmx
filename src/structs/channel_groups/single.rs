@@ -1,6 +1,7 @@
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 use std::thread::{self, sleep};
+use std::sync::mpsc;
 
 use DmxValue;
 use FadeTime;
@@ -11,18 +12,19 @@ use Channel;
 use FadeCurve;
 
 use get_fade_steps_int;
+use stop_fade;
 
 #[derive(Debug)]
 pub struct Single {
     pub channel1: Arc<Mutex<Channel>>,
-    pub active_value_collections: Vec<(usize, ChannelGroupValue)>
+    pub active_switches: Vec<(usize, ChannelGroupValue)>
 }
 
 impl Single {
     pub fn new(channel1: Arc<Mutex<Channel>>) -> Single {
         Single {
             channel1: channel1,
-            active_value_collections: Vec::new()
+            active_switches: Vec::new()
         }
     }
     pub fn fade_simple(&mut self, curve: FadeCurve, time: FadeTime, end_value: DmxValue) {
@@ -32,19 +34,26 @@ impl Single {
 
     pub fn fade(&mut self, curve: FadeCurve, time: FadeTime, start_value: DmxValue, end_value: DmxValue, preheat: bool) {
         let steps = time*FADE_TICKS/1000;
+        let (tx, rx) = mpsc::channel();
         let channel1 = self.channel1.clone();
-
+        stop_fade(channel1.clone(), tx.clone());
         thread::spawn(move || {
-            let mut channel1_locked = channel1.lock().unwrap();
+
             for value in get_fade_steps_int(start_value, end_value, steps, curve) {
-                if preheat {
-                        channel1_locked.set_preheat(value);
-                }
-                else {
-                    channel1_locked.set(value);
+                {
+                    if rx.try_recv().is_ok() { return }
+                    let mut channel1_locked = channel1.lock().unwrap();
+
+                    if preheat {
+                            channel1_locked.set_preheat(value);
+                    }
+                    else {
+                        channel1_locked.set(value);
+                    }
                 }
                 sleep(Duration::from_millis((time/steps) as u64));
             }
+            channel1.lock().unwrap().current_thread = None;
         });
     }
 
