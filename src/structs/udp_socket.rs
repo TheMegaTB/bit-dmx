@@ -87,14 +87,15 @@ impl UDPSocket {
         }).unwrap();
     }
 
-    pub fn start_watchdog_client(&self) -> WatchDogClient {
+    pub fn start_watchdog_client<F: Fn(IpAddr) + Send + 'static>(&self, callback: F) -> WatchDogClient {
         let sock = self.assemble_socket(self.port + 2, true);
         let state = Arc::new(Mutex::new([false]));
         let server_addr = Arc::new(Mutex::new([None]));
+        let callback = Arc::new(Mutex::new(callback));
         {
             let s = state.clone();
             let s_addr = server_addr.clone();
-            thread::Builder::new().name("WatchDog-Client".to_string()).spawn(move|| {
+            thread::Builder::new().name("WatchDog-Client".to_string()).spawn(move || {
                 sock.set_read_timeout(Some(Duration::from_secs(WATCHDOG_TTL + 1))).unwrap();
                 let payload = VERSION.to_string() + &GIT_HASH.to_string();
                 let mut buf = (0..(payload.as_bytes().len())).map(|_| 0).collect::<Vec<_>>();
@@ -104,7 +105,13 @@ impl UDPSocket {
                             if buf == payload.as_bytes() {
                                 trace!("received valid watchdog data");
                                 s.lock().unwrap()[0] = true;
-                                s_addr.lock().unwrap()[0] = Some(addr.ip());
+                                let mut s_addr_locked = s_addr.lock().unwrap();
+                                if s_addr_locked[0] != Some(addr.ip()) {
+                                    println!("new connection to {}", addr.ip());
+                                    //println!("{}", callback);
+                                    callback.lock().unwrap()(addr.ip());
+                                }
+                                s_addr_locked[0] = Some(addr.ip());
                             } else {
                                 println!("RECEIVED INVALID WATCHDOG DATA");
                                 trace!("received invalid watchdog data");
