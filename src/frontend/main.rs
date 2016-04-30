@@ -35,7 +35,7 @@ use conrod::{
     // WidgetMatrix,
     // XYPad,
 };
-use piston_window::{ EventLoop, Glyphs, PistonWindow, UpdateEvent, WindowSettings, PressEvent };
+use piston_window::{ EventLoop, Glyphs, PistonWindow, UpdateEvent, WindowSettings, PressEvent, ReleaseEvent };
 
 use rustc_serialize::json;
 
@@ -47,13 +47,15 @@ type UiCell<'a> = conrod::UiCell<'a, Backend>;
 widget_ids! {
     CANVAS,
     TITLE,
-    CONNECTED_BUTTON
+    CONNECTED_BUTTON,
+    BUTTON with 4000
 }
 
 struct UI {
     pub watchdog: WatchDogClient,
     tx: mpsc::Sender<Vec<u8>>,
-    frontend_data: FrontendData
+    frontend_data: FrontendData,
+    shift_state: bool
 }
 
 impl UI {
@@ -80,7 +82,8 @@ impl UI {
         UI {
             watchdog: watchdog,
             tx: tx,
-            frontend_data: FrontendData::new()
+            frontend_data: FrontendData::new(),
+            shift_state: false
         }
     }
 
@@ -92,7 +95,7 @@ impl UI {
                     let _ = stream.read_to_string(&mut buffer);
 
                     self.frontend_data = json::decode(&buffer).unwrap();
-                    println!("{:?}", self.frontend_data);
+                    //println!("{:?}", self.frontend_data);
                 }
                 Err(_) => {
                     println!("Error while connecting");
@@ -122,14 +125,20 @@ fn create_output_window() {
         Ui::new(glyph_cache.unwrap(), theme)
     };
 
-    window.set_ups(60);
+    window.set_ups(30);
 
     // Poll events from the window.
     while let Some(event) = window.next() {
         if let Some(button) = event.press_args() {
             println!("button {:?} pressed", button);
-            if button == piston_window::Button::Mouse(piston_window::MouseButton::Left) {
-                println!("HI");
+            if button == piston_window::Button::Keyboard(piston_window::Key::LShift){    //Button::Mouse(piston_window::MouseButton::Left) {
+                ui.shift_state = true;
+            }
+        };
+        if let Some(button) = event.release_args() {
+            println!("button {:?} pressed", button);
+            if button == piston_window::Button::Keyboard(piston_window::Key::LShift){    //Button::Mouse(piston_window::MouseButton::Left) {
+                ui.shift_state = false;
             }
         };
         conrod_ui.handle_event(&event);
@@ -171,6 +180,43 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
         })
         .react(|| {})
         .set(CONNECTED_BUTTON, conrod_ui);
+
+    let mut id = TITLE;
+    let tx = ui.tx.clone();
+    for (i, button) in ui.frontend_data.switches.iter().enumerate() {
+        let label = i.to_string();
+        Button::new()
+            .w_h(200.0, 50.0)
+            .and(|b| {
+                if i > 0 {
+                    b.right_from(id, 5.0)
+                } else { b.down(25.0) }
+            })
+            .and(|b| {
+                if button.dimmer_value != 0.0 {
+                    b.rgb(0.1, 0.9, 0.1)
+                } else {
+                    b.rgb(0.9, 0.1, 0.1)
+                }
+            })
+            .frame(1.0)
+            .label(&label)
+            .react(|| {
+                let new_value = if button.dimmer_value == 0.0 {255} else {0};
+                tx.send(vec![if ui.shift_state {129} else {1}, 0, i as u8, new_value]).unwrap();
+                // button.1 = !button.1;
+                // if button.1 {
+                //     tx.send(vec![1, 0, button.0 as u8, 255]).unwrap()
+                //     // client.send(&[1, 0, button.0 as u8, 255], server);
+                // } else {
+                //     tx.send(vec![1, 0, button.0 as u8, 0]).unwrap()
+                //     // client.send(&[1, 0, button.0 as u8, 0], server);
+                // }
+            })
+            .set(BUTTON + i, conrod_ui);
+        id = BUTTON + i;
+    }
+    ui.fetch_data(); //TODO replace with udp
 }
 
 fn main() {

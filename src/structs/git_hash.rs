@@ -1,1 +1,1 @@
-pub const GIT_HASH: &'static str = "311521c";
+pub const GIT_HASH: &'static str = "f6bf07c";

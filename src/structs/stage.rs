@@ -19,9 +19,9 @@ use JsonSwitch;
 
 #[derive(Debug, RustcDecodable, RustcEncodable)]
 pub struct FrontendData {
-    max_dmx_address: DmxAddress,
-    fixtures: Vec<EmptyFixture>,
-    switches: Vec<JsonSwitch>
+    pub max_dmx_address: DmxAddress,
+    pub fixtures: Vec<EmptyFixture>,
+    pub switches: Vec<JsonSwitch>
 }
 
 impl FrontendData {
@@ -86,7 +86,7 @@ impl Stage {
     pub fn deactivate_group_of_switch(&mut self, group_switch_id: usize) {
         let s = self.switch_groups.get(&self.switches[group_switch_id].switch_group).unwrap().iter().filter(|&x| *x != group_switch_id).map(|&x| x).collect::<Vec<usize>>();
         for switch_id in s {
-            self.deactivate_switch(switch_id);
+            self.set_switch(switch_id, 0.0);
         }
     }
 
