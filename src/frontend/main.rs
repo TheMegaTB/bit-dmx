@@ -131,13 +131,13 @@ fn create_output_window() {
     while let Some(event) = window.next() {
         if let Some(button) = event.press_args() {
             println!("button {:?} pressed", button);
-            if button == piston_window::Button::Keyboard(piston_window::Key::LShift){    //Button::Mouse(piston_window::MouseButton::Left) {
+            if button == piston_window::Button::Keyboard(piston_window::Key::LShift) || button == piston_window::Button::Keyboard(piston_window::Key::RShift) {    //Button::Mouse(piston_window::MouseButton::Left) {
                 ui.shift_state = true;
             }
         };
         if let Some(button) = event.release_args() {
             println!("button {:?} pressed", button);
-            if button == piston_window::Button::Keyboard(piston_window::Key::LShift){    //Button::Mouse(piston_window::MouseButton::Left) {
+            if button == piston_window::Button::Keyboard(piston_window::Key::LShift) || button == piston_window::Button::Keyboard(piston_window::Key::RShift) {    //Button::Mouse(piston_window::MouseButton::Left) {
                 ui.shift_state = false;
             }
         };
