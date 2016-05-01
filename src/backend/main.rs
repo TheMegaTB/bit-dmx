@@ -88,7 +88,7 @@ fn main() {
         thread::spawn(move || {
             loop {
                 let (d, _) = server.receive();
-                debug!("{:?}", d); //TODO: do something with the data that isn't completely useless
+                debug!("{:?}", d);
 
                 let address_type:u8 = d[0] & 127;
                 let shift: bool = d[0] & 128 != 0;
@@ -116,8 +116,7 @@ fn main() {
                 }
                 println!("{:?}, {:?}", address, value);
 
-                //stage.fixtures.push();
-                server.send_to_multicast(&d);
+                server.send_to_multicast(&d); //TODO: remove this and place ist in set switch etc. so that set switch can be called from a different thread (e.g. from chaser thread)
             }
         });
     }

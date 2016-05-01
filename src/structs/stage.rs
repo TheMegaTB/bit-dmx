@@ -129,25 +129,25 @@ impl Stage {
         for (&(fixture_id, channel_group_id), &(_, _, (ref curve_out, time_out))) in self.switches[switch_id].channel_groups.iter() {
             match self.fixtures[fixture_id].channel_groups[channel_group_id] {
                 ChannelGroup::Single(ref mut group) => {
-                    if remove_from_value_collections(&mut group.active_switches, switch_id) {
+                    if remove_from_active_switches(&mut group.active_switches, switch_id) {
                         let (new_values, new_curve, new_time) = extract_new_values(&mut group.active_switches, vec![0], curve_out.clone(), time_out);
                         group.fade_simple(new_curve, new_time, new_values[0]);
                     }
                 },
                 ChannelGroup::RGB(ref mut group) => {
-                    if remove_from_value_collections(&mut group.active_switches, switch_id) {
+                    if remove_from_active_switches(&mut group.active_switches, switch_id) {
                         let (new_values, new_curve, new_time) = extract_new_values(&mut group.active_switches, vec![0, 0, 0], curve_out.clone(), time_out);
                         group.fade_simple(new_curve, new_time, new_values[0], new_values[1], new_values[2]);
                     }
                 },
                 ChannelGroup::RGBA(ref mut group) => {
-                    if remove_from_value_collections(&mut group.active_switches, switch_id) {
+                    if remove_from_active_switches(&mut group.active_switches, switch_id) {
                         let (new_values, new_curve, new_time) = extract_new_values(&mut group.active_switches, vec![0, 0, 0, 0], curve_out.clone(), time_out);
                         group.fade_simple(new_curve, new_time, new_values[0], new_values[1], new_values[2], new_values[3]);
                     }
                 },
                 ChannelGroup::Moving2D(ref mut group) => {
-                    if remove_from_value_collections(&mut group.active_switches, switch_id) {
+                    if remove_from_active_switches(&mut group.active_switches, switch_id) {
                         let (new_values, new_curve, new_time) = extract_new_values(&mut group.active_switches, vec![0, 0], curve_out.clone(), time_out);
                         group.fade_simple(new_curve, new_time, new_values[0], new_values[1]);
                     }
@@ -165,7 +165,7 @@ impl Stage {
     }
 }
 
-fn remove_from_value_collections(active_switches: &mut Vec<(usize, ChannelGroupValue)>, switch_id: usize) -> bool {
+fn remove_from_active_switches(active_switches: &mut Vec<(usize, ChannelGroupValue)>, switch_id: usize) -> bool {
     if active_switches.len() > 0 { //TODO: Replace this workaround.
         let last_index = active_switches.len() - 1;
         let last_id = active_switches[last_index].0;
