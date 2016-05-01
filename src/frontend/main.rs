@@ -202,9 +202,7 @@ impl UI {
     }
 }
 
-fn create_output_window() {
-    let mut ui = UI::new();
-
+fn create_output_window(ui: Arc<Mutex<UI>>) {
     let mut window: PistonWindow = WindowSettings::new("Sushi Reloaded!", [1100, 560])
                                     .exit_on_esc(false).vsync(true).build().unwrap();
 
@@ -320,7 +318,42 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
     }
 }
 
+fn create_splash_window(ui: Arc<Mutex<UI>>) {
+    let mut window: PistonWindow = WindowSettings::new("BitDMX Splashscreen", [500, 300])
+                                    .exit_on_esc(true).vsync(true).build().unwrap();
+
+    let mut conrod_ui = {
+        let assets = find_folder::Search::KidsThenParents(3, 5)
+            .for_folder("assets").unwrap();
+        let font_path = assets.join("fonts/NotoSans/NotoSans-Regular.ttf");
+        let theme = Theme::default();
+        let glyph_cache = Glyphs::new(&font_path, window.factory.clone());
+        Ui::new(glyph_cache.unwrap(), theme)
+    };
+
+    window.set_ups(1);
+
+    // Poll events from the window.
+    while let Some(event) = window.next() {
+        conrod_ui.handle_event(&event);
+        window.draw_2d(&event, |c, g| conrod_ui.draw_if_changed(c, g));
+
+        event.update(|_| conrod_ui.set_widgets(|mut conrod_ui| {
+            Canvas::new()
+                .frame(1.0)
+                .pad(30.0)
+                .color(color::rgb(0.236, 0.239, 0.900))
+                .set(CANVAS, &mut conrod_ui);
+        }));
+
+        if ui.lock().unwrap().watchdog.is_alive() { break }
+    }
+}
+
+
 fn main() {
     println!("BitDMX frontend v{}-{}", VERSION, GIT_HASH);
-    create_output_window();
+    let ui = UI::new();
+    create_splash_window(ui.clone());
+    create_output_window(ui.clone());
 }
