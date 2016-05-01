@@ -184,7 +184,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
     let mut id = TITLE;
     let tx = ui.tx.clone();
     for (i, button) in ui.frontend_data.switches.iter().enumerate() {
-        let label = i.to_string();
+        let label = button.name.clone();// i.to_string();
         Button::new()
             .w_h(200.0, 50.0)
             .and(|b| {
