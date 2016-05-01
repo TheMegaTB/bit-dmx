@@ -21,7 +21,8 @@ use JsonSwitch;
 pub struct FrontendData {
     pub max_dmx_address: DmxAddress,
     pub fixtures: Vec<EmptyFixture>,
-    pub switches: Vec<JsonSwitch>
+    pub switches: Vec<JsonSwitch>,
+    switch_groups: HashMap<usize, Vec<usize>>
 }
 
 impl FrontendData {
@@ -29,7 +30,8 @@ impl FrontendData {
         FrontendData {
             max_dmx_address: 0,
             fixtures: Vec::new(),
-            switches: Vec::new()
+            switches: Vec::new(),
+            switch_groups: HashMap::new()
         }
     }
 }
@@ -59,7 +61,8 @@ impl Stage {
         FrontendData {
             max_dmx_address: self.channels.len() as DmxAddress,
             fixtures: self.fixtures.iter().map(|x| x.to_empty_fixture()).collect(),
-            switches: self.switches.iter().map(|x| x.with_json_hashmap()).collect()
+            switches: self.switches.iter().map(|x| x.with_json_hashmap()).collect(),
+            switch_groups: self.switch_groups.clone()
         }
     }
 
