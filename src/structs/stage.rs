@@ -83,11 +83,13 @@ impl Stage {
         id
     }
 
-    pub fn deactivate_group_of_switch(&mut self, group_switch_id: usize) {
+    pub fn deactivate_group_of_switch(&mut self, group_switch_id: usize) -> Vec<usize> {
         let s = self.switch_groups.get(&self.switches[group_switch_id].switch_group).unwrap().iter().filter(|&x| *x != group_switch_id).map(|&x| x).collect::<Vec<usize>>();
-        for switch_id in s {
-            self.set_switch(switch_id, 0.0);
-        }
+
+        for switch_id in s.iter() {
+            self.set_switch(*switch_id, 0.0);
+        };
+        s
     }
 
     pub fn set_switch(&mut self, switch_id: usize, dimmer_value: f64) {

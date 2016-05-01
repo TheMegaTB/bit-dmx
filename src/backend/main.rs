@@ -77,7 +77,6 @@ fn main() {
     // stage.deactivate_group_of_switch(s3);
     // stage.set_switch(s3, 255.0);
 
-    let serialized_stage = Arc::new(Mutex::new([json::encode(&stage.get_frontend_data()).unwrap()]));
     let stage = Arc::new(Mutex::new(stage));
 
     let socket = UDPSocket::new();
@@ -86,14 +85,13 @@ fn main() {
 
     {
         let stage = stage.clone();
-        let serialized_stage = serialized_stage.clone();
         thread::spawn(move || {
             loop {
                 let (d, _) = server.receive();
                 debug!("{:?}", d); //TODO: do something with the data that isn't completely useless
 
-                let address_type:u8 = d[0] & (2u8.pow(7)-1);
-                let shift: bool = d[0] & (2u8.pow(7)) != 0;
+                let address_type:u8 = d[0] & 127;
+                let shift: bool = d[0] & 128 != 0;
                 let address: u16 = ((d[1] as u16) << 8) + (d[2] as u16);
                 let value: u8 = d[3];
 
@@ -107,11 +105,14 @@ fn main() {
                     // Switch
                     println!("Set switch with address {:?} to {:?} (shifted: {:?})", address, value, shift);
                     if shift {
-                        stage_locked.deactivate_group_of_switch(address as usize);
+                        for switch_id in stage_locked.deactivate_group_of_switch(address as usize) {
+                            println!("{:?}", switch_id);
+                            let addr_high = (switch_id >> 8) as u8;
+                            let addr_low = switch_id as u8;
+                            server.send_to_multicast(&[1, addr_high, addr_low, 0]);
+                        }
                     }
                     stage_locked.set_switch(address as usize, value as f64);
-                    let mut serialized_stage_locked = serialized_stage.lock().unwrap();
-                    serialized_stage_locked[0] = json::encode(&stage_locked.get_frontend_data()).unwrap();
                 }
                 println!("{:?}, {:?}", address, value);
 
@@ -123,7 +124,19 @@ fn main() {
 
     {
         let stage = stage.clone();
-        let serialized_stage = serialized_stage.clone();
+        thread::spawn(move || {
+            sleep(Duration::from_millis(10000));
+            let mut stage_locked = stage.lock().unwrap();
+            let mut test_v2 = HashMap::new();
+            test_v2.insert((1, 0), (vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
+            test_v2.insert((2, 0), (vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
+            stage_locked.add_switch(Switch::new("CYAN".to_string(), test_v2, 2));
+            UDPSocket::new().start_frontend_client().send_to_multicast(&[255, 255, 255, 255]);
+        });
+    }
+
+    {
+        let stage = stage.clone();
         thread::spawn(move || {
             use std::io::Write;
             use std::net::TcpListener;
@@ -132,14 +145,12 @@ fn main() {
             info!("listening started, ready to accept");
             for stream in listener.incoming() {
                 let stage = stage.clone();
-                let serialized_stage = serialized_stage.clone();
                 thread::spawn(move || {
-                    let _stage_locked = stage.lock().unwrap();
-                    let serialized_stage_locked = serialized_stage.lock().unwrap();
+                    let stage_locked = stage.lock().unwrap();
                     let mut stream = stream.unwrap();
                     //TODO: receive data and update stage
 
-                    stream.write(serialized_stage_locked[0].as_bytes()).unwrap();
+                    stream.write(json::encode(&stage_locked.get_frontend_data()).unwrap().as_bytes()).unwrap();
                 });
             }
         }).join().unwrap();

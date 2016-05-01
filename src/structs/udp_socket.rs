@@ -10,25 +10,25 @@ use net2::UdpSocketExt;
 use VERSION;
 use GIT_HASH;
 
-const INPUT_BUFFER: usize = 4;
-const WATCHDOG_TTL: u64 = 5;
+pub const INPUT_BUFFER: usize = 4;
+pub const WATCHDOG_TTL: u64 = 5;
 // const WATCHDOG_DATA: [u8; 3] = [68, 77, 88]; // "DMX" as bytes
 
 pub struct UDPSocket {
     local_addr: Ipv4Addr,
     multicast_addr: Ipv4Addr,
-    port: u16
+    pub port: u16
 }
 
 pub struct UDPSocketHandle {
-    socket: UdpSocket,
+    pub socket: UdpSocket,
     multicast_addr: SocketAddr
 }
 
 #[derive(Clone)]
 pub struct WatchDogClient {
-    server_addr: Arc<Mutex<[Option<IpAddr>; 1]>>,
-    state: Arc<Mutex<[bool; 1]>>
+    pub server_addr: Arc<Mutex<[Option<IpAddr>; 1]>>,
+    pub state: Arc<Mutex<[bool; 1]>>
 }
 
 impl UDPSocket {
@@ -55,22 +55,22 @@ impl UDPSocket {
         self
     }
 
-    fn assemble_socket(&self, port: u16, multicast: bool) -> UdpSocket {
+    pub fn assemble_socket(&self, port: u16, multicast: bool) -> UdpSocket {
         let sock = UdpSocket::bind(SocketAddrV4::new(self.local_addr, port)).unwrap();
         if multicast { sock.join_multicast_v4(&self.multicast_addr, &self.local_addr).ok().expect("Failed to join multicast."); }
         sock
     }
 
-    // pub fn start_frontend_server(&self) -> UDPSocketHandle {
-    //     UDPSocketHandle {
-    //         socket: self.assemble_socket(self.port + 1, true),
-    //         multicast_addr: SocketAddr::V4(SocketAddrV4::new(self.multicast_addr, self.port))
-    //     }
-    // }
-
-    pub fn start_client(&self) -> UDPSocketHandle {
+    pub fn start_frontend_server(&self) -> UDPSocketHandle {
         UDPSocketHandle {
             socket: self.assemble_socket(self.port, true),
+            multicast_addr: SocketAddr::V4(SocketAddrV4::new(self.multicast_addr, self.port))
+        }
+    }
+
+    pub fn start_frontend_client(&self) -> UDPSocketHandle {
+        UDPSocketHandle {
+            socket: self.assemble_socket(0, true),
             multicast_addr: SocketAddr::V4(SocketAddrV4::new(self.multicast_addr, self.port))
         }
     }
@@ -94,41 +94,10 @@ impl UDPSocket {
         }).unwrap();
     }
 
-    pub fn start_watchdog_client(&self) -> WatchDogClient {
-        let sock = self.assemble_socket(self.port + 2, true);
+    pub fn create_watchdog_client(&self) -> WatchDogClient {
         let state = Arc::new(Mutex::new([false]));
         let server_addr = Arc::new(Mutex::new([None]));
-        {
-            let s = state.clone();
-            let s_addr = server_addr.clone();
-            thread::Builder::new().name("WatchDog-Client".to_string()).spawn(move || {
-                sock.set_read_timeout(Some(Duration::from_secs(WATCHDOG_TTL + 1))).unwrap();
-                let payload = VERSION.to_string() + &GIT_HASH.to_string();
-                let mut buf = (0..(payload.as_bytes().len())).map(|_| 0).collect::<Vec<_>>();
-                loop {
-                    match sock.recv_from(&mut buf) {
-                        Ok((_, addr)) => {
-                            if buf == payload.as_bytes() {
-                                trace!("received valid watchdog data");
-                                s.lock().unwrap()[0] = true;
-                                let mut s_addr_locked = s_addr.lock().unwrap();
-                                s_addr_locked[0] = Some(addr.ip());
-                            } else {
-                                println!("RECEIVED INVALID WATCHDOG DATA");
-                                trace!("received invalid watchdog data");
-                                s.lock().unwrap()[0] = false;
-                                s_addr.lock().unwrap()[0] = None;
-                            }
-                        },
-                        Err(_) => {
-                            trace!("watchdog timeout");
-                            s.lock().unwrap()[0] = false;
-                            s_addr.lock().unwrap()[0] = None;
-                        }
-                    }
-                }
-            }).unwrap();
-        }
+
         WatchDogClient {
             server_addr: server_addr,
             state: state
