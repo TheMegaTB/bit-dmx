@@ -52,7 +52,7 @@ widget_ids! {
     TITLE,
     CONNECTED_BUTTON,
     BUTTON with 4000,
-    CHASER_BUTTON with 4000
+    CHASER_TITLE with 4000
 }
 
 struct UI {
@@ -278,73 +278,137 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
 
     let button_width = 200.0;
     let button_height = 50.0;
-    let switches_per_group: HashMap<usize, usize> = HashMap::new();
-    let switches_per_group_mutex = Arc::new(Mutex::new(switches_per_group));
-    {
-        for (i, button) in ui.frontend_data.switches.iter().enumerate() {
-            let switches_per_group = switches_per_group_mutex.clone();
-            let label = button.name.clone();// i.to_string();
+    let mut current_button_id = BUTTON;
+
+    let chasers: Vec<String> = ui.frontend_data.chasers.keys().map(|x| x.clone()).collect(); //TODO edit by user,  save & load
+
+    for (id, (name, switches)) in chasers.iter().map(|x| (x, ui.frontend_data.chasers.get(x).unwrap())).enumerate() {
+        let x_pos = -button_width/2.0 + id as f64 * button_width;
+        let y_offset = -50.0;
+        Text::new(name)
+            .xy_relative_to(TITLE, [x_pos, y_offset])
+            .font_size(15)
+            .color(bg_color.plain_contrast())
+            .set(CHASER_TITLE + id, conrod_ui);
+
+        for (switch_id_in_chaser, (switch_id, switch)) in switches.iter().map(|&switch_id| (switch_id, &ui.frontend_data.switches[switch_id])).enumerate() {
+            let y_pos = y_offset - 50.0 - switch_id_in_chaser as f64*button_height;
             Button::new()
                 .w_h(button_width, button_height)
-                .and(move |b| {
-                    let mut switches_per_group_locked = switches_per_group.lock().unwrap();
-                    let in_group = if !switches_per_group_locked.contains_key(&button.switch_group) {
-                        switches_per_group_locked.insert(button.switch_group, 1);
-                        1
-                    }
-                    else {
-                        if let Some(x) = switches_per_group_locked.get_mut(&button.switch_group) {
-                            *x = *x + 1;
-                            *x
-                        }
-                        else {
-                            1
-                        }
-                    };
-                    b.xy_relative_to(TITLE, [-button_width/2.0 + button.switch_group as f64 * button_width, - (70.0 + (in_group - 1) as f64 * button_height)])
-                })
+                .xy_relative_to(TITLE, [x_pos, y_pos])
                 .and(|b| {
-                    if button.dimmer_value != 0.0 {
+                    if switch.dimmer_value != 0.0 {
                         b.rgb(0.1, 0.9, 0.1)
                     } else {
                         b.rgb(0.9, 0.1, 0.1)
                     }
                 })
                 .frame(1.0)
-                .label(&label)
+                .label(&switch.name)
                 .react(|| {
-                    let new_value = if button.dimmer_value == 0.0 {255} else {0};
-                    tx.send(vec![if ui.shift_state {129} else {1}, 0, i as u8, new_value]).unwrap();
+                    let new_value = if switch.dimmer_value == 0.0 {255} else {0};
+                    let addr_high = (switch_id >> 8) as u8;
+                    let addr_low = switch_id as u8;
+                    tx.send(vec![if ui.shift_state {129} else {1}, addr_high, addr_low, new_value]).unwrap();
                 })
-                .set(BUTTON + i, conrod_ui);
+                .set(current_button_id, conrod_ui);
+                current_button_id = current_button_id + 1;
         }
-    }
-    for (&k,&v) in switches_per_group_mutex.lock().unwrap().iter() {
+        let y_pos = y_offset - 50.0 - (switches.len() as f64 - 0.25)*button_height;
+        let x_pos = -button_width/2.0 + (id as f64 - 0.25) * button_width;
         Button::new()
             .w_h(button_width/2.0, button_height/2.0)
-            .xy_relative_to(TITLE, [-3.0*button_width/4.0 + k as f64 * button_width, - (70.0 + v as f64 * button_height - button_height/4.0)])
+            .xy_relative_to(TITLE, [x_pos, y_pos])
             .rgb(0.9, 0.9, 0.1)
             .frame(1.0)
             .label(&"<<".to_string())
             .react(|| {
                 println!("<<");
-                //let new_value = if button.dimmer_value == 0.0 {255} else {0};
-                //tx.send(vec![if ui.shift_state {129} else {1}, 0, i as u8, new_value]).unwrap();
             })
-            .set(CHASER_BUTTON + 2*k, conrod_ui);
+            .set(current_button_id, conrod_ui);
+            current_button_id = current_button_id + 1;
+        let x_pos = -button_width/2.0 + (id as f64 + 0.25) * button_width;
         Button::new()
             .w_h(button_width/2.0, button_height/2.0)
-            .xy_relative_to(TITLE, [-button_width/4.0 + k as f64 * button_width, - (70.0 + v as f64 * button_height - button_height/4.0)])
+            .xy_relative_to(TITLE, [x_pos, y_pos])
             .rgb(0.9, 0.9, 0.1)
             .frame(1.0)
             .label(&">>".to_string())
             .react(|| {
                 println!(">>");
-                //let new_value = if button.dimmer_value == 0.0 {255} else {0};
-                //tx.send(vec![if ui.shift_state {129} else {1}, 0, i as u8, new_value]).unwrap();
             })
-            .set(CHASER_BUTTON + 2*k + 1, conrod_ui);
+            .set(current_button_id, conrod_ui);
+            current_button_id = current_button_id + 1;
     }
+
+
+
+
+    // {
+    //     for (i, button) in ui.frontend_data.switches.iter().enumerate() {
+    //         let switches_per_group = switches_per_group_mutex.clone();
+    //         let label = button.name.clone();// i.to_string();
+            // Button::new()
+            //     .w_h(button_width, button_height)
+            //     .and(move |b| {
+            //         let mut switches_per_group_locked = switches_per_group.lock().unwrap();
+            //         let in_group = if !switches_per_group_locked.contains_key(&button.switch_group) {
+            //             switches_per_group_locked.insert(button.switch_group, 1);
+            //             1
+            //         }
+            //         else {
+            //             if let Some(x) = switches_per_group_locked.get_mut(&button.switch_group) {
+            //                 *x = *x + 1;
+            //                 *x
+            //             }
+            //             else {
+            //                 1
+            //             }
+            //         };
+            //         b.xy_relative_to(TITLE, [-button_width/2.0 + button.switch_group as f64 * button_width, - (70.0 + (in_group - 1) as f64 * button_height)])
+            //     })
+            //     .and(|b| {
+            //         if button.dimmer_value != 0.0 {
+            //             b.rgb(0.1, 0.9, 0.1)
+            //         } else {
+            //             b.rgb(0.9, 0.1, 0.1)
+            //         }
+            //     })
+            //     .frame(1.0)
+            //     .label(&label)
+            //     .react(|| {
+            //         let new_value = if button.dimmer_value == 0.0 {255} else {0};
+            //         tx.send(vec![if ui.shift_state {129} else {1}, 0, i as u8, new_value]).unwrap();
+            //     })
+            //     .set(BUTTON + i, conrod_ui);
+        // }
+    // }
+    // for (&k,&v) in switches_per_group_mutex.lock().unwrap().iter() {
+        // Button::new()
+        //     .w_h(button_width/2.0, button_height/2.0)
+        //     .xy_relative_to(TITLE, [-3.0*button_width/4.0 + k as f64 * button_width, - (70.0 + v as f64 * button_height - button_height/4.0)])
+        //     .rgb(0.9, 0.9, 0.1)
+        //     .frame(1.0)
+        //     .label(&"<<".to_string())
+        //     .react(|| {
+        //         println!("<<");
+        //         //let new_value = if button.dimmer_value == 0.0 {255} else {0};
+        //         //tx.send(vec![if ui.shift_state {129} else {1}, 0, i as u8, new_value]).unwrap();
+        //     })
+        //     .set(CHASER_BUTTON + 2*k, conrod_ui);
+    //     Button::new()
+    //         .w_h(button_width/2.0, button_height/2.0)
+    //         .xy_relative_to(TITLE, [-button_width/4.0 + k as f64 * button_width, - (70.0 + v as f64 * button_height - button_height/4.0)])
+    //         .rgb(0.9, 0.9, 0.1)
+    //         .frame(1.0)
+    //         .label(&">>".to_string())
+    //         .react(|| {
+    //             println!(">>");
+    //             //let new_value = if button.dimmer_value == 0.0 {255} else {0};
+    //             //tx.send(vec![if ui.shift_state {129} else {1}, 0, i as u8, new_value]).unwrap();
+    //         })
+    //         .set(CHASER_BUTTON + 2*k + 1, conrod_ui);
+    // }
 }
 
 fn create_splash_window(ui: Arc<Mutex<UI>>) {
@@ -360,7 +424,7 @@ fn create_splash_window(ui: Arc<Mutex<UI>>) {
         Ui::new(glyph_cache.unwrap(), theme)
     };
 
-    window.set_ups(1);
+    window.set_ups(30);
 
     // Poll events from the window.
     while let Some(event) = window.next() {

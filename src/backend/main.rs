@@ -30,25 +30,25 @@ fn main() {
     v1.insert((0, 0), (vec![255], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
     v1.insert((1, 0), (vec![255], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
     v1.insert((2, 0), (vec![255], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
-    stage.add_switch(Switch::new("RGB full on".to_string(), v1, 0));
+    stage.add_switch(Switch::new("RGB full on".to_string(), v1, "Full".to_string(), 3000));
 
     let mut v1 = HashMap::new();
     v1.insert((0, 0), (vec![0], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
     v1.insert((1, 0), (vec![0], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
     v1.insert((2, 0), (vec![0], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
-    stage.add_switch(Switch::new("Blackout".to_string(), v1, 0));
+    stage.add_switch(Switch::new("Blackout".to_string(), v1, "Full".to_string(), 3000));
 
     let mut v2 = HashMap::new();
     v2.insert((0, 0), (vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
-    stage.add_switch(Switch::new("RED".to_string(), v2, 1));
+    stage.add_switch(Switch::new("RED".to_string(), v2, "Single Colors".to_string(), 3000));
 
     let mut test_v = HashMap::new();
     test_v.insert((1, 0), (vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
-    stage.add_switch(Switch::new("GREEN".to_string(), test_v, 1));
+    stage.add_switch(Switch::new("GREEN".to_string(), test_v, "Single Colors".to_string(), 3000));
 
     let mut test_v2 = HashMap::new();
     test_v2.insert((2, 0), (vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
-    stage.add_switch(Switch::new("BLUE".to_string(), test_v2, 1));
+    stage.add_switch(Switch::new("BLUE".to_string(), test_v2, "Single Colors".to_string(), 3000));
 
 
     for fixture in stage.fixtures.iter_mut() {
@@ -130,7 +130,7 @@ fn main() {
             let mut test_v2 = HashMap::new();
             test_v2.insert((1, 0), (vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
             test_v2.insert((2, 0), (vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
-            stage_locked.add_switch(Switch::new("CYAN".to_string(), test_v2, 2));
+            stage_locked.add_switch(Switch::new("CYAN".to_string(), test_v2, "Multi Color".to_string(), 3000));
             UDPSocket::new().start_frontend_client().send_to_multicast(&[255, 255, 255, 255]);
         });
     }

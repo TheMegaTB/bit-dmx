@@ -22,7 +22,7 @@ pub struct FrontendData {
     pub max_dmx_address: DmxAddress,
     pub fixtures: Vec<EmptyFixture>,
     pub switches: Vec<JsonSwitch>,
-    switch_groups: HashMap<usize, Vec<usize>>
+    pub chasers: HashMap<String, Vec<usize>>
 }
 
 impl FrontendData {
@@ -31,7 +31,7 @@ impl FrontendData {
             max_dmx_address: 0,
             fixtures: Vec::new(),
             switches: Vec::new(),
-            switch_groups: HashMap::new()
+            chasers: HashMap::new()
         }
     }
 }
@@ -43,7 +43,7 @@ pub struct Stage {
     pub fixtures: Vec<Fixture>,
     switches: Vec<Switch>,
     dmx_tx: mpsc::Sender<(DmxAddress, DmxValue)>,
-    switch_groups: HashMap<usize, Vec<usize>>
+    chasers: HashMap<String, Vec<usize>>
 }
 
 impl Stage {
@@ -52,7 +52,7 @@ impl Stage {
             channels: Vec::new(),
             fixtures: Vec::new(),
             switches: Vec::new(),
-            switch_groups: HashMap::new(),
+            chasers: HashMap::new(),
             dmx_tx: dmx_tx
         }
     }
@@ -62,7 +62,7 @@ impl Stage {
             max_dmx_address: self.channels.len() as DmxAddress,
             fixtures: self.fixtures.iter().map(|x| x.to_empty_fixture()).collect(),
             switches: self.switches.iter().map(|x| x.with_json_hashmap()).collect(),
-            switch_groups: self.switch_groups.clone()
+            chasers: self.chasers.clone()
         }
     }
 
@@ -71,28 +71,28 @@ impl Stage {
         self.fixtures.len() - 1
     }
 
-    fn add_fixture_to_switch_group(&mut self, switch_id:usize, group_id: usize) {
-        if !self.switch_groups.contains_key(&group_id) {
-            self.switch_groups.insert(group_id, Vec::new());
+    fn add_fixture_to_switch_group(&mut self, switch_id:usize, chaser_id: String) {
+        if !self.chasers.contains_key(&chaser_id) {
+            self.chasers.insert(chaser_id.clone(), Vec::new());
         }
-        self.switch_groups.get_mut(&group_id).unwrap().push(switch_id);
+        self.chasers.get_mut(&chaser_id).unwrap().push(switch_id);
     }
 
     pub fn add_switch(&mut self, switch: Switch) -> usize {
         let id = self.switches.len();
-        self.add_fixture_to_switch_group(id, switch.switch_group);
+        self.add_fixture_to_switch_group(id, switch.chaser_id.clone());
         self.switches.push(switch);
 
         id
     }
 
-    pub fn deactivate_group_of_switch(&mut self, group_switch_id: usize) -> Vec<usize> {
-        let s = self.switch_groups.get(&self.switches[group_switch_id].switch_group).unwrap().iter().filter(|&x| *x != group_switch_id).map(|&x| x).collect::<Vec<usize>>();
+    pub fn deactivate_group_of_switch(&mut self, switch_id: usize) -> Vec<usize> {
+        let switches = self.chasers.get(&self.switches[switch_id].chaser_id).unwrap().iter().filter(|&x| *x != switch_id).map(|&x| x).collect::<Vec<usize>>();
 
-        for switch_id in s.iter() {
+        for switch_id in switches.iter() {
             self.set_switch(*switch_id, 0.0);
         };
-        s
+        switches
     }
 
     pub fn set_switch(&mut self, switch_id: usize, dimmer_value: f64) {
