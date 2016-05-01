@@ -278,8 +278,8 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
     // let mut id = None;
     let tx = ui.tx.clone();
 
-    let BUTTON_WIDTH = 200.0;
-    let BUTTON_HEIGHT = 50.0;
+    let button_width = 200.0;
+    let button_height = 50.0;
     let switches_per_group: HashMap<usize, usize> = HashMap::new();
     let switches_per_group_mutex = Arc::new(Mutex::new(switches_per_group));
     {
@@ -287,7 +287,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
             let switches_per_group = switches_per_group_mutex.clone();
             let label = button.name.clone();// i.to_string();
             Button::new()
-                .w_h(BUTTON_WIDTH, BUTTON_HEIGHT)
+                .w_h(button_width, button_height)
                 .and(move |b| {
                     let mut switches_per_group_locked = switches_per_group.lock().unwrap();
                     let in_group = if !switches_per_group_locked.contains_key(&button.switch_group) {
@@ -303,7 +303,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
                             1
                         }
                     };
-                    b.xy_relative_to(TITLE, [-BUTTON_WIDTH/2.0 + button.switch_group as f64 * BUTTON_WIDTH, - (70.0 + (in_group - 1) as f64 * BUTTON_HEIGHT)])
+                    b.xy_relative_to(TITLE, [-button_width/2.0 + button.switch_group as f64 * button_width, - (70.0 + (in_group - 1) as f64 * button_height)])
                 })
                 .and(|b| {
                     if button.dimmer_value != 0.0 {
@@ -323,8 +323,8 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
     }
     for (&k,&v) in switches_per_group_mutex.lock().unwrap().iter() {
         Button::new()
-            .w_h(BUTTON_WIDTH/2.0, BUTTON_HEIGHT/2.0)
-            .xy_relative_to(TITLE, [-3.0*BUTTON_WIDTH/4.0 + k as f64 * BUTTON_WIDTH, - (70.0 + v as f64 * BUTTON_HEIGHT - BUTTON_HEIGHT/4.0)])
+            .w_h(button_width/2.0, button_height/2.0)
+            .xy_relative_to(TITLE, [-3.0*button_width/4.0 + k as f64 * button_width, - (70.0 + v as f64 * button_height - button_height/4.0)])
             .rgb(0.9, 0.9, 0.1)
             .frame(1.0)
             .label(&"<<".to_string())
@@ -335,8 +335,8 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
             })
             .set(CHASER_BUTTON + 2*k, conrod_ui);
         Button::new()
-            .w_h(BUTTON_WIDTH/2.0, BUTTON_HEIGHT/2.0)
-            .xy_relative_to(TITLE, [-BUTTON_WIDTH/4.0 + k as f64 * BUTTON_WIDTH, - (70.0 + v as f64 * BUTTON_HEIGHT - BUTTON_HEIGHT/4.0)])
+            .w_h(button_width/2.0, button_height/2.0)
+            .xy_relative_to(TITLE, [-button_width/4.0 + k as f64 * button_width, - (70.0 + v as f64 * button_height - button_height/4.0)])
             .rgb(0.9, 0.9, 0.1)
             .frame(1.0)
             .label(&">>".to_string())
