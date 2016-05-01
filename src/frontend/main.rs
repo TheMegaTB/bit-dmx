@@ -9,8 +9,7 @@ extern crate rustc_serialize;
 use structures::*;
 use std::io::Read;
 use std::time::Duration;
-use std::thread::{self, sleep};
-use std::collections::HashMap;
+use std::thread;
 
 use std::net::{TcpStream, SocketAddr};
 use std::sync::{Arc, Mutex, mpsc};
@@ -38,7 +37,7 @@ use conrod::{
     // WidgetMatrix,
     // XYPad,
 };
-use piston_window::{ EventLoop, Glyphs, PistonWindow, UpdateEvent, WindowSettings, PressEvent, ReleaseEvent, Window };
+use piston_window::{ EventLoop, Glyphs, PistonWindow, UpdateEvent, WindowSettings, PressEvent, ReleaseEvent };
 use rustc_serialize::json;
 
 
@@ -91,7 +90,7 @@ impl UI {
             });
         }
 
-        let mut ui = UI {
+        let ui = UI {
             watchdog: watchdog,
             tx: tx,
             frontend_data: frontend_data,
@@ -310,9 +309,6 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
                 .react(|| {
                     let new_value = if switch.dimmer_value == 0.0 {255} else {0};
                     tx.send(get_switch_update(ui.shift_state, switch_id as u16, new_value)).unwrap();
-                    // let addr_high = (switch_id >> 8) as u8;
-                    // let addr_low = switch_id as u8;
-                    // tx.send(vec![if ui.shift_state {129} else {1}, addr_high, addr_low, new_value]).unwrap();
                 })
                 .set(current_button_id, conrod_ui);
                 current_button_id = current_button_id + 1;
