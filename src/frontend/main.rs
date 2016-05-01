@@ -38,7 +38,7 @@ use conrod::{
     // WidgetMatrix,
     // XYPad,
 };
-use piston_window::{ EventLoop, Glyphs, PistonWindow, UpdateEvent, WindowSettings, PressEvent, ReleaseEvent };
+use piston_window::{ EventLoop, Glyphs, PistonWindow, UpdateEvent, WindowSettings, PressEvent, ReleaseEvent, Window };
 use rustc_serialize::json;
 
 
@@ -285,6 +285,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
     for (id, (name, switches)) in chasers.iter().map(|x| (x, ui.frontend_data.chasers.get(x).unwrap())).enumerate() {
         let x_pos = -button_width/2.0 + id as f64 * button_width;
         let y_offset = -50.0;
+        let mut last_active_switch_id = None;
         Text::new(name)
             .xy_relative_to(TITLE, [x_pos, y_offset])
             .font_size(15)
@@ -298,6 +299,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
                 .xy_relative_to(TITLE, [x_pos, y_pos])
                 .and(|b| {
                     if switch.dimmer_value != 0.0 {
+                        last_active_switch_id = Some(switch_id_in_chaser);
                         b.rgb(0.1, 0.9, 0.1)
                     } else {
                         b.rgb(0.9, 0.1, 0.1)
@@ -307,39 +309,69 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
                 .label(&switch.name)
                 .react(|| {
                     let new_value = if switch.dimmer_value == 0.0 {255} else {0};
-                    let addr_high = (switch_id >> 8) as u8;
-                    let addr_low = switch_id as u8;
-                    tx.send(vec![if ui.shift_state {129} else {1}, addr_high, addr_low, new_value]).unwrap();
+                    tx.send(get_switch_update(ui.shift_state, switch_id as u16, new_value)).unwrap();
+                    // let addr_high = (switch_id >> 8) as u8;
+                    // let addr_low = switch_id as u8;
+                    // tx.send(vec![if ui.shift_state {129} else {1}, addr_high, addr_low, new_value]).unwrap();
                 })
                 .set(current_button_id, conrod_ui);
                 current_button_id = current_button_id + 1;
         }
         let y_pos = y_offset - 50.0 - (switches.len() as f64 - 0.25)*button_height;
-        let x_pos = -button_width/2.0 + (id as f64 - 0.25) * button_width;
-        Button::new()
-            .w_h(button_width/2.0, button_height/2.0)
-            .xy_relative_to(TITLE, [x_pos, y_pos])
-            .rgb(0.9, 0.9, 0.1)
-            .frame(1.0)
-            .label(&"<<".to_string())
-            .react(|| {
-                println!("<<");
-            })
-            .set(current_button_id, conrod_ui);
-            current_button_id = current_button_id + 1;
-        let x_pos = -button_width/2.0 + (id as f64 + 0.25) * button_width;
-        Button::new()
-            .w_h(button_width/2.0, button_height/2.0)
-            .xy_relative_to(TITLE, [x_pos, y_pos])
-            .rgb(0.9, 0.9, 0.1)
-            .frame(1.0)
-            .label(&">>".to_string())
-            .react(|| {
-                println!(">>");
-            })
-            .set(current_button_id, conrod_ui);
-            current_button_id = current_button_id + 1;
+        {
+            let tx = tx.clone();
+            let x_pos = -button_width/2.0 + (id as f64 - 0.25) * button_width;
+            Button::new()
+                .w_h(button_width/2.0, button_height/2.0)
+                .xy_relative_to(TITLE, [x_pos, y_pos])
+                .rgb(0.9, 0.9, 0.1)
+                .frame(1.0)
+                .label(&"<<".to_string())
+                .react(|| {
+                    println!("<<");
+                    let next_switch_id = {
+                        match last_active_switch_id {
+                            Some(last_active_switch_id) => {
+                                if last_active_switch_id == 0 {switches.len() - 1} else {last_active_switch_id - 1}
+                            },
+                            None => 0
+                        }
+                    };
+                    tx.send(get_switch_update(!ui.shift_state, switches[next_switch_id] as u16, 255)).unwrap();
+                })
+                .set(current_button_id, conrod_ui);
+                current_button_id = current_button_id + 1;
+        }
+        {
+            let x_pos = -button_width/2.0 + (id as f64 + 0.25) * button_width;
+            Button::new()
+                .w_h(button_width/2.0, button_height/2.0)
+                .xy_relative_to(TITLE, [x_pos, y_pos])
+                .rgb(0.9, 0.9, 0.1)
+                .frame(1.0)
+                .label(&">>".to_string())
+                .react(|| {
+                    println!(">>");
+                    let next_switch_id = {
+                        match last_active_switch_id {
+                            Some(last_active_switch_id) => {
+                                if last_active_switch_id + 1 == switches.len() {0} else {last_active_switch_id + 1}
+                            },
+                            None => 0
+                        }
+                    };
+                    tx.send(get_switch_update(!ui.shift_state, switches[next_switch_id] as u16, 255)).unwrap();
+                })
+                .set(current_button_id, conrod_ui);
+                current_button_id = current_button_id + 1;
+        }
     }
+}
+
+fn get_switch_update(shift_state: bool, addr: u16, value: u8) -> Vec<u8> {
+    let addr_high = (addr >> 8) as u8;
+    let addr_low = addr as u8;
+    vec![if shift_state {129} else {1}, addr_high, addr_low, value]
 }
 
 fn create_splash_window(ui: Arc<Mutex<UI>>) {
