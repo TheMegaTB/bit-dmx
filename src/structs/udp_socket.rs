@@ -61,6 +61,13 @@ impl UDPSocket {
         sock
     }
 
+    // pub fn start_frontend_server(&self) -> UDPSocketHandle {
+    //     UDPSocketHandle {
+    //         socket: self.assemble_socket(self.port + 1, true),
+    //         multicast_addr: SocketAddr::V4(SocketAddrV4::new(self.multicast_addr, self.port))
+    //     }
+    // }
+
     pub fn start_client(&self) -> UDPSocketHandle {
         UDPSocketHandle {
             socket: self.assemble_socket(self.port, true),

@@ -8,6 +8,7 @@ use structures::*;
 use std::io::Read;
 use std::time::Duration;
 use std::thread::{self, sleep};
+use std::collections::HashMap;
 
 use std::net::{TcpStream, SocketAddr};
 use std::sync::{Arc, Mutex, mpsc};
@@ -106,6 +107,10 @@ impl UI {
             println!("No server ip");
         }
     }
+
+    // fn udp_listener() {
+    //
+    // }
 }
 
 fn create_output_window() {
@@ -131,13 +136,13 @@ fn create_output_window() {
     while let Some(event) = window.next() {
         if let Some(button) = event.press_args() {
             println!("button {:?} pressed", button);
-            if button == piston_window::Button::Keyboard(piston_window::Key::LShift) || button == piston_window::Button::Keyboard(piston_window::Key::RShift) {    //Button::Mouse(piston_window::MouseButton::Left) {
+            if button == piston_window::Button::Keyboard(piston_window::Key::LShift){    //Button::Mouse(piston_window::MouseButton::Left) {
                 ui.shift_state = true;
             }
         };
         if let Some(button) = event.release_args() {
             println!("button {:?} pressed", button);
-            if button == piston_window::Button::Keyboard(piston_window::Key::LShift) || button == piston_window::Button::Keyboard(piston_window::Key::RShift) {    //Button::Mouse(piston_window::MouseButton::Left) {
+            if button == piston_window::Button::Keyboard(piston_window::Key::LShift){    //Button::Mouse(piston_window::MouseButton::Left) {
                 ui.shift_state = false;
             }
         };
@@ -181,16 +186,34 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
         .react(|| {})
         .set(CONNECTED_BUTTON, conrod_ui);
 
-    let mut id = TITLE;
+    // let mut id = None;
     let tx = ui.tx.clone();
+
+    let switches_per_group: HashMap<usize, usize> = HashMap::new();
+    let switches_per_group_mutex = Arc::new(Mutex::new(switches_per_group));
     for (i, button) in ui.frontend_data.switches.iter().enumerate() {
+        println!("{:?}", switches_per_group_mutex);
+        let switches_per_group = switches_per_group_mutex.clone();
         let label = button.name.clone();// i.to_string();
         Button::new()
             .w_h(200.0, 50.0)
-            .and(|b| {
-                if i > 0 {
-                    b.right_from(id, 5.0)
-                } else { b.down(25.0) }
+            .and(move |b| {
+                let mut switches_per_group_locked = switches_per_group.lock().unwrap();
+                let in_group = if !switches_per_group_locked.contains_key(&button.switch_group) {
+                    switches_per_group_locked.insert(button.switch_group, 1);
+                    1
+                }
+                else {
+                    if let Some(x) = switches_per_group_locked.get_mut(&button.switch_group) {
+                        *x = *x + 1;
+                        *x
+                    }
+                    else {
+                        1
+                    }
+                };
+                println!("{:?}, {:?}", button.switch_group, in_group);
+                b.xy_relative_to(TITLE, [button.switch_group as f64 * 200.0, - (70.0 + (in_group - 1) as f64 * 50.0)])
             })
             .and(|b| {
                 if button.dimmer_value != 0.0 {
@@ -204,17 +227,8 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
             .react(|| {
                 let new_value = if button.dimmer_value == 0.0 {255} else {0};
                 tx.send(vec![if ui.shift_state {129} else {1}, 0, i as u8, new_value]).unwrap();
-                // button.1 = !button.1;
-                // if button.1 {
-                //     tx.send(vec![1, 0, button.0 as u8, 255]).unwrap()
-                //     // client.send(&[1, 0, button.0 as u8, 255], server);
-                // } else {
-                //     tx.send(vec![1, 0, button.0 as u8, 0]).unwrap()
-                //     // client.send(&[1, 0, button.0 as u8, 0], server);
-                // }
             })
             .set(BUTTON + i, conrod_ui);
-        id = BUTTON + i;
     }
     ui.fetch_data(); //TODO replace with udp
 }
