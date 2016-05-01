@@ -192,7 +192,6 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
     let switches_per_group: HashMap<usize, usize> = HashMap::new();
     let switches_per_group_mutex = Arc::new(Mutex::new(switches_per_group));
     for (i, button) in ui.frontend_data.switches.iter().enumerate() {
-        println!("{:?}", switches_per_group_mutex);
         let switches_per_group = switches_per_group_mutex.clone();
         let label = button.name.clone();// i.to_string();
         Button::new()
@@ -212,7 +211,6 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
                         1
                     }
                 };
-                println!("{:?}, {:?}", button.switch_group, in_group);
                 b.xy_relative_to(TITLE, [button.switch_group as f64 * 200.0, - (70.0 + (in_group - 1) as f64 * 50.0)])
             })
             .and(|b| {

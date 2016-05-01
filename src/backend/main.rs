@@ -30,19 +30,25 @@ fn main() {
     v1.insert((0, 0), (vec![255], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
     v1.insert((1, 0), (vec![255], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
     v1.insert((2, 0), (vec![255], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
-    let s1 = stage.add_switch(Switch::new("RGB full on".to_string(), v1, 0));
+    stage.add_switch(Switch::new("RGB full on".to_string(), v1, 0));
+
+    let mut v1 = HashMap::new();
+    v1.insert((0, 0), (vec![0], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
+    v1.insert((1, 0), (vec![0], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
+    v1.insert((2, 0), (vec![0], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
+    stage.add_switch(Switch::new("Blackout".to_string(), v1, 0));
 
     let mut v2 = HashMap::new();
     v2.insert((0, 0), (vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
-    let s2 = stage.add_switch(Switch::new("RED".to_string(), v2, 1));
+    stage.add_switch(Switch::new("RED".to_string(), v2, 1));
 
     let mut test_v = HashMap::new();
     test_v.insert((1, 0), (vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
-    let s3 = stage.add_switch(Switch::new("GREEN".to_string(), test_v, 1));
+    stage.add_switch(Switch::new("GREEN".to_string(), test_v, 1));
 
     let mut test_v2 = HashMap::new();
     test_v2.insert((2, 0), (vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
-    let s4 = stage.add_switch(Switch::new("BLUE".to_string(), test_v2, 1));
+    stage.add_switch(Switch::new("BLUE".to_string(), test_v2, 1));
 
 
     for fixture in stage.fixtures.iter_mut() {
@@ -58,11 +64,11 @@ fn main() {
     //
     // println!("{:?}", (json::encode(&stage.get_frontend_data()).unwrap()));
 
-    stage.set_switch(s2, 100.0);
-    sleep(Duration::from_millis(2500));
-    stage.set_switch(s2, 255.0);
-    sleep(Duration::from_millis(2500));
-    stage.set_switch(s2, 0.0);
+    // stage.set_switch(s2, 100.0);
+    // sleep(Duration::from_millis(2500));
+    // stage.set_switch(s2, 255.0);
+    // sleep(Duration::from_millis(2500));
+    // stage.set_switch(s2, 0.0);
 
 
     // stage.set_switch(s1, 255.0);
