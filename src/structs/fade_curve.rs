@@ -2,7 +2,7 @@ use meval::Expr;
 
 #[derive(Debug, Clone)]
 #[derive(RustcDecodable, RustcEncodable)]
-pub enum FadeCurve {
+pub enum FadeCurve { //TODO add fadecurve from pointlist
     Linear,
     Squared,
     SquareRoot,
