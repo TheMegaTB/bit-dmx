@@ -78,7 +78,7 @@ impl UI {
                     if watchdog.is_alive() {
                         frontend_client.send(data.as_slice(), SocketAddr::new(watchdog.get_server_addr().unwrap(), 8001));
                     } else {
-                        println!("Couldn't send data. No server available");
+                        println!("Could not send data. No server available");
                     }
                 }
             });
