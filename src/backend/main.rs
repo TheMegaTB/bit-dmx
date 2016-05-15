@@ -42,7 +42,7 @@ fn main() {
 
     let mut v2 = HashMap::new();
     v2.insert((0, 0), (vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
-    stage.add_switch(Switch::new("RED".to_string(), v2, "Single Colors".to_string(), 3000));
+    stage.add_switch(Switch::new("RED".to_string(), v2, "Single Colors".to_string(), 1000));
 
     let mut test_v = HashMap::new();
     test_v.insert((1, 0), (vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
@@ -98,19 +98,26 @@ fn main() {
                 let address: u16 = ((d[1] as u16) << 8) + (d[2] as u16);
                 let value: u8 = d[3];
 
-                let mut stage_locked = stage.lock().unwrap();
+
                 if address_type == 0 {
+                    let mut stage_locked = stage.lock().unwrap();
                     let mut channel_locked = stage_locked.channels[address as usize].lock().unwrap();
                     channel_locked.stop_fade();
                     channel_locked.set(value);
                 }
                 else if address_type == 1 {
                     // Switch
+                    let mut stage_locked = stage.lock().unwrap();
                     println!("Set switch with address {:?} to {:?} (shifted: {:?})", address, value, shift);
                     if shift {
-                        switch_id in stage_locked.deactivate_group_of_switch(address as usize)
+                        stage_locked.deactivate_group_of_switch(address as usize)
                     }
                     stage_locked.set_switch(address as usize, value as f64);
+                }
+                else if address_type == 2 {
+                    // Chaser
+                    println!("Start chaser with switch with address {:?} to {:?} (shifted: {:?})", address, value, shift);
+                    start_chaser_of_switch(stage.clone(), address as usize, value as f64);
                 }
             }
         });

@@ -1,6 +1,8 @@
 use std::sync::{Arc, Mutex};
 use std::sync::mpsc;
 use std::collections::HashMap;
+use std::time::Duration;
+use std::thread::{self, sleep};
 
 use DmxAddress;
 use DmxValue;
@@ -50,6 +52,15 @@ impl Chaser {
             switches: Vec::new(),
             current_thread: None
         }
+    }
+    pub fn stop_chaser(&mut self) {
+        match self.current_thread {
+            Some(ref tx) => {
+                if tx.send(()).is_ok() {println!("chaser killed")}
+            },
+            None => {}
+        }
+        self.current_thread = None;
     }
 }
 
@@ -185,7 +196,35 @@ impl Stage {
     }
 }
 
-fn remove_from_active_switches(active_switches: &mut Vec<(usize, ChannelGroupValue)>, switch_id: usize) -> bool {
+pub fn start_chaser_of_switch(stage: Arc<Mutex<Stage>>, switch_id: usize, dimmer_value: f64) {
+    let (chaser, rx) = {
+        let stage_locked = stage.lock().unwrap();
+        let mut chaser = stage_locked.chasers.get(&stage_locked.switches[switch_id].chaser_id).unwrap();
+        chaser.stop_chaser();
+        let (tx, rx) = mpsc::channel();
+        chaser.current_thread = Some(tx);
+        (chaser.clone(), rx)
+    };
+    println!("{:?}", chaser);
+    thread::spawn(move || {
+        let mut current_switch_id_in_chaser: usize = 0; //TODO user switch_id
+        loop {
+            {stage.lock().unwrap().deactivate_group_of_switch(chaser.switches[current_switch_id_in_chaser]);}
+            {stage.lock().unwrap().set_switch(chaser.switches[current_switch_id_in_chaser], dimmer_value);}
+            current_switch_id_in_chaser = (current_switch_id_in_chaser + 1) % chaser.switches.len();
+            let sleep_time = {
+                let stage_locked = stage.lock().unwrap();
+                stage_locked.switches[chaser.switches[current_switch_id_in_chaser]].before_chaser as u64
+            };
+            sleep(Duration::from_millis(sleep_time));
+            if rx.try_recv().is_ok() { return };
+        }
+    });
+    println!("ready");
+}
+
+fn remove_from_active_switches(active_switches:
+    &mut Vec<(usize, ChannelGroupValue)>, switch_id: usize) -> bool {
     if active_switches.len() > 0 { //TODO: Replace this workaround.
         let last_index = active_switches.len() - 1;
         let last_id = active_switches[last_index].0;
