@@ -41,16 +41,16 @@ fn main() {
     stage.add_switch(Switch::new("Blackout".to_string(), v1, "Full".to_string(), 3000));
 
     let mut v2 = HashMap::new();
-    v2.insert((0, 0), (vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
+    v2.insert((0, 0), (vec![20], (FadeCurve::Squared, 0), (FadeCurve::Linear, 0)));
     stage.add_switch(Switch::new("RED".to_string(), v2, "Single Colors".to_string(), 1000));
 
     let mut test_v = HashMap::new();
-    test_v.insert((1, 0), (vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
-    stage.add_switch(Switch::new("GREEN".to_string(), test_v, "Single Colors".to_string(), 3000));
+    test_v.insert((1, 0), (vec![20], (FadeCurve::Squared, 0), (FadeCurve::Linear, 5000)));
+    stage.add_switch(Switch::new("GREEN".to_string(), test_v, "Single Colors".to_string(), 1000));
 
     let mut test_v2 = HashMap::new();
-    test_v2.insert((2, 0), (vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
-    stage.add_switch(Switch::new("BLUE".to_string(), test_v2, "Single Colors".to_string(), 3000));
+    test_v2.insert((2, 0), (vec![20], (FadeCurve::Squared, 500), (FadeCurve::Linear, 0)));
+    stage.add_switch(Switch::new("BLUE".to_string(), test_v2, "Single Colors".to_string(), 800));
 
 
     for fixture in stage.fixtures.iter_mut() {
@@ -61,24 +61,6 @@ fn main() {
             _ => {}
         }
     }
-
-    // let data = stage.get_frontend_data();
-    //
-    // println!("{:?}", (json::encode(&stage.get_frontend_data()).unwrap()));
-
-    // stage.set_switch(s2, 100.0);
-    // sleep(Duration::from_millis(2500));
-    // stage.set_switch(s2, 255.0);
-    // sleep(Duration::from_millis(2500));
-    // stage.set_switch(s2, 0.0);
-
-
-    // stage.set_switch(s1, 255.0);
-    // stage.set_switch(s2, 255.0);
-    // sleep(Duration::from_millis(2500));
-    // stage.deactivate_group_of_switch(s3);
-    // stage.set_switch(s3, 255.0);
-
 
    let socket = UDPSocket::new();
     socket.start_watchdog_server();
@@ -100,7 +82,7 @@ fn main() {
 
 
                 if address_type == 0 {
-                    let mut stage_locked = stage.lock().unwrap();
+                    let stage_locked = stage.lock().unwrap();
                     let mut channel_locked = stage_locked.channels[address as usize].lock().unwrap();
                     channel_locked.stop_fade();
                     channel_locked.set(value);

@@ -4,6 +4,9 @@ use Channel;
 use std::sync::mpsc;
 use std::sync::{Arc, Mutex};
 
+use FadeTime;
+use FADE_TICKS;
+
 
 fn max3(a: f64, b: f64, c: f64) -> f64 {
     a.max(b).max(c)
@@ -68,6 +71,16 @@ pub fn hsv_to_rgb(h: f64, s: f64, v: f64) -> (DmxValue, DmxValue, DmxValue) {
         (c, 0f64, x)
     };
     (((r2+m)*255f64) as DmxValue, ((g2+m)*255f64) as DmxValue, ((b2+m)*255f64) as DmxValue)
+}
+
+pub fn get_step_number(time: FadeTime) -> usize {
+    let steps = time*FADE_TICKS/1000;
+    if steps > 0 {
+        steps
+    }
+    else {
+        1
+    }
 }
 
 pub fn get_fade_steps_int(start_value: DmxValue, target_value: DmxValue, steps: usize, curve: FadeCurve) -> Vec<DmxValue> {

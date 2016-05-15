@@ -7,9 +7,13 @@ extern crate rand;
 extern crate structures;
 extern crate rustc_serialize;
 use structures::*;
-use std::io::Read;
+//use std::io::Read;
 use std::time::Duration;
 use std::thread;
+
+use std::io::prelude::*;
+use std::io::BufReader;
+use std::fs::File;
 
 use std::net::{TcpStream, SocketAddr};
 use std::sync::{Arc, Mutex, mpsc};
@@ -128,6 +132,13 @@ impl UI {
                         // Switch
                         ui_locked.frontend_data.switches[address as usize].dimmer_value = value as f64;
                     }
+                    else if address_type == 2 {
+                        // chaser
+                        let chaser_id = ui_locked.frontend_data.switches[address as usize].clone().chaser_id;
+                        let mut chaser = ui_locked.frontend_data.chasers.get_mut(&chaser_id).unwrap();
+
+                        chaser.current_thread = value != 0;
+                    }
                 }
                 println!("{:?}", buf);
             }
@@ -202,7 +213,7 @@ impl UI {
     }
 }
 
-fn create_output_window(ui: Arc<Mutex<UI>>) {
+fn create_output_window(ui: Arc<Mutex<UI>>, chasers: Vec<String>) {
     let mut window: PistonWindow = WindowSettings::new("Sushi Reloaded!", [1100, 560])
                                     .exit_on_esc(false).vsync(true).build().unwrap();
 
@@ -233,12 +244,12 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
             }
         };
         conrod_ui.handle_event(&event);
-        event.update(|_| conrod_ui.set_widgets(|mut conrod_ui| set_widgets(&mut conrod_ui, &mut ui_locked)));
+        event.update(|_| conrod_ui.set_widgets(|mut conrod_ui| set_widgets(&mut conrod_ui, &mut ui_locked, chasers.clone())));
         window.draw_2d(&event, |c, g| conrod_ui.draw_if_changed(c, g));
     }
 }
 
-fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
+fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>) {
     let bg_color = color::rgb(0.236, 0.239, 0.241);
 
     Canvas::new()
@@ -279,9 +290,9 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
     let button_height = 50.0;
     let mut current_button_id = BUTTON;
 
-    let chasers: Vec<String> = ui.frontend_data.chasers.keys().map(|x| x.clone()).collect(); //TODO edit by user,  save & load
+    //let chasers: Vec<String> = ui.frontend_data.chasers.keys().map(|x| x.clone()).collect(); //TODO edit by user,  save & load
 
-    for (id, (name, switches)) in chasers.iter().map(|x| (x, ui.frontend_data.chasers.get(x).unwrap())).enumerate() {
+    for (id, (name, chaser)) in chasers.iter().map(|x| (x, ui.frontend_data.chasers.get(x).unwrap())).enumerate() {
         let x_pos = (id as f64 - 0.5) * button_width;
         let y_offset = -50.0;
         let mut last_active_switch_id = None;
@@ -291,7 +302,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
             .color(bg_color.plain_contrast())
             .set(CHASER_TITLE + id, conrod_ui);
 
-        for (switch_id_in_chaser, (switch_id, switch)) in switches.iter().map(|&switch_id| (switch_id, &ui.frontend_data.switches[switch_id])).enumerate() {
+        for (switch_id_in_chaser, (switch_id, switch)) in chaser.switches.iter().map(|&switch_id| (switch_id, &ui.frontend_data.switches[switch_id])).enumerate() {
             let y_pos = y_offset - 50.0 - switch_id_in_chaser as f64*button_height;
             Button::new()
                 .w_h(button_width, button_height)
@@ -313,7 +324,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
                 .set(current_button_id, conrod_ui);
                 current_button_id = current_button_id + 1;
         }
-        let y_pos = y_offset - 50.0 - (switches.len() as f64 - 0.25)*button_height;
+        let y_pos = y_offset - 50.0 - (chaser.switches.len() as f64 - 0.25)*button_height;
         {
             let tx = tx.clone();
             let x_pos = (id as f64 - 5f64/6f64) * button_width;
@@ -328,12 +339,12 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
                     let next_switch_id = {
                         match last_active_switch_id {
                             Some(last_active_switch_id) => {
-                                if last_active_switch_id == 0 {switches.len() - 1} else {last_active_switch_id - 1}
+                                if last_active_switch_id == 0 {chaser.switches.len() - 1} else {last_active_switch_id - 1}
                             },
                             None => 0
                         }
                     };
-                    tx.send(get_switch_update(!ui.shift_state, switches[next_switch_id] as u16, 255)).unwrap();
+                    tx.send(get_switch_update(!ui.shift_state, chaser.switches[next_switch_id] as u16, 255)).unwrap();
                 })
                 .set(current_button_id, conrod_ui);
                 current_button_id = current_button_id + 1;
@@ -341,23 +352,36 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
         {
             let tx = tx.clone();
             let x_pos = (id as f64 - 0.5) * button_width;
+            let label = {
+                if chaser.current_thread {
+                    "||".to_string()
+                }
+                else {
+                    ">".to_string()
+                }
+            };
             Button::new()
                 .w_h(button_width/3.0, button_height/2.0)
                 .xy_relative_to(TITLE, [x_pos, y_pos])
                 .rgb(0.9, 0.9, 0.1)
                 .frame(1.0)
-                .label(&">".to_string())
+                .label(&label)
                 .react(|| {
                     println!(">");
                     let next_switch_id = {
                         match last_active_switch_id {
                             Some(last_active_switch_id) => {
-                                if last_active_switch_id == 0 {switches.len() - 1} else {last_active_switch_id - 1}
+                                if last_active_switch_id == 0 {chaser.switches.len() - 1} else {last_active_switch_id - 1}
                             },
                             None => 0
                         }
                     };
-                    tx.send(get_start_chaser(!ui.shift_state, switches[next_switch_id] as u16, 255)).unwrap();
+                    if chaser.current_thread {
+                        tx.send(get_start_chaser(!ui.shift_state, chaser.switches[next_switch_id] as u16, 0)).unwrap();
+                    }
+                    else {
+                        tx.send(get_start_chaser(!ui.shift_state, chaser.switches[next_switch_id] as u16, 255)).unwrap();
+                    }
                 })
                 .set(current_button_id, conrod_ui);
                 current_button_id = current_button_id + 1;
@@ -375,12 +399,12 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
                     let next_switch_id = {
                         match last_active_switch_id {
                             Some(last_active_switch_id) => {
-                                if last_active_switch_id + 1 == switches.len() {0} else {last_active_switch_id + 1}
+                                if last_active_switch_id + 1 == chaser.switches.len() {0} else {last_active_switch_id + 1}
                             },
                             None => 0
                         }
                     };
-                    tx.send(get_switch_update(!ui.shift_state, switches[next_switch_id] as u16, 255)).unwrap();
+                    tx.send(get_switch_update(!ui.shift_state, chaser.switches[next_switch_id] as u16, 255)).unwrap();
                 })
                 .set(current_button_id, conrod_ui);
                 current_button_id = current_button_id + 1;
@@ -432,10 +456,21 @@ fn create_splash_window(ui: Arc<Mutex<UI>>) {
     }
 }
 
+fn lines_from_file() -> Vec<String>
+{
+    let assets = find_folder::Search::KidsThenParents(3, 5)
+        .for_folder("assets").unwrap();
+    let path = assets.join("chasers.dmx");
+    let file = File::open(path).expect("no such file");
+    let buf = BufReader::new(file);
+    buf.lines().map(|l| l.expect("Could not parse line")).collect()
+}
+
 
 fn main() {
     println!("BitDMX frontend v{}-{}", VERSION, GIT_HASH);
     let ui = UI::new();
     create_splash_window(ui.clone());
-    create_output_window(ui.clone());
+    let chasers = lines_from_file();
+    create_output_window(ui.clone(), chasers);
 }

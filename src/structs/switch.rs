@@ -4,7 +4,7 @@ use ChannelGroupValue;
 use rustc_serialize::json;
 use FadeTime;
 
-#[derive(Debug, RustcDecodable, RustcEncodable)]
+#[derive(Debug, Clone, RustcDecodable, RustcEncodable)]
 pub struct JsonSwitch {
     pub channel_groups: HashMap<String, ChannelGroupValue>,
     pub chaser_id: String,

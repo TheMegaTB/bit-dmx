@@ -6,12 +6,12 @@ use std::sync::mpsc;
 use DmxValue;
 use DmxAddress;
 use FadeTime;
-use FADE_TICKS;
 use ChannelGroupValue;
 
 use Channel;
 use FadeCurve;
 
+use get_step_number;
 use get_fade_steps_int;
 use stop_fade;
 
@@ -32,7 +32,7 @@ impl Moving2D {
     }
 
     pub fn fade_simple(&mut self, curve: FadeCurve, time: FadeTime, end_x: DmxValue, end_y: DmxValue) {
-        let steps = time*FADE_TICKS/1000;
+        let steps = get_step_number(time);
         let (tx, rx) = mpsc::channel();
         let channel_x = self.channel_x.clone();
         let channel_y = self.channel_y.clone();

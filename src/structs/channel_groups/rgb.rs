@@ -6,7 +6,6 @@ use std::sync::mpsc;
 use DmxValue;
 use DmxAddress;
 use FadeTime;
-use FADE_TICKS;
 use ChannelGroupValue;
 
 use Channel;
@@ -16,6 +15,7 @@ use FadeCurve;
 // use hsv_to_rgb;
 //
 // use get_fade_steps;
+use get_step_number;
 use get_fade_steps_int;
 use stop_fade;
 
@@ -64,7 +64,7 @@ impl RGB {
     // }
 
     pub fn fade_simple(&mut self, curve: FadeCurve, time: FadeTime, end_r: DmxValue, end_g: DmxValue, end_b: DmxValue) {
-        let steps = time*FADE_TICKS/1000;
+        let steps = get_step_number(time);
         let (tx, rx) = mpsc::channel();
         let channel_r = self.channel_r.clone();
         let channel_g = self.channel_g.clone();

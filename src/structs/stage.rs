@@ -26,7 +26,7 @@ pub struct FrontendData {
     pub max_dmx_address: DmxAddress,
     pub fixtures: Vec<EmptyFixture>,
     pub switches: Vec<JsonSwitch>,
-    pub chasers: HashMap<String, Vec<usize>>
+    pub chasers: HashMap<String, FrontendChaser>
 }
 
 impl FrontendData {
@@ -40,8 +40,14 @@ impl FrontendData {
     }
 }
 
+#[derive(Debug, RustcDecodable, RustcEncodable)]
+pub struct FrontendChaser {
+    pub switches: Vec<usize>,
+    pub current_thread: bool
+}
+
 #[derive(Debug, Clone)]
-struct Chaser {
+pub struct Chaser {
     pub switches: Vec<usize>,
     pub current_thread: Option<mpsc::Sender<()>>
 }
@@ -61,6 +67,12 @@ impl Chaser {
             None => {}
         }
         self.current_thread = None;
+    }
+    pub fn get_frontend_data(&self) -> FrontendChaser {
+        FrontendChaser {
+            switches: self.switches.clone(),
+            current_thread: self.current_thread.is_some()
+        }
     }
 }
 
@@ -91,7 +103,7 @@ impl Stage {
             max_dmx_address: self.channels.len() as DmxAddress,
             fixtures: self.fixtures.iter().map(|x| x.to_empty_fixture()).collect(),
             switches: self.switches.iter().map(|x| x.with_json_hashmap()).collect(),
-            chasers: self.chasers.iter().map(|(name, data)| (name.clone(), data.clone().switches)).collect()
+            chasers: self.chasers.iter().map(|(name, data)| (name.clone(), data.get_frontend_data())).collect()
         }
     }
 
@@ -196,18 +208,26 @@ impl Stage {
     }
 }
 
+
 pub fn start_chaser_of_switch(stage: Arc<Mutex<Stage>>, switch_id: usize, dimmer_value: f64) {
+
+    let addr_high = (switch_id >> 8) as u8;
+    let addr_low = switch_id as u8;
+    UDPSocket::new().start_frontend_client().send_to_multicast(&[2, addr_high, addr_low, dimmer_value as u8]);
     let (chaser, rx) = {
-        let stage_locked = stage.lock().unwrap();
-        let mut chaser = stage_locked.chasers.get(&stage_locked.switches[switch_id].chaser_id).unwrap();
-        chaser.stop_chaser();
+        let mut stage_locked = stage.lock().unwrap();
+        let chaser_id = stage_locked.switches[switch_id].clone().chaser_id;
+        let mut chaser = stage_locked.chasers.get_mut(&chaser_id).unwrap();
+            chaser.stop_chaser();
+        if dimmer_value == 0.0 {
+            return
+        }
         let (tx, rx) = mpsc::channel();
         chaser.current_thread = Some(tx);
         (chaser.clone(), rx)
     };
-    println!("{:?}", chaser);
     thread::spawn(move || {
-        let mut current_switch_id_in_chaser: usize = 0; //TODO user switch_id
+        let mut current_switch_id_in_chaser: usize = 0; //TODO use switch_id
         loop {
             {stage.lock().unwrap().deactivate_group_of_switch(chaser.switches[current_switch_id_in_chaser]);}
             {stage.lock().unwrap().set_switch(chaser.switches[current_switch_id_in_chaser], dimmer_value);}
@@ -220,7 +240,6 @@ pub fn start_chaser_of_switch(stage: Arc<Mutex<Stage>>, switch_id: usize, dimmer
             if rx.try_recv().is_ok() { return };
         }
     });
-    println!("ready");
 }
 
 fn remove_from_active_switches(active_switches:
