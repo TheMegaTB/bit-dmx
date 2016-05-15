@@ -16,6 +16,8 @@ use ChannelGroupValue;
 use FadeCurve;
 use JsonSwitch;
 
+use UDPSocket;
+
 
 #[derive(Debug, RustcDecodable, RustcEncodable)]
 pub struct FrontendData {
@@ -36,6 +38,22 @@ impl FrontendData {
     }
 }
 
+#[derive(Debug, Clone)]
+struct Chaser {
+    pub switches: Vec<usize>,
+    pub current_thread: Option<mpsc::Sender<()>>
+}
+
+impl Chaser {
+    pub fn new() -> Chaser {
+        Chaser {
+            switches: Vec::new(),
+            current_thread: None
+        }
+    }
+}
+
+
 
 #[derive(Debug)]
 pub struct Stage {
@@ -43,7 +61,7 @@ pub struct Stage {
     pub fixtures: Vec<Fixture>,
     switches: Vec<Switch>,
     dmx_tx: mpsc::Sender<(DmxAddress, DmxValue)>,
-    chasers: HashMap<String, Vec<usize>>
+    chasers: HashMap<String, Chaser>
 }
 
 impl Stage {
@@ -62,7 +80,7 @@ impl Stage {
             max_dmx_address: self.channels.len() as DmxAddress,
             fixtures: self.fixtures.iter().map(|x| x.to_empty_fixture()).collect(),
             switches: self.switches.iter().map(|x| x.with_json_hashmap()).collect(),
-            chasers: self.chasers.clone()
+            chasers: self.chasers.iter().map(|(name, data)| (name.clone(), data.clone().switches)).collect()
         }
     }
 
@@ -73,9 +91,9 @@ impl Stage {
 
     fn add_fixture_to_switch_group(&mut self, switch_id:usize, chaser_id: String) {
         if !self.chasers.contains_key(&chaser_id) {
-            self.chasers.insert(chaser_id.clone(), Vec::new());
+            self.chasers.insert(chaser_id.clone(), Chaser::new());
         }
-        self.chasers.get_mut(&chaser_id).unwrap().push(switch_id);
+        self.chasers.get_mut(&chaser_id).unwrap().switches.push(switch_id);
     }
 
     pub fn add_switch(&mut self, switch: Switch) -> usize {
@@ -86,13 +104,12 @@ impl Stage {
         id
     }
 
-    pub fn deactivate_group_of_switch(&mut self, switch_id: usize) -> Vec<usize> {
-        let switches = self.chasers.get(&self.switches[switch_id].chaser_id).unwrap().iter().filter(|&x| *x != switch_id).map(|&x| x).collect::<Vec<usize>>();
+    pub fn deactivate_group_of_switch(&mut self, switch_id: usize) {
+        let switches = self.chasers.get(&self.switches[switch_id].chaser_id).unwrap().switches.iter().filter(|&x| *x != switch_id).map(|&x| x).collect::<Vec<usize>>();
 
         for switch_id in switches.iter() {
             self.set_switch(*switch_id, 0.0);
         };
-        switches
     }
 
     pub fn set_switch(&mut self, switch_id: usize, dimmer_value: f64) {
@@ -123,6 +140,9 @@ impl Stage {
                 }
             }
         }
+        let addr_high = (switch_id >> 8) as u8;
+        let addr_low = switch_id as u8;
+        UDPSocket::new().start_frontend_client().send_to_multicast(&[1, addr_high, addr_low, dimmer_value as u8]);
     }
 
     fn deactivate_switch(&mut self, switch_id: usize) {

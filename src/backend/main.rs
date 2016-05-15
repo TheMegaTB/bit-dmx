@@ -21,9 +21,11 @@ fn main() {
 
     env_logger::init().unwrap();
 
-    let interface = Interface::new().port("/dev/tty.usbmodem40131".to_string()).connect();
+    //let interface = Interface::new().port("/dev/tty.usbmodem40131".to_string()).connect();
+    let interface = Interface::new().port("/dev/ttyACM0".to_string()).connect();
     if interface.is_err() { panic!(interface) }
     let (tx, _interrupt_tx) = interface.unwrap().to_thread();
+
     let mut stage = Parser::new(Stage::new(tx)).parse();
 
     let mut v1 = HashMap::new();
@@ -77,11 +79,12 @@ fn main() {
     // stage.deactivate_group_of_switch(s3);
     // stage.set_switch(s3, 255.0);
 
-    let stage = Arc::new(Mutex::new(stage));
 
-    let socket = UDPSocket::new();
+   let socket = UDPSocket::new();
     socket.start_watchdog_server();
-    let server = socket.start_backend_server(); //receiving updates (DMX values etc. from frontend)
+    let server = socket.start_backend_server(); //receiving updates (DMX values etc. from frontend)`
+
+    let stage = Arc::new(Mutex::new(stage));
 
     {
         let stage = stage.clone();
@@ -105,18 +108,10 @@ fn main() {
                     // Switch
                     println!("Set switch with address {:?} to {:?} (shifted: {:?})", address, value, shift);
                     if shift {
-                        for switch_id in stage_locked.deactivate_group_of_switch(address as usize) {
-                            println!("{:?}", switch_id);
-                            let addr_high = (switch_id >> 8) as u8;
-                            let addr_low = switch_id as u8;
-                            server.send_to_multicast(&[1, addr_high, addr_low, 0]);
-                        }
+                        switch_id in stage_locked.deactivate_group_of_switch(address as usize)
                     }
                     stage_locked.set_switch(address as usize, value as f64);
                 }
-                println!("{:?}, {:?}", address, value);
-
-                server.send_to_multicast(&d); //TODO: remove this and place ist in set switch etc. so that set switch can be called from a different thread (e.g. from chaser thread)
             }
         });
     }

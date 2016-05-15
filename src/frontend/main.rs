@@ -282,7 +282,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
     let chasers: Vec<String> = ui.frontend_data.chasers.keys().map(|x| x.clone()).collect(); //TODO edit by user,  save & load
 
     for (id, (name, switches)) in chasers.iter().map(|x| (x, ui.frontend_data.chasers.get(x).unwrap())).enumerate() {
-        let x_pos = -button_width/2.0 + id as f64 * button_width;
+        let x_pos = (id as f64 - 0.5) * button_width;
         let y_offset = -50.0;
         let mut last_active_switch_id = None;
         Text::new(name)
@@ -316,9 +316,9 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
         let y_pos = y_offset - 50.0 - (switches.len() as f64 - 0.25)*button_height;
         {
             let tx = tx.clone();
-            let x_pos = -button_width/2.0 + (id as f64 - 0.25) * button_width;
+            let x_pos = (id as f64 - 5f64/6f64) * button_width;
             Button::new()
-                .w_h(button_width/2.0, button_height/2.0)
+                .w_h(button_width/3.0, button_height/2.0)
                 .xy_relative_to(TITLE, [x_pos, y_pos])
                 .rgb(0.9, 0.9, 0.1)
                 .frame(1.0)
@@ -339,9 +339,33 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI) {
                 current_button_id = current_button_id + 1;
         }
         {
-            let x_pos = -button_width/2.0 + (id as f64 + 0.25) * button_width;
+            let tx = tx.clone();
+            let x_pos = (id as f64 - 0.5) * button_width;
             Button::new()
-                .w_h(button_width/2.0, button_height/2.0)
+                .w_h(button_width/3.0, button_height/2.0)
+                .xy_relative_to(TITLE, [x_pos, y_pos])
+                .rgb(0.9, 0.9, 0.1)
+                .frame(1.0)
+                .label(&">".to_string())
+                .react(|| {
+                    println!(">");
+                    let next_switch_id = {
+                        match last_active_switch_id {
+                            Some(last_active_switch_id) => {
+                                if last_active_switch_id == 0 {switches.len() - 1} else {last_active_switch_id - 1}
+                            },
+                            None => 0
+                        }
+                    };
+                    tx.send(get_start_chaser(!ui.shift_state, switches[next_switch_id] as u16, 255)).unwrap();
+                })
+                .set(current_button_id, conrod_ui);
+                current_button_id = current_button_id + 1;
+        }
+        {
+            let x_pos = (id as f64 - 1f64/6f64) * button_width;
+            Button::new()
+                .w_h(button_width/3.0, button_height/2.0)
                 .xy_relative_to(TITLE, [x_pos, y_pos])
                 .rgb(0.9, 0.9, 0.1)
                 .frame(1.0)
@@ -368,6 +392,12 @@ fn get_switch_update(shift_state: bool, addr: u16, value: u8) -> Vec<u8> {
     let addr_high = (addr >> 8) as u8;
     let addr_low = addr as u8;
     vec![if shift_state {129} else {1}, addr_high, addr_low, value]
+}
+
+fn get_start_chaser(shift_state: bool, addr: u16, value: u8) -> Vec<u8> {
+    let addr_high = (addr >> 8) as u8;
+    let addr_low = addr as u8;
+    vec![if shift_state {130} else {2}, addr_high, addr_low, value]
 }
 
 fn create_splash_window(ui: Arc<Mutex<UI>>) {

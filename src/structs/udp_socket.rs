@@ -14,12 +14,14 @@ pub const INPUT_BUFFER: usize = 4;
 pub const WATCHDOG_TTL: u64 = 5;
 // const WATCHDOG_DATA: [u8; 3] = [68, 77, 88]; // "DMX" as bytes
 
+#[derive(Debug)]
 pub struct UDPSocket {
     local_addr: Ipv4Addr,
     multicast_addr: Ipv4Addr,
     pub port: u16
 }
 
+#[derive(Debug)]
 pub struct UDPSocketHandle {
     pub socket: UdpSocket,
     multicast_addr: SocketAddr
