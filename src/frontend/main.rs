@@ -352,18 +352,18 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>) {
         {
             let tx = tx.clone();
             let x_pos = (id as f64 - 0.5) * button_width;
-            let label = {
+            let (label, r) = {
                 if chaser.current_thread {
-                    "||".to_string()
+                    ("||".to_string(), 0.1)
                 }
                 else {
-                    ">".to_string()
+                    (">".to_string(), 0.9)
                 }
             };
             Button::new()
                 .w_h(button_width/3.0, button_height/2.0)
                 .xy_relative_to(TITLE, [x_pos, y_pos])
-                .rgb(0.9, 0.9, 0.1)
+                .rgb(r, 0.9, 0.1)
                 .frame(1.0)
                 .label(&label)
                 .react(|| {
