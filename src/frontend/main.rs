@@ -498,9 +498,9 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
 
                     y_pos = y_pos - 60.0;
 
-                    let mut path_string = "My Test String is long!!!!!!".to_string();
+                    let mut test_string = "My Test String is long!!!!!!".to_string();
 
-                    TextBox::new(&mut path_string)
+                    TextBox::new(&test_string) //TODO use TextBox::new(switch_name)
                         .font_size(20)
                         .xy_relative_to(TITLE, [x_pos, y_pos])
                         .w_h(320.0, 40.0)
