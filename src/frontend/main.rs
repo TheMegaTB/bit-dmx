@@ -469,8 +469,8 @@ fn lines_from_file() -> Vec<String>
 
 fn main() {
     println!("BitDMX frontend v{}-{}", VERSION, GIT_HASH);
+    let chasers = lines_from_file();
     let ui = UI::new();
     create_splash_window(ui.clone());
-    let chasers = lines_from_file();
     create_output_window(ui.clone(), chasers);
 }
