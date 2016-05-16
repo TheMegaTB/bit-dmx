@@ -500,7 +500,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
 
                     let mut test_string = "My Test String is long!!!!!!".to_string();
 
-                    TextBox::new(&test_string) //TODO use TextBox::new(switch_name)
+                    TextBox::new(&mut test_string) //TODO use TextBox::new(switch_name)
                         .font_size(20)
                         .xy_relative_to(TITLE, [x_pos, y_pos])
                         .w_h(320.0, 40.0)
