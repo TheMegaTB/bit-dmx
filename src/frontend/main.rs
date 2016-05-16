@@ -366,89 +366,91 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
         if y_pos - button_height < next_y_offset {
             next_y_offset = y_pos - button_height;
         }
-        {
-            let tx = tx.clone();
-            //let x_pos = (id as f64 - 5f64/6f64) * button_width;
-            Button::new()
-                .w_h(button_width/3.0, button_height/2.0)
-                .xy_relative_to(TITLE, [x_pos - button_width/3.0, y_pos])
-                .rgb(0.9, 0.9, 0.1)
-                .frame(1.0)
-                .label(&"<<".to_string())
-                .react(|| {
-                    println!("<<");
-                    let next_switch_id = {
-                        match last_active_switch_id {
-                            Some(last_active_switch_id) => {
-                                if last_active_switch_id == 0 {chaser.switches.len() - 1} else {last_active_switch_id - 1}
-                            },
-                            None => 0
-                        }
-                    };
-                    tx.send(get_switch_update(!ui.shift_state, chaser.switches[next_switch_id] as u16, 255)).unwrap();
-                })
-                .set(current_button_id, conrod_ui);
-                current_button_id = current_button_id + 1;
-        }
-        {
-            let tx = tx.clone();
-            //let x_pos = (id as f64 - 0.5) * button_width;
-            let (label, r) = {
-                if chaser.current_thread {
-                    ("||".to_string(), 0.1)
-                }
-                else {
-                    (">".to_string(), 0.9)
-                }
-            };
-            Button::new()
-                .w_h(button_width/3.0, button_height/2.0)
-                .xy_relative_to(TITLE, [x_pos, y_pos])
-                .rgb(r, 0.9, 0.1)
-                .frame(1.0)
-                .label(&label)
-                .react(|| {
-                    println!(">");
-                    let next_switch_id = {
-                        match last_active_switch_id {
-                            Some(last_active_switch_id) => {
-                                if last_active_switch_id == 0 {chaser.switches.len() - 1} else {last_active_switch_id - 1}
-                            },
-                            None => 0
-                        }
-                    };
+        if !ui.edit_state {
+            {
+                let tx = tx.clone();
+                //let x_pos = (id as f64 - 5f64/6f64) * button_width;
+                Button::new()
+                    .w_h(button_width/3.0, button_height/2.0)
+                    .xy_relative_to(TITLE, [x_pos - button_width/3.0, y_pos])
+                    .rgb(0.9, 0.9, 0.1)
+                    .frame(1.0)
+                    .label(&"<<".to_string())
+                    .react(|| {
+                        println!("<<");
+                        let next_switch_id = {
+                            match last_active_switch_id {
+                                Some(last_active_switch_id) => {
+                                    if last_active_switch_id == 0 {chaser.switches.len() - 1} else {last_active_switch_id - 1}
+                                },
+                                None => 0
+                            }
+                        };
+                        tx.send(get_switch_update(!ui.shift_state, chaser.switches[next_switch_id] as u16, 255)).unwrap();
+                    })
+                    .set(current_button_id, conrod_ui);
+                    current_button_id = current_button_id + 1;
+            }
+            {
+                let tx = tx.clone();
+                //let x_pos = (id as f64 - 0.5) * button_width;
+                let (label, r) = {
                     if chaser.current_thread {
-                        tx.send(get_start_chaser(!ui.shift_state, chaser.switches[next_switch_id] as u16, 0)).unwrap();
+                        ("||".to_string(), 0.1)
                     }
                     else {
-                        tx.send(get_start_chaser(!ui.shift_state, chaser.switches[next_switch_id] as u16, 255)).unwrap();
+                        (">".to_string(), 0.9)
                     }
-                })
-                .set(current_button_id, conrod_ui);
-                current_button_id = current_button_id + 1;
-        }
-        {
-            //let x_pos = (id as f64 - 1f64/6f64) * button_width;
-            Button::new()
-                .w_h(button_width/3.0, button_height/2.0)
-                .xy_relative_to(TITLE, [x_pos + button_width/3.0, y_pos])
-                .rgb(0.9, 0.9, 0.1)
-                .frame(1.0)
-                .label(&">>".to_string())
-                .react(|| {
-                    println!(">>");
-                    let next_switch_id = {
-                        match last_active_switch_id {
-                            Some(last_active_switch_id) => {
-                                if last_active_switch_id + 1 == chaser.switches.len() {0} else {last_active_switch_id + 1}
-                            },
-                            None => 0
+                };
+                Button::new()
+                    .w_h(button_width/3.0, button_height/2.0)
+                    .xy_relative_to(TITLE, [x_pos, y_pos])
+                    .rgb(r, 0.9, 0.1)
+                    .frame(1.0)
+                    .label(&label)
+                    .react(|| {
+                        println!(">");
+                        let next_switch_id = {
+                            match last_active_switch_id {
+                                Some(last_active_switch_id) => {
+                                    if last_active_switch_id == 0 {chaser.switches.len() - 1} else {last_active_switch_id - 1}
+                                },
+                                None => 0
+                            }
+                        };
+                        if chaser.current_thread {
+                            tx.send(get_start_chaser(!ui.shift_state, chaser.switches[next_switch_id] as u16, 0)).unwrap();
                         }
-                    };
-                    tx.send(get_switch_update(!ui.shift_state, chaser.switches[next_switch_id] as u16, 255)).unwrap();
-                })
-                .set(current_button_id, conrod_ui);
-                current_button_id = current_button_id + 1;
+                        else {
+                            tx.send(get_start_chaser(!ui.shift_state, chaser.switches[next_switch_id] as u16, 255)).unwrap();
+                        }
+                    })
+                    .set(current_button_id, conrod_ui);
+                    current_button_id = current_button_id + 1;
+            }
+            {
+                //let x_pos = (id as f64 - 1f64/6f64) * button_width;
+                Button::new()
+                    .w_h(button_width/3.0, button_height/2.0)
+                    .xy_relative_to(TITLE, [x_pos + button_width/3.0, y_pos])
+                    .rgb(0.9, 0.9, 0.1)
+                    .frame(1.0)
+                    .label(&">>".to_string())
+                    .react(|| {
+                        println!(">>");
+                        let next_switch_id = {
+                            match last_active_switch_id {
+                                Some(last_active_switch_id) => {
+                                    if last_active_switch_id + 1 == chaser.switches.len() {0} else {last_active_switch_id + 1}
+                                },
+                                None => 0
+                            }
+                        };
+                        tx.send(get_switch_update(!ui.shift_state, chaser.switches[next_switch_id] as u16, 255)).unwrap();
+                    })
+                    .set(current_button_id, conrod_ui);
+                    current_button_id = current_button_id + 1;
+            }
         }
     }
 }
