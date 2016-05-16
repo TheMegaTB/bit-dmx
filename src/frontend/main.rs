@@ -54,7 +54,9 @@ widget_ids! {
     CANVAS,
     TITLE,
     CONNECTED_BUTTON,
-    EDIT_BUTTON,
+    EDITOR_BUTTON,
+    EDITOR_TITLE,
+    EDITOR_INFO,
     BUTTON with 4000,
     CHASER_TITLE with 4000
 }
@@ -64,7 +66,8 @@ struct UI {
     tx: mpsc::Sender<Vec<u8>>,
     frontend_data: FrontendData,
     shift_state: bool,
-    edit_state: bool
+    edit_state: bool,
+    current_edited_switch: Arc<Mutex<[Option<usize>; 1]>>
 }
 
 impl UI {
@@ -101,7 +104,8 @@ impl UI {
             tx: tx,
             frontend_data: frontend_data,
             shift_state: false,
-            edit_state: false
+            edit_state: false,
+            current_edited_switch: Arc::new(Mutex::new([None]))
         };
 
         let ui = Arc::new(Mutex::new(ui));
@@ -247,12 +251,12 @@ fn create_output_window(ui: Arc<Mutex<UI>>, chasers: Vec<String>) {
             }
         };
         conrod_ui.handle_event(&event);
-        event.update(|_| conrod_ui.set_widgets(|mut conrod_ui| set_widgets(&mut conrod_ui, &mut ui_locked, chasers.clone(), window.size().width, window.size().height)));
+        event.update(|_| conrod_ui.set_widgets(|mut conrod_ui| set_widgets(&mut conrod_ui, &mut ui_locked, chasers.clone(), window.size().width)));
         window.draw_2d(&event, |c, g| conrod_ui.draw_if_changed(c, g));
     }
 }
 
-fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, window_width: u32, window_height: u32) {
+fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, window_width: u32) {
     let bg_color = color::rgb(0.236, 0.239, 0.241);
 
     Canvas::new()
@@ -300,9 +304,11 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
             }
         })
         .react(|| {
+            let mut current_edited_switch_locked = ui.current_edited_switch.lock().unwrap();
+            current_edited_switch_locked[0] = None;
             ui.edit_state = !ui.edit_state;
         })
-        .set(EDIT_BUTTON, conrod_ui);
+        .set(EDITOR_BUTTON, conrod_ui);
 
     // let mut id = None;
     let tx = ui.tx.clone();
@@ -324,12 +330,14 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
     let mut next_y_offset = 0f64;
     let mut x_pos = -button_width;
     let mut y_offset = -90.0;
+    let mut rightmost = 0.0;
 
     for (id, (name, chaser)) in chasers.iter().map(|x| (x, ui.frontend_data.chasers.get(x).unwrap())).enumerate() {
         x_pos = x_pos + button_width;
         //let x_pos = (id as f64 - 0.5) * button_width;
         let usable_width = if ui.edit_state {2*window_width/3} else {window_width};
         if (x_pos + 1.5*button_width) as u32 >= usable_width {
+            rightmost = x_pos + 0.5*button_width;
             x_pos = 0.0;
             y_offset = next_y_offset;
         }
@@ -342,6 +350,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
 
         for (switch_id_in_chaser, (switch_id, switch)) in chaser.switches.iter().map(|&switch_id| (switch_id, &ui.frontend_data.switches[switch_id])).enumerate() {
             let y_pos = y_offset - 50.0 - switch_id_in_chaser as f64*button_height;
+            let current_edited_switch = ui.current_edited_switch.clone();
             Button::new()
                 .w_h(button_width, button_height)
                 .xy_relative_to(TITLE, [x_pos, y_pos])
@@ -356,8 +365,13 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                 .frame(1.0)
                 .label(&switch.name)
                 .react(|| {
-                    let new_value = if switch.dimmer_value == 0.0 {255} else {0};
-                    tx.send(get_switch_update(ui.shift_state, switch_id as u16, new_value)).unwrap();
+                    if ui.edit_state {
+                        current_edited_switch.lock().unwrap()[0] = Some(switch_id);
+                    }
+                    else {
+                        let new_value = if switch.dimmer_value == 0.0 {255} else {0};
+                        tx.send(get_switch_update(ui.shift_state, switch_id as u16, new_value)).unwrap();
+                    }
                 })
                 .set(current_button_id, conrod_ui);
                 current_button_id = current_button_id + 1;
@@ -450,6 +464,35 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                     })
                     .set(current_button_id, conrod_ui);
                     current_button_id = current_button_id + 1;
+            }
+        }
+        else {
+            let x_pos = rightmost;
+            let mut y_pos = - 30.0;
+
+            Text::new("Editor")
+                .xy_relative_to(TITLE, [x_pos, y_pos])
+                .font_size(22)
+                .color(bg_color.plain_contrast())
+                .set(EDITOR_TITLE, conrod_ui);
+
+            y_pos = y_pos - 40.0;
+
+            match ui.current_edited_switch.lock().unwrap()[0] {
+                Some(switch_id) => {
+                    Text::new(&("Switch #".to_string() + &switch_id.to_string()))
+                        .xy_relative_to(TITLE, [x_pos, y_pos])
+                        .font_size(14)
+                        .color(bg_color.plain_contrast())
+                        .set(EDITOR_INFO, conrod_ui);
+                }
+                None => {
+                    Text::new("No switch selected")
+                        .xy_relative_to(TITLE, [x_pos, y_pos])
+                        .font_size(14)
+                        .color(bg_color.plain_contrast())
+                        .set(EDITOR_INFO, conrod_ui);
+                }
             }
         }
     }

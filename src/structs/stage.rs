@@ -40,7 +40,7 @@ impl FrontendData {
     }
 }
 
-#[derive(Debug, RustcDecodable, RustcEncodable)]
+#[derive(Debug, Clone, RustcDecodable, RustcEncodable)]
 pub struct FrontendChaser {
     pub switches: Vec<usize>,
     pub current_thread: bool
