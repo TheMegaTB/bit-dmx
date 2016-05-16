@@ -36,7 +36,7 @@ use conrod::{
     // Point,
     Sizeable,
     // Slider,
-    // TextBox,
+    TextBox,
     // Toggle,
     // WidgetMatrix,
     // XYPad,
@@ -57,6 +57,7 @@ widget_ids! {
     EDITOR_BUTTON,
     EDITOR_TITLE,
     EDITOR_INFO,
+    EDITOR_CONTENT with 4000,
     BUTTON with 4000,
     CHASER_TITLE with 4000
 }
@@ -67,7 +68,8 @@ struct UI {
     frontend_data: FrontendData,
     shift_state: bool,
     edit_state: bool,
-    current_edited_switch: Arc<Mutex<[Option<usize>; 1]>>
+    current_edited_switch: Arc<Mutex<[Option<usize>; 1]>>,
+    current_edited_switch_name: Arc<Mutex<[String; 1]>>
 }
 
 impl UI {
@@ -105,7 +107,8 @@ impl UI {
             frontend_data: frontend_data,
             shift_state: false,
             edit_state: false,
-            current_edited_switch: Arc::new(Mutex::new([None]))
+            current_edited_switch: Arc::new(Mutex::new([None])),
+            current_edited_switch_name: Arc::new(Mutex::new(["".to_string()]))
         };
 
         let ui = Arc::new(Mutex::new(ui));
@@ -304,8 +307,12 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
             }
         })
         .react(|| {
-            let mut current_edited_switch_locked = ui.current_edited_switch.lock().unwrap();
-            current_edited_switch_locked[0] = None;
+            // let mut current_edited_switch_locked = ui.current_edited_switch.lock().unwrap();
+            // current_edited_switch_locked[0] = None;
+
+            ui.current_edited_switch.lock().unwrap()[0] = None;
+
+            ui.current_edited_switch_name.lock().unwrap()[0] = "".to_string();
             ui.edit_state = !ui.edit_state;
         })
         .set(EDITOR_BUTTON, conrod_ui);
@@ -480,11 +487,29 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
 
             match ui.current_edited_switch.lock().unwrap()[0] {
                 Some(switch_id) => {
-                    Text::new(&("Switch #".to_string() + &switch_id.to_string()))
+                    {ui.current_edited_switch_name.lock().unwrap()[0] = ui.frontend_data.switches[switch_id].name.clone()}
+                    let ref mut switch_name = ui.current_edited_switch_name.lock().unwrap()[0];
+
+                    Text::new(&("Switch #".to_string() + &switch_id.to_string() + ": " + &switch_name))
                         .xy_relative_to(TITLE, [x_pos, y_pos])
                         .font_size(14)
                         .color(bg_color.plain_contrast())
                         .set(EDITOR_INFO, conrod_ui);
+
+                    y_pos = y_pos - 60.0;
+
+                    let mut path_string = "My Test String is long!!!!!!".to_string();
+
+                    TextBox::new(&mut path_string)
+                        .font_size(20)
+                        .xy_relative_to(TITLE, [x_pos, y_pos])
+                        .w_h(320.0, 40.0)
+                        .frame(2.0)
+                        .frame_color(bg_color.invert().plain_contrast())
+                        .color(bg_color.plain_contrast())
+                        .react(|_string: &mut String|{})
+                        .set(EDITOR_CONTENT, conrod_ui);
+
                 }
                 None => {
                     Text::new("No switch selected")

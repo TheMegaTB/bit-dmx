@@ -8,8 +8,8 @@ use DmxAddress;
 
 #[derive(Debug, RustcDecodable, RustcEncodable)]
 pub struct EmptyFixture {
-    channel_groups: Vec<(u8, Vec<DmxAddress>)>,
-    name: String,
+    pub channel_groups: Vec<(u8, Vec<DmxAddress>)>,
+    pub name: String,
 }
 
 impl EmptyFixture {
