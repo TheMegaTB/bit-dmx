@@ -41,7 +41,7 @@ use conrod::{
     // WidgetMatrix,
     // XYPad,
 };
-use piston_window::{ EventLoop, Glyphs, PistonWindow, UpdateEvent, WindowSettings, PressEvent, ReleaseEvent };
+use piston_window::{ EventLoop, Glyphs, PistonWindow, UpdateEvent, WindowSettings, PressEvent, ReleaseEvent, Window };
 use rustc_serialize::json;
 
 
@@ -54,6 +54,7 @@ widget_ids! {
     CANVAS,
     TITLE,
     CONNECTED_BUTTON,
+    EDIT_BUTTON,
     BUTTON with 4000,
     CHASER_TITLE with 4000
 }
@@ -62,7 +63,8 @@ struct UI {
     pub watchdog: WatchDogClient,
     tx: mpsc::Sender<Vec<u8>>,
     frontend_data: FrontendData,
-    shift_state: bool
+    shift_state: bool,
+    edit_state: bool
 }
 
 impl UI {
@@ -98,7 +100,8 @@ impl UI {
             watchdog: watchdog,
             tx: tx,
             frontend_data: frontend_data,
-            shift_state: false
+            shift_state: false,
+            edit_state: false
         };
 
         let ui = Arc::new(Mutex::new(ui));
@@ -244,12 +247,12 @@ fn create_output_window(ui: Arc<Mutex<UI>>, chasers: Vec<String>) {
             }
         };
         conrod_ui.handle_event(&event);
-        event.update(|_| conrod_ui.set_widgets(|mut conrod_ui| set_widgets(&mut conrod_ui, &mut ui_locked, chasers.clone())));
+        event.update(|_| conrod_ui.set_widgets(|mut conrod_ui| set_widgets(&mut conrod_ui, &mut ui_locked, chasers.clone(), window.size().width, window.size().height)));
         window.draw_2d(&event, |c, g| conrod_ui.draw_if_changed(c, g));
     }
 }
 
-fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>) {
+fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, window_width: u32, window_height: u32) {
     let bg_color = color::rgb(0.236, 0.239, 0.241);
 
     Canvas::new()
@@ -268,8 +271,8 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>) {
     let connected = ui.watchdog.is_alive();
     let label = if connected { "Connected".to_string() } else { "Disconnected".to_string() };
     Button::new()
-        .w_h(75.0, 25.0)
-        .right_from(TITLE, 5.0)
+        .w_h(105.0, 35.0)
+        .down_from(TITLE, 5.0)
         .frame(1.0)
         .label(&label)
         .label_font_size(11)
@@ -283,6 +286,24 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>) {
         .react(|| {})
         .set(CONNECTED_BUTTON, conrod_ui);
 
+    Button::new()
+        .w_h(105.0, 35.0)
+        .right_from(CONNECTED_BUTTON, 5.0)
+        .frame(1.0)
+        .label(&"Edit Mode".to_string())
+        .label_font_size(11)
+        .and(|b| {
+            if ui.edit_state {
+                b.rgb(0.1, 0.9, 0.1)
+            } else {
+                b.rgb(0.9, 0.1, 0.1)
+            }
+        })
+        .react(|| {
+            ui.edit_state = !ui.edit_state;
+        })
+        .set(EDIT_BUTTON, conrod_ui);
+
     // let mut id = None;
     let tx = ui.tx.clone();
 
@@ -290,11 +311,28 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>) {
     let button_height = 50.0;
     let mut current_button_id = BUTTON;
 
-    //let chasers: Vec<String> = ui.frontend_data.chasers.keys().map(|x| x.clone()).collect(); //TODO edit by user,  save & load
+    let chasers = {
+        let mut tmp_chasers = Vec::new();
+        for chaser_name in chasers.iter() {
+            if ui.frontend_data.chasers.get(chaser_name).is_some() {
+                tmp_chasers.push(chaser_name.clone());
+            }
+        }
+        tmp_chasers
+    };
+
+    let mut next_y_offset = 0f64;
+    let mut x_pos = -button_width;
+    let mut y_offset = -90.0;
 
     for (id, (name, chaser)) in chasers.iter().map(|x| (x, ui.frontend_data.chasers.get(x).unwrap())).enumerate() {
-        let x_pos = (id as f64 - 0.5) * button_width;
-        let y_offset = -50.0;
+        x_pos = x_pos + button_width;
+        //let x_pos = (id as f64 - 0.5) * button_width;
+        let usable_width = if ui.edit_state {2*window_width/3} else {window_width};
+        if (x_pos + 1.5*button_width) as u32 >= usable_width {
+            x_pos = 0.0;
+            y_offset = next_y_offset;
+        }
         let mut last_active_switch_id = None;
         Text::new(name)
             .xy_relative_to(TITLE, [x_pos, y_offset])
@@ -325,12 +363,15 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>) {
                 current_button_id = current_button_id + 1;
         }
         let y_pos = y_offset - 50.0 - (chaser.switches.len() as f64 - 0.25)*button_height;
+        if y_pos - button_height < next_y_offset {
+            next_y_offset = y_pos - button_height;
+        }
         {
             let tx = tx.clone();
-            let x_pos = (id as f64 - 5f64/6f64) * button_width;
+            //let x_pos = (id as f64 - 5f64/6f64) * button_width;
             Button::new()
                 .w_h(button_width/3.0, button_height/2.0)
-                .xy_relative_to(TITLE, [x_pos, y_pos])
+                .xy_relative_to(TITLE, [x_pos - button_width/3.0, y_pos])
                 .rgb(0.9, 0.9, 0.1)
                 .frame(1.0)
                 .label(&"<<".to_string())
@@ -351,7 +392,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>) {
         }
         {
             let tx = tx.clone();
-            let x_pos = (id as f64 - 0.5) * button_width;
+            //let x_pos = (id as f64 - 0.5) * button_width;
             let (label, r) = {
                 if chaser.current_thread {
                     ("||".to_string(), 0.1)
@@ -387,10 +428,10 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>) {
                 current_button_id = current_button_id + 1;
         }
         {
-            let x_pos = (id as f64 - 1f64/6f64) * button_width;
+            //let x_pos = (id as f64 - 1f64/6f64) * button_width;
             Button::new()
                 .w_h(button_width/3.0, button_height/2.0)
-                .xy_relative_to(TITLE, [x_pos, y_pos])
+                .xy_relative_to(TITLE, [x_pos + button_width/3.0, y_pos])
                 .rgb(0.9, 0.9, 0.1)
                 .frame(1.0)
                 .label(&">>".to_string())
