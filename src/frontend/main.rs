@@ -60,7 +60,8 @@ widget_ids! {
     EDITOR_TIME_SLIDER,
     EDITOR_CONTENT with 4000,
     BUTTON with 4000,
-    CHASER_TITLE with 4000
+    CHASER_TITLE with 4000,
+    EDITOR_SWITCH_ELEMENT with 4000
 }
 
 struct UI {
@@ -510,13 +511,16 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
 
 
                 let time = ui.frontend_data.switches[switch_id].before_chaser;
+                let item_width = 320.0;
+                let item_height = 40.0;
+                let line = "-----------------------------------------";
                 let ref mut switch_name = switch_name.lock().unwrap()[0];
                 //println!("name: {:?}", switch_name);
 
                 TextBox::new(switch_name)
                     .font_size(20)
                     .xy_relative_to(TITLE, [x_pos, y_pos])
-                    .w_h(320.0, 40.0)
+                    .w_h(item_width, item_height)
                     .frame(2.0)
                     .frame_color(bg_color.invert().plain_contrast())
                     .color(bg_color.plain_contrast())
@@ -537,7 +541,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                 };
 
                 Slider::new(time as f32, 0.0, 10000.0)
-                    .w_h(320.0, 40.0)
+                    .w_h(item_width, item_height)
                     .xy_relative_to(TITLE, [x_pos, y_pos])
                     .rgb(0.5, 0.3, 0.6)
                     .frame(2.0)
@@ -547,6 +551,62 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                         ui.frontend_data.switches[switch_id].before_chaser = new_time as FadeTime;
                         println!("Changed time: {:?}", new_time);})
                     .set(EDITOR_TIME_SLIDER, conrod_ui);
+
+
+                y_pos = y_pos - 60.0;
+                let mut editor_switch_element_count = 0;
+
+
+                Text::new(line)
+                    .xy_relative_to(TITLE, [x_pos, y_pos])
+                    .font_size(14)
+                    .color(bg_color.plain_contrast())
+                    .set(EDITOR_SWITCH_ELEMENT + editor_switch_element_count, conrod_ui);
+                editor_switch_element_count += 1;
+                y_pos = y_pos - 60.0;
+
+                // for (id_string, data) in ui.frontend_data.switches[switch_id].channel_groups.iter() {
+                //     let mut id_vector: Vec<String> = id_string.split(",").map(|x| x.to_string()).collect();
+                //     id_vector[0].remove(0);
+                //     id_vector[1].pop();
+                //     let fixture_id = id_vector[0].parse::<usize>();
+                //     let channel_group_id = id_vector[1].parse::<usize>();
+                //     println!("{:?}", id_vector);
+                //
+                //     for (index, &value) in data.0.iter().enumerate() {
+                //         let label = {
+                //             let mut text = "Value: ".to_string();
+                //             text.push_str(&value.to_string());
+                //             text
+                //         };
+                //
+                //         Slider::new(value as f32, 0.0, 255.0)
+                //             .w_h(item_width, item_height)
+                //             .xy_relative_to(TITLE, [x_pos, y_pos])
+                //             .rgb(0.5, 0.3, 0.6)
+                //             .frame(2.0)
+                //             .label(&label)
+                //             .label_color(color::WHITE)
+                //             .react(|new_value: f32| {})
+                //             .set(EDITOR_TIME_SLIDER, conrod_ui);
+                //         editor_switch_element_count += 1;
+                //         y_pos = y_pos - 60.0;
+                //     }
+                //
+                //     println!("{:?}", data);
+                // }
+
+
+                Button::new()
+                    .w_h(item_width, item_height)
+                    .xy_relative_to(TITLE, [x_pos, y_pos])
+                    .rgb(0.9, 0.9, 0.1)
+                    .frame(1.0)
+                    .label("Add")
+                    .react(|| {})
+                    .set(EDITOR_SWITCH_ELEMENT + editor_switch_element_count, conrod_ui);
+                editor_switch_element_count += 1;
+                y_pos = y_pos - 60.0;
 
 
             }
