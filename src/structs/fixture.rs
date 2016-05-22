@@ -6,7 +6,7 @@ use channel_groups::moving_2d::*;
 use DmxAddress;
 
 
-#[derive(Debug, RustcDecodable, RustcEncodable)]
+#[derive(Debug, Clone, RustcDecodable, RustcEncodable)]
 pub struct EmptyFixture {
     pub channel_groups: Vec<(u8, Vec<DmxAddress>)>,
     pub name: String,

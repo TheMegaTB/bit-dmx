@@ -28,6 +28,8 @@ fn main() {
 
     let mut stage = Parser::new(Stage::new(tx)).parse();
 
+    println!("{:?}", stage.fixtures);
+
     let mut v1 = HashMap::new();
     v1.insert((0, 0), (vec![255], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
     v1.insert((1, 0), (vec![255], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));

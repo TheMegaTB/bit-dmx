@@ -12,6 +12,7 @@ use Fixture;
 use EmptyFixture;
 use ChannelGroup;
 use Channel;
+use rustc_serialize::json;
 
 use Switch;
 use ChannelGroupValue;
@@ -21,7 +22,7 @@ use JsonSwitch;
 use UDPSocket;
 
 
-#[derive(Debug, RustcDecodable, RustcEncodable)]
+#[derive(Debug, Clone, RustcDecodable, RustcEncodable)]
 pub struct FrontendData {
     pub max_dmx_address: DmxAddress,
     pub fixtures: Vec<EmptyFixture>,
@@ -36,6 +37,83 @@ impl FrontendData {
             fixtures: Vec::new(),
             switches: Vec::new(),
             chasers: HashMap::new()
+        }
+    }
+    pub fn get_empty_data(&self, new_fixture_id: usize, new_channel_group_id: usize) -> Vec<DmxValue> {
+        match self.fixtures[new_fixture_id].channel_groups[new_channel_group_id].0 { //ids are defind in fixtures.rs::50
+            0 => vec!(0),
+            1 => vec!(0, 0, 0),
+            2 => vec!(0, 0, 0, 0),
+            3 => vec!(0, 0),
+            _ => vec!()
+        }
+    }
+    pub fn change_channel_group(&mut self, switch_id: usize, old_id: String, new_fixture_id: usize, new_channel_group_id: usize) -> bool {
+        let new_id = json::encode(&(new_fixture_id, new_channel_group_id)).unwrap();
+        if !self.switches[switch_id].channel_groups.contains_key(&new_id) {
+            println!("{:?}", self.switches[switch_id].channel_groups);
+            println!("{:?} -> {:?}", old_id, new_id);
+            let new_values = self.get_empty_data(new_fixture_id, new_channel_group_id);
+            let old_data = self.switches[switch_id].channel_groups.get(&old_id).unwrap().clone();
+            let new_data = (new_values, old_data.1, old_data.2);
+            self.switches[switch_id].channel_groups.remove(&old_id);
+            self.switches[switch_id].channel_groups.insert(new_id, new_data);
+            println!("{:?}", self.switches[switch_id].channel_groups);
+            true
+        }
+        else {
+            false
+        }
+    }
+
+    // pub fn change_channel_group(&mut self, switch_id: usize, old_id: String, new_fixture_id: usize, new_channel_group_id: Option<usize>) {
+    //     let mut new_id = None;
+    //     match new_channel_group_id {
+    //         Some(channel_group_id) => {
+    //             let tmp_id = json::encode(&(new_fixture_id, new_channel_group_id)).unwrap();
+    //             if !self.switches[switch_id].channel_groups.contains_key(&tmp_id) {
+    //                 new_id = Some((tmp_id, self.get_empty_data(new_fixture_id, channel_group_id)));
+    //             }
+    //         },
+    //         None => {
+    //             for (channel_group_index, _) in self.fixtures[new_fixture_id].channel_groups.iter().enumerate() {
+    //                 let tmp_id = json::encode(&(new_fixture_id, channel_group_index)).unwrap();
+    //                 if !self.switches[switch_id].channel_groups.contains_key(&tmp_id) {
+    //                     new_id = Some((tmp_id, self.get_empty_data(new_fixture_id, channel_group_index)));
+    //                     break;
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     match new_id {
+    //         Some((id, new_values)) => {
+    //             let old_data = self.switches[switch_id].channel_groups.get(&old_id).unwrap().clone();
+    //             let new_data = (new_values, old_data.1, old_data.2);
+    //             self.switches[switch_id].channel_groups.insert(id, new_data);
+    //             self.switches[switch_id].channel_groups.remove(&old_id);
+    //         }
+    //         _ => {}
+    //     }
+    // }
+    pub fn remove_channel_group(&mut self, switch_id: usize, old_id: String) {
+        self.switches[switch_id].channel_groups.remove(&old_id);
+    }
+    pub fn add_channel_group(&mut self, switch_id: usize) {
+        let mut new_id = None;
+        'outer: for (fixture_index, fixture) in self.fixtures.iter().enumerate() {
+            for (channel_group_index, _) in fixture.channel_groups.iter().enumerate() {
+                let tmp_id = json::encode(&(fixture_index, channel_group_index)).unwrap();
+                if !self.switches[switch_id].channel_groups.contains_key(&tmp_id) {
+                    new_id = Some((tmp_id, self.get_empty_data(fixture_index, channel_group_index)));
+                    break 'outer;
+                }
+            }
+        }
+        match new_id {
+            Some((id, new_values)) => {
+                self.switches[switch_id].channel_groups.insert(id.clone(), (new_values, (FadeCurve::Linear, 1000), (FadeCurve::Linear, 1000)));
+            },
+            _ => {}
         }
     }
 }

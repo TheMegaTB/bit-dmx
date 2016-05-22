@@ -29,7 +29,7 @@ use conrod::{
     Button,
     // Circle,
     // Color,
-    // DropDownList,
+    DropDownList,
     // EnvelopeEditor,
     Labelable,
     // NumberDialer,
@@ -61,9 +61,13 @@ widget_ids! {
     EDITOR_CONTENT with 4000,
     BUTTON with 4000,
     CHASER_TITLE with 4000,
-    EDITOR_SWITCH_ELEMENT with 4000
+    EDITOR_SWITCH_SLIDER with 4000,
+    EDITOR_SWITCH_BUTTON with 4000,
+    EDITOR_SWITCH_TEXT with 4000,
+    EDITOR_SWITCH_DROP_DOWNS with 4000
 }
 
+#[derive(Debug, Clone)]
 struct UI {
     pub watchdog: WatchDogClient,
     tx: mpsc::Sender<Vec<u8>>,
@@ -71,6 +75,7 @@ struct UI {
     shift_state: bool,
     edit_state: bool,
     current_edited_switch_id: Arc<Mutex<[Option<usize>; 1]>>,
+    current_edited_channel_group_id: i64,
     current_edited_switch_name: Arc<Mutex<[String; 1]>>
 }
 
@@ -110,6 +115,7 @@ impl UI {
             shift_state: false,
             edit_state: false,
             current_edited_switch_id: Arc::new(Mutex::new([None])),
+            current_edited_channel_group_id: -1,
             current_edited_switch_name: Arc::new(Mutex::new(["".to_string()]))
         };
 
@@ -209,6 +215,7 @@ impl UI {
                     let mut buffer = String::new();
                     let _ = stream.read_to_string(&mut buffer);
                     self.frontend_data = json::decode(&buffer).unwrap();
+                    println!("{:?}", self.frontend_data.fixtures);
                     println!("TCP update");
                     true
                 }
@@ -315,6 +322,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
             ui.current_edited_switch_id.lock().unwrap()[0] = None;
 
             ui.current_edited_switch_name.lock().unwrap()[0] = "".to_string();
+            ui.current_edited_channel_group_id = -1;
             println!("reset the name");
             ui.edit_state = !ui.edit_state;
         })
@@ -513,6 +521,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                 let time = ui.frontend_data.switches[switch_id].before_chaser;
                 let item_width = 320.0;
                 let item_height = 40.0;
+                let item_x_offset = 20.0;
                 let line = "-----------------------------------------";
                 let ref mut switch_name = switch_name.lock().unwrap()[0];
                 //println!("name: {:?}", switch_name);
@@ -525,8 +534,8 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                     .frame_color(bg_color.invert().plain_contrast())
                     .color(bg_color.plain_contrast())
                     .react(|new_name: &mut String| {
-                        println!("changed name: {:?}", new_name);
                         ui.frontend_data.switches[switch_id].name = new_name.clone();
+                        //TODO send change to server
                     })
                     .enabled(true)
                     .set(EDITOR_CONTENT, conrod_ui);
@@ -549,53 +558,25 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                     .label_color(color::WHITE)
                     .react(|new_time: f32| {
                         ui.frontend_data.switches[switch_id].before_chaser = new_time as FadeTime;
-                        println!("Changed time: {:?}", new_time);})
+                        //TODO send change to server
+                    })
                     .set(EDITOR_TIME_SLIDER, conrod_ui);
 
 
                 y_pos = y_pos - 60.0;
-                let mut editor_switch_element_count = 0;
+                let mut editor_switch_slider_count = 0;
+                let mut editor_switch_button_count = 0;
+                let mut editor_switch_text_count = 0;
+                let mut editor_switch_drop_downs_count = 0;
 
 
                 Text::new(line)
                     .xy_relative_to(TITLE, [x_pos, y_pos])
                     .font_size(14)
                     .color(bg_color.plain_contrast())
-                    .set(EDITOR_SWITCH_ELEMENT + editor_switch_element_count, conrod_ui);
-                editor_switch_element_count += 1;
+                    .set(EDITOR_SWITCH_TEXT + editor_switch_text_count, conrod_ui);
+                editor_switch_text_count += 1;
                 y_pos = y_pos - 60.0;
-
-                // for (id_string, data) in ui.frontend_data.switches[switch_id].channel_groups.iter() {
-                //     let mut id_vector: Vec<String> = id_string.split(",").map(|x| x.to_string()).collect();
-                //     id_vector[0].remove(0);
-                //     id_vector[1].pop();
-                //     let fixture_id = id_vector[0].parse::<usize>();
-                //     let channel_group_id = id_vector[1].parse::<usize>();
-                //     println!("{:?}", id_vector);
-                //
-                //     for (index, &value) in data.0.iter().enumerate() {
-                //         let label = {
-                //             let mut text = "Value: ".to_string();
-                //             text.push_str(&value.to_string());
-                //             text
-                //         };
-                //
-                //         Slider::new(value as f32, 0.0, 255.0)
-                //             .w_h(item_width, item_height)
-                //             .xy_relative_to(TITLE, [x_pos, y_pos])
-                //             .rgb(0.5, 0.3, 0.6)
-                //             .frame(2.0)
-                //             .label(&label)
-                //             .label_color(color::WHITE)
-                //             .react(|new_value: f32| {})
-                //             .set(EDITOR_TIME_SLIDER, conrod_ui);
-                //         editor_switch_element_count += 1;
-                //         y_pos = y_pos - 60.0;
-                //     }
-                //
-                //     println!("{:?}", data);
-                // }
-
 
                 Button::new()
                     .w_h(item_width, item_height)
@@ -603,12 +584,135 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                     .rgb(0.9, 0.9, 0.1)
                     .frame(1.0)
                     .label("Add")
-                    .react(|| {})
-                    .set(EDITOR_SWITCH_ELEMENT + editor_switch_element_count, conrod_ui);
-                editor_switch_element_count += 1;
+                    .react(|| {
+                        ui.frontend_data.add_channel_group(switch_id);
+                    })
+                    .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
+                editor_switch_button_count += 1;
                 y_pos = y_pos - 60.0;
 
+                let cloned_ui = ui.clone();
 
+                let mut data: Vec<String> = cloned_ui.frontend_data.switches[switch_id].channel_groups.keys().map(|x| x.clone()).collect();
+                data.sort();
+
+                //println!("{:?}", cloned_ui.frontend_data.switches[switch_id].channel_groups);
+
+                let mut dropdown_list = Vec::new();
+                let mut dropdown_background_list_fixture = Vec::new();
+                let mut dropdown_background_list_channel_groups = Vec::new();
+                for (fixture_index, fixture) in cloned_ui.frontend_data.fixtures.iter().enumerate() {
+                    if fixture.channel_groups.len() == 1 {
+                        dropdown_list.push(fixture.name.clone());
+                        dropdown_background_list_fixture.push(fixture_index);
+                        dropdown_background_list_channel_groups.push(0);
+                    }
+                    else {
+                        for (channel_group_index, _) in fixture.channel_groups.iter().enumerate() {
+                            dropdown_list.push(fixture.name.clone() + ":" + &channel_group_index.to_string());
+                            dropdown_background_list_fixture.push(fixture_index);
+                            dropdown_background_list_channel_groups.push(channel_group_index);
+                        }
+                    }
+                }
+
+                for (id_string, data) in data.iter().map(|x| (x, cloned_ui.frontend_data.switches[switch_id].channel_groups.get(x).unwrap())) { //
+                // for (id_string, data) in cloned_ui.frontend_data.switches[switch_id].channel_groups.iter() {
+                    let mut id_vector: Vec<String> = id_string.split(",").map(|x| x.to_string()).collect();
+                    id_vector[0].remove(0);
+                    id_vector[1].pop();
+                    let fixture_id = id_vector[0].parse::<usize>().unwrap();
+                    let channel_group_id = id_vector[1].parse::<usize>().unwrap();
+
+
+
+                    let mut dropdown_index = 0;
+                    for (index, (&fixture_index, &channel_group_index)) in dropdown_background_list_fixture.iter().zip(dropdown_background_list_channel_groups.iter()).enumerate() {
+                        if fixture_index == fixture_id && channel_group_index == channel_group_id {
+                            dropdown_index = index;
+                        }
+                    }
+
+                    DropDownList::new(&mut dropdown_list, &mut Some(dropdown_index))
+                        .w_h(item_width-item_height, item_height)
+                        .xy_relative_to(TITLE, [x_pos-item_height/2.0, y_pos])
+                        .rgb(0.5, 0.3, 0.6)
+                        .frame(2.0)
+                        .label(&cloned_ui.frontend_data.fixtures[fixture_id].name.clone())
+                        .label_color(color::WHITE)
+                        .react(|_: &mut Option<usize>, new_idx, _: &str| {
+                            if ui.frontend_data.change_channel_group(switch_id, id_string.clone(), dropdown_background_list_fixture[new_idx], dropdown_background_list_channel_groups[new_idx]) {
+                                ui.current_edited_channel_group_id = new_idx as i64;
+                            }
+                            println!("{:?}", ui.frontend_data.switches[switch_id].channel_groups);
+                        })
+                        .set(EDITOR_SWITCH_DROP_DOWNS + editor_switch_drop_downs_count, conrod_ui);
+                        editor_switch_drop_downs_count += 1;
+
+                    let label = if dropdown_index as i64 == ui.current_edited_channel_group_id {
+                        "v".to_string()
+                    }
+                    else {
+                        ">".to_string()
+                    };
+
+                    Button::new()
+                        .w_h(item_height, item_height)
+                        .xy_relative_to(TITLE, [x_pos+(item_width-item_height)/2.0, y_pos])
+                        .rgb(0.9, 0.9, 0.1)
+                        .frame(1.0)
+                        .label(&label)
+                        .react(|| {
+                            if dropdown_index as i64 == ui.current_edited_channel_group_id {
+                                ui.current_edited_channel_group_id = -1;
+                            }
+                            else {
+                                ui.current_edited_channel_group_id = dropdown_index as i64;
+                            };
+                        })
+                        .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
+                    editor_switch_button_count += 1;
+                    y_pos = y_pos - 60.0;
+
+
+                    if dropdown_index as i64 == ui.current_edited_channel_group_id {
+                        for (index, &value) in data.0.iter().enumerate() {
+                            let label = {
+                                let mut text = "Value: ".to_string();
+                                text.push_str(&value.to_string());
+                                text
+                            };
+
+                            Slider::new(value as f32, 0.0, 255.0)
+                                .w_h(item_width - item_x_offset, item_height)
+                                .xy_relative_to(TITLE, [x_pos + item_x_offset/2.0, y_pos])
+                                .rgb(0.5, 0.3, 0.6)
+                                .frame(2.0)
+                                .label(&label)
+                                .label_color(color::WHITE)
+                                .react(|new_value: f32| {
+                                    ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().0[index] = new_value as u8;
+                                    //TODO send change to server
+                                })
+                                .set(EDITOR_SWITCH_SLIDER + editor_switch_slider_count, conrod_ui);
+                            editor_switch_slider_count += 1;
+                            y_pos = y_pos - 60.0;
+                        }
+
+                        Button::new()
+                            .w_h(item_width - item_x_offset, item_height)
+                            .xy_relative_to(TITLE, [x_pos + item_x_offset/2.0, y_pos])
+                            .rgb(0.9, 0.1, 0.1)
+                            .frame(1.0)
+                            .label("Delete")
+                            .react(|| {
+                                ui.frontend_data.remove_channel_group(switch_id, id_string.clone());
+                            })
+                            .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
+                        editor_switch_button_count += 1;
+                        y_pos = y_pos - 60.0;
+                    }
+                }
             }
             None => {
                 Text::new("No switch selected")
