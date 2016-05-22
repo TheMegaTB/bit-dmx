@@ -35,7 +35,7 @@ use conrod::{
     // NumberDialer,
     // Point,
     Sizeable,
-    // Slider,
+    Slider,
     TextBox,
     // Toggle,
     // WidgetMatrix,
@@ -57,6 +57,7 @@ widget_ids! {
     EDITOR_BUTTON,
     EDITOR_TITLE,
     EDITOR_INFO,
+    EDITOR_TIME_SLIDER,
     EDITOR_CONTENT with 4000,
     BUTTON with 4000,
     CHASER_TITLE with 4000
@@ -68,7 +69,7 @@ struct UI {
     frontend_data: FrontendData,
     shift_state: bool,
     edit_state: bool,
-    current_edited_switch: Arc<Mutex<[Option<usize>; 1]>>,
+    current_edited_switch_id: Arc<Mutex<[Option<usize>; 1]>>,
     current_edited_switch_name: Arc<Mutex<[String; 1]>>
 }
 
@@ -107,7 +108,7 @@ impl UI {
             frontend_data: frontend_data,
             shift_state: false,
             edit_state: false,
-            current_edited_switch: Arc::new(Mutex::new([None])),
+            current_edited_switch_id: Arc::new(Mutex::new([None])),
             current_edited_switch_name: Arc::new(Mutex::new(["".to_string()]))
         };
 
@@ -310,9 +311,10 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
             // let mut current_edited_switch_locked = ui.current_edited_switch.lock().unwrap();
             // current_edited_switch_locked[0] = None;
 
-            ui.current_edited_switch.lock().unwrap()[0] = None;
+            ui.current_edited_switch_id.lock().unwrap()[0] = None;
 
             ui.current_edited_switch_name.lock().unwrap()[0] = "".to_string();
+            println!("reset the name");
             ui.edit_state = !ui.edit_state;
         })
         .set(EDITOR_BUTTON, conrod_ui);
@@ -339,6 +341,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
     let mut y_offset = -90.0;
     let mut rightmost = 0.0;
 
+
     for (id, (name, chaser)) in chasers.iter().map(|x| (x, ui.frontend_data.chasers.get(x).unwrap())).enumerate() {
         x_pos = x_pos + button_width;
         //let x_pos = (id as f64 - 0.5) * button_width;
@@ -357,7 +360,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
 
         for (switch_id_in_chaser, (switch_id, switch)) in chaser.switches.iter().map(|&switch_id| (switch_id, &ui.frontend_data.switches[switch_id])).enumerate() {
             let y_pos = y_offset - 50.0 - switch_id_in_chaser as f64*button_height;
-            let current_edited_switch = ui.current_edited_switch.clone();
+            let current_edited_switch = ui.current_edited_switch_id.clone();
             Button::new()
                 .w_h(button_width, button_height)
                 .xy_relative_to(TITLE, [x_pos, y_pos])
@@ -374,6 +377,8 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                 .react(|| {
                     if ui.edit_state {
                         current_edited_switch.lock().unwrap()[0] = Some(switch_id);
+                        ui.current_edited_switch_name.lock().unwrap()[0] = switch.name.clone();
+                        println!("set to {:?}", switch.name);
                     }
                     else {
                         let new_value = if switch.dimmer_value == 0.0 {255} else {0};
@@ -473,51 +478,84 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                     current_button_id = current_button_id + 1;
             }
         }
-        else {
-            let x_pos = rightmost;
-            let mut y_pos = - 30.0;
+    }
+    if ui.edit_state {
+        let x_pos = rightmost;
+        let mut y_pos = - 30.0;
 
-            Text::new("Editor")
-                .xy_relative_to(TITLE, [x_pos, y_pos])
-                .font_size(22)
-                .color(bg_color.plain_contrast())
-                .set(EDITOR_TITLE, conrod_ui);
+        Text::new("Editor")
+            .xy_relative_to(TITLE, [x_pos, y_pos])
+            .font_size(22)
+            .color(bg_color.plain_contrast())
+            .set(EDITOR_TITLE, conrod_ui);
 
-            y_pos = y_pos - 40.0;
+        y_pos = y_pos - 40.0;
 
-            match ui.current_edited_switch.lock().unwrap()[0] {
-                Some(switch_id) => {
-                    {ui.current_edited_switch_name.lock().unwrap()[0] = ui.frontend_data.switches[switch_id].name.clone()}
-                    let ref mut switch_name = ui.current_edited_switch_name.lock().unwrap()[0];
+        let current_edited_switch = {
+            ui.current_edited_switch_id.lock().unwrap()[0].clone()
+        };
 
-                    Text::new(&("Switch #".to_string() + &switch_id.to_string() + ": " + &switch_name))
-                        .xy_relative_to(TITLE, [x_pos, y_pos])
-                        .font_size(14)
-                        .color(bg_color.plain_contrast())
-                        .set(EDITOR_INFO, conrod_ui);
+        let switch_name = ui.current_edited_switch_name.clone();
 
-                    y_pos = y_pos - 60.0;
+        match current_edited_switch {
+            Some(switch_id) => {
 
-                    let mut test_string = "My Test String is long!!!!!!".to_string();
+                Text::new(&("Switch #".to_string() + &switch_id.to_string() + ": " + &ui.frontend_data.switches[switch_id].name.clone()))
+                    .xy_relative_to(TITLE, [x_pos, y_pos])
+                    .font_size(14)
+                    .color(bg_color.plain_contrast())
+                    .set(EDITOR_INFO, conrod_ui);
 
-                    TextBox::new(&mut test_string) //TODO use TextBox::new(switch_name)
-                        .font_size(20)
-                        .xy_relative_to(TITLE, [x_pos, y_pos])
-                        .w_h(320.0, 40.0)
-                        .frame(2.0)
-                        .frame_color(bg_color.invert().plain_contrast())
-                        .color(bg_color.plain_contrast())
-                        .react(|_string: &mut String|{})
-                        .set(EDITOR_CONTENT, conrod_ui);
+                y_pos = y_pos - 60.0;
 
-                }
-                None => {
-                    Text::new("No switch selected")
-                        .xy_relative_to(TITLE, [x_pos, y_pos])
-                        .font_size(14)
-                        .color(bg_color.plain_contrast())
-                        .set(EDITOR_INFO, conrod_ui);
-                }
+
+                let time = ui.frontend_data.switches[switch_id].before_chaser;
+                let ref mut switch_name = switch_name.lock().unwrap()[0];
+                //println!("name: {:?}", switch_name);
+
+                TextBox::new(switch_name)
+                    .font_size(20)
+                    .xy_relative_to(TITLE, [x_pos, y_pos])
+                    .w_h(320.0, 40.0)
+                    .frame(2.0)
+                    .frame_color(bg_color.invert().plain_contrast())
+                    .color(bg_color.plain_contrast())
+                    .react(|new_name: &mut String| {
+                        println!("changed name: {:?}", new_name);
+                        ui.frontend_data.switches[switch_id].name = new_name.clone();
+                    })
+                    .enabled(true)
+                    .set(EDITOR_CONTENT, conrod_ui);
+
+                y_pos = y_pos - 60.0;
+
+                let time_string = time.to_string();
+                let label = {
+                    let mut text = "Chaser time: ".to_string();
+                    text.push_str(&time_string);
+                    text
+                };
+
+                Slider::new(time as f32, 0.0, 10000.0)
+                    .w_h(320.0, 40.0)
+                    .xy_relative_to(TITLE, [x_pos, y_pos])
+                    .rgb(0.5, 0.3, 0.6)
+                    .frame(2.0)
+                    .label(&label)
+                    .label_color(color::WHITE)
+                    .react(|new_time: f32| {
+                        ui.frontend_data.switches[switch_id].before_chaser = new_time as FadeTime;
+                        println!("Changed time: {:?}", new_time);})
+                    .set(EDITOR_TIME_SLIDER, conrod_ui);
+
+
+            }
+            None => {
+                Text::new("No switch selected")
+                    .xy_relative_to(TITLE, [x_pos, y_pos])
+                    .font_size(14)
+                    .color(bg_color.plain_contrast())
+                    .set(EDITOR_INFO, conrod_ui);
             }
         }
     }
