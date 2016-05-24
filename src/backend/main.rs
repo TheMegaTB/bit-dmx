@@ -9,8 +9,6 @@ use std::thread::{self, sleep};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
-mod channel_group_value;
-use channel_group_value::ChannelGroupValue;
 
 mod interface_handler;
 use interface_handler::*;
@@ -115,8 +113,8 @@ fn main() {
             sleep(Duration::from_millis(10000));
             let mut stage_locked = stage.lock().unwrap();
             let mut test_v2 = HashMap::new();
-            test_v2.insert((1, 0), (vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
-            test_v2.insert((2, 0), (vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
+            test_v2.insert((1, 0), ChannelGroupValue::from_tuple((vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
+            test_v2.insert((2, 0), ChannelGroupValue::from_tuple((vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
             stage_locked.add_switch(Switch::new("CYAN".to_string(), test_v2, "Multi Color".to_string(), 3000));
             UDPSocket::new().start_frontend_client().send_to_multicast(&[255, 255, 255, 255]); //TODO make this server public (see todo above)
         });

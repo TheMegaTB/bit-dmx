@@ -63,7 +63,9 @@ widget_ids! {
     EDITOR_SWITCH_SLIDER with 4000,
     EDITOR_SWITCH_BUTTON with 4000,
     EDITOR_SWITCH_TEXT with 4000,
-    EDITOR_SWITCH_DROP_DOWNS with 4000
+    EDITOR_SWITCH_DROP_DOWNS with 4000,
+    EDITOR_CURVE_STRING1,
+    EDITOR_CURVE_STRING2
 }
 
 #[derive(Debug, Clone)]
@@ -75,7 +77,8 @@ struct UI {
     edit_state: bool,
     current_edited_switch_id: Arc<Mutex<[Option<usize>; 1]>>,
     current_edited_channel_group_id: i64,
-    current_edited_switch_name: Arc<Mutex<[String; 1]>>
+    current_edited_switch_name: Arc<Mutex<[String; 1]>>,
+    current_edited_curve_strings: Arc<Mutex<[String; 2]>>
 }
 
 impl UI {
@@ -115,7 +118,8 @@ impl UI {
             edit_state: false,
             current_edited_switch_id: Arc::new(Mutex::new([None])),
             current_edited_channel_group_id: -1,
-            current_edited_switch_name: Arc::new(Mutex::new(["".to_string()]))
+            current_edited_switch_name: Arc::new(Mutex::new(["".to_string()])),
+            current_edited_curve_strings: Arc::new(Mutex::new(["".to_string(), "".to_string()]))
         };
 
         let ui = Arc::new(Mutex::new(ui));
@@ -315,13 +319,8 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
             }
         })
         .react(|| {
-            // let mut current_edited_switch_locked = ui.current_edited_switch.lock().unwrap();
-            // current_edited_switch_locked[0] = None;
-
             ui.current_edited_switch_id.lock().unwrap()[0] = None;
-
             ui.current_edited_switch_name.lock().unwrap()[0] = "".to_string();
-            ui.current_edited_channel_group_id = -1;
             println!("reset the name");
             ui.edit_state = !ui.edit_state;
         })
@@ -667,6 +666,9 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                             }
                             else {
                                 ui.current_edited_channel_group_id = dropdown_index as i64;
+                                let mut current_edited_curve_strings_locked = ui.current_edited_curve_strings.lock().unwrap();
+                                current_edited_curve_strings_locked[0] = data.curve_in.get_string();
+                                current_edited_curve_strings_locked[1] = data.curve_out.get_string();
                             };
                         })
                         .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
@@ -675,6 +677,20 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
 
 
                     if dropdown_index as i64 == ui.current_edited_channel_group_id {
+
+                        Button::new()
+                            .w_h(item_width - item_x_offset, item_height)
+                            .xy_relative_to(TITLE, [x_pos + item_x_offset/2.0, y_pos])
+                            .rgb(0.9, 0.1, 0.1)
+                            .frame(1.0)
+                            .label("Delete")
+                            .react(|| {
+                                ui.frontend_data.remove_channel_group(switch_id, id_string.clone());
+                            })
+                            .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
+                            editor_switch_button_count += 1;
+                        y_pos = y_pos - 60.0;
+
                         for (index, &value) in data.values.iter().enumerate() {
                             let label = {
                                 let mut text = "Value: ".to_string();
@@ -701,10 +717,10 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                         let mut fade_curve_list = vec!("Linear".to_string(), "Squared".to_string(), "Square root".to_string(), "Custom".to_string());
 
                         {
-                            let mut data = ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap();
+                            let data = ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap();
 
-                            //let dropdown_index = (ui.frontend_data.switches[switch_id].channel_groups.get(id_string).unwrap().clone().1).0.get_id();
-                            DropDownList::new(&mut fade_curve_list, &mut Some(data.clone().curve_in.get_id()))
+                            let fade_curve_id = data.curve_in.get_id();
+                            DropDownList::new(&mut fade_curve_list, &mut Some(fade_curve_id))
                                 .w_h(item_width - item_x_offset, item_height)
                                 .xy_relative_to(TITLE, [x_pos + item_x_offset/2.0, y_pos])
                                 .rgb(0.5, 0.3, 0.6)
@@ -717,21 +733,60 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                                 .set(EDITOR_SWITCH_DROP_DOWNS + editor_switch_drop_downs_count, conrod_ui);
                             editor_switch_drop_downs_count += 1;
                             y_pos = y_pos - 60.0;
+
+                            if fade_curve_id == 3 {
+                                let ref mut curve_string = ui.current_edited_curve_strings.lock().unwrap()[0];
+
+                                TextBox::new(curve_string)
+                                    .w_h(item_width - item_x_offset, item_height)
+                                    .xy_relative_to(TITLE, [x_pos + item_x_offset/2.0, y_pos])
+                                    .frame(2.0)
+                                    .frame_color(bg_color.invert().plain_contrast())
+                                    .color(bg_color.plain_contrast())
+                                    .react(|new_name: &mut String| {
+                                        data.curve_in = FadeCurve::Custom(new_name.clone());
+                                        // ui.current_edited_curve_strings.lock().unwrap()[0] = new_name.clone();
+                                        //TODO send change to server
+                                    })
+                                    .enabled(true)
+                                    .set(EDITOR_CURVE_STRING1, conrod_ui);
+                                y_pos = y_pos - 60.0;
+                            }
+
+                            let fade_curve_id = data.curve_out.get_id();
+                            DropDownList::new(&mut fade_curve_list, &mut Some(fade_curve_id))
+                                .w_h(item_width - item_x_offset, item_height)
+                                .xy_relative_to(TITLE, [x_pos + item_x_offset/2.0, y_pos])
+                                .rgb(0.5, 0.3, 0.6)
+                                .frame(2.0)
+                                .label(&cloned_ui.frontend_data.fixtures[fixture_id].name.clone())
+                                .label_color(color::WHITE)
+                                .react(|_: &mut Option<usize>, new_idx, _: &str| {
+                                    data.curve_out = FadeCurve::get_by_id(new_idx, "x".to_string());
+                                })
+                                .set(EDITOR_SWITCH_DROP_DOWNS + editor_switch_drop_downs_count, conrod_ui);
+                            editor_switch_drop_downs_count += 1;
+                            y_pos = y_pos - 60.0;
+
+                            if fade_curve_id == 3 {
+                                let ref mut curve_string = ui.current_edited_curve_strings.lock().unwrap()[1];
+
+                                TextBox::new(curve_string)
+                                    .w_h(item_width - item_x_offset, item_height)
+                                    .xy_relative_to(TITLE, [x_pos + item_x_offset/2.0, y_pos])
+                                    .frame(2.0)
+                                    .frame_color(bg_color.invert().plain_contrast())
+                                    .color(bg_color.plain_contrast())
+                                    .react(|new_name: &mut String| {
+                                        data.curve_out = FadeCurve::Custom(new_name.clone());
+                                        // ui.current_edited_curve_strings.lock().unwrap()[0] = new_name.clone();
+                                        //TODO send change to server
+                                    })
+                                    .enabled(true)
+                                    .set(EDITOR_CURVE_STRING2, conrod_ui);
+                                y_pos = y_pos - 60.0;
+                            }
                         }
-
-
-                        Button::new()
-                        .w_h(item_width - item_x_offset, item_height)
-                        .xy_relative_to(TITLE, [x_pos + item_x_offset/2.0, y_pos])
-                        .rgb(0.9, 0.1, 0.1)
-                        .frame(1.0)
-                        .label("Delete")
-                        .react(|| {
-                            ui.frontend_data.remove_channel_group(switch_id, id_string.clone());
-                        })
-                        .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
-                        editor_switch_button_count += 1;
-                        y_pos = y_pos - 60.0;
                     }
                 }
             }

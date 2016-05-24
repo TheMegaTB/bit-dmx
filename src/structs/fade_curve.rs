@@ -32,8 +32,8 @@ impl FadeCurve {
             FadeCurve::Custom(e) => Expr::from_str(e).unwrap().bind("x").unwrap()
         }
     }
-    pub fn get_id(self) -> usize {
-        match self {
+    pub fn get_id(&self) -> usize {
+        match *self {
             FadeCurve::Linear => 0,
             FadeCurve::Squared => 1,
             FadeCurve::SquareRoot => 2,
@@ -49,6 +49,12 @@ impl FadeCurve {
             2 => FadeCurve::SquareRoot,
             3 => FadeCurve::Custom(custom_string),
             _ => FadeCurve::Linear,
+        }
+    }
+    pub fn get_string(&self) -> String {
+        match *self {
+            FadeCurve::Custom(ref e) => e.clone(),
+            _ => "x".to_string()
         }
     }
 }
