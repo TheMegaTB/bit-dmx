@@ -42,4 +42,22 @@ impl Switch {
             name: self.name.clone()
         }
     }
+
+    pub fn load_from_json_switch(json_switch: JsonSwitch) -> Switch {
+        Switch {
+            channel_groups: json_switch.channel_groups.iter().map(|(k, v)| {
+                let mut id_vector: Vec<String> = k.split(",").map(|x| x.to_string()).collect();
+                id_vector[0].remove(0);
+                id_vector[1].pop();
+                let fixture_id = id_vector[0].parse::<usize>().unwrap();
+                let channel_group_id = id_vector[1].parse::<usize>().unwrap();
+                ((fixture_id, channel_group_id), v.clone())
+
+            }).collect::<HashMap<(usize, usize), ChannelGroupValue>>(),
+            chaser_id: json_switch.chaser_id.clone(),
+            dimmer_value: json_switch.dimmer_value,
+            before_chaser: json_switch.before_chaser,
+            name: json_switch.name.clone()
+        }
+    }
 }

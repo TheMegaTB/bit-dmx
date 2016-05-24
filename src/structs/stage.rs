@@ -89,6 +89,8 @@ impl FrontendData {
     }
 }
 
+
+//TODO move to chaser.rs
 #[derive(Debug, Clone, RustcDecodable, RustcEncodable)]
 pub struct FrontendChaser {
     pub switches: Vec<usize>,
@@ -105,6 +107,12 @@ impl Chaser {
     pub fn new() -> Chaser {
         Chaser {
             switches: Vec::new(),
+            current_thread: None
+        }
+    }
+    pub fn from_frontend_data(frontend_chaser: FrontendChaser) -> Chaser {
+        Chaser {
+            switches: frontend_chaser.switches,
             current_thread: None
         }
     }
@@ -154,6 +162,17 @@ impl Stage {
             switches: self.switches.iter().map(|x| x.with_json_hashmap()).collect(),
             chasers: self.chasers.iter().map(|(name, data)| (name.clone(), data.get_frontend_data())).collect()
         }
+    }
+
+    pub fn from_frontend_data(&mut self, frontend_data: FrontendData) {
+
+        self.switches = frontend_data.switches.iter().map(|x| Switch::load_from_json_switch(x.clone())).collect();
+
+        for (_, chaser) in self.chasers.iter_mut() {
+            chaser.stop_chaser();
+        }
+        self.chasers = frontend_data.chasers.iter().map(|(name, data)| (name.clone(), Chaser::from_frontend_data(data.clone()))).collect()
+
     }
 
     pub fn add_fixture(&mut self, fixture: Fixture) -> usize {

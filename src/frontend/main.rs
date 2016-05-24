@@ -233,6 +233,27 @@ impl UI {
             false
         }
     }
+
+    fn send_data(&mut self) -> bool {
+        println!("start sending...");
+        if self.watchdog.get_server_addr().is_some() {
+            match TcpStream::connect((&*self.watchdog.get_server_addr().unwrap().to_string(), 8001)) {
+                Ok(mut stream) => {
+                    stream.write(json::encode(&self.frontend_data).unwrap().as_bytes()).unwrap();
+                    println!("Data send");
+                    true
+                }
+                Err(_) => {
+                    println!("Error while connecting");
+                    false
+                }
+            }
+        }
+        else {
+            println!("No server ip");
+            false
+        }
+    }
 }
 
 fn create_output_window(ui: Arc<Mutex<UI>>, chasers: Vec<String>) {
@@ -322,6 +343,10 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
             ui.current_edited_switch_id.lock().unwrap()[0] = None;
             ui.current_edited_switch_name.lock().unwrap()[0] = "".to_string();
             println!("reset the name");
+            if ui.edit_state {
+                println!("send data");
+                ui.send_data();
+            }
             ui.edit_state = !ui.edit_state;
         })
         .set(EDITOR_BUTTON, conrod_ui);
@@ -533,7 +558,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                     .color(bg_color.plain_contrast())
                     .react(|new_name: &mut String| {
                         ui.frontend_data.switches[switch_id].name = new_name.clone();
-                        //TODO send change to server
+                        //ui.send_data();
                     })
                     .enabled(true)
                     .set(EDITOR_CONTENT, conrod_ui);
@@ -556,7 +581,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                     .label_color(color::WHITE)
                     .react(|new_time: f32| {
                         ui.frontend_data.switches[switch_id].before_chaser = new_time as FadeTime;
-                        //TODO send change to server
+                        //ui.send_data();
                     })
                     .set(EDITOR_TIME_SLIDER, conrod_ui);
 
@@ -584,6 +609,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                     .label("Add")
                     .react(|| {
                         ui.frontend_data.add_channel_group(switch_id);
+                        //ui.send_data();
                     })
                     .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
                 editor_switch_button_count += 1;
@@ -614,8 +640,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                     }
                 }
 
-                for (id_string, data) in data.iter().map(|x| (x, cloned_ui.frontend_data.switches[switch_id].channel_groups.get(x).unwrap())) { //
-                // for (id_string, data) in cloned_ui.frontend_data.switches[switch_id].channel_groups.iter() {
+                for (id_string, data) in data.iter().map(|x| (x, cloned_ui.frontend_data.switches[switch_id].channel_groups.get(x).unwrap())) {
                     let mut id_vector: Vec<String> = id_string.split(",").map(|x| x.to_string()).collect();
                     id_vector[0].remove(0);
                     id_vector[1].pop();
@@ -641,6 +666,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                         .react(|_: &mut Option<usize>, new_idx, _: &str| {
                             if ui.frontend_data.change_channel_group(switch_id, id_string.clone(), dropdown_background_list_fixture[new_idx], dropdown_background_list_channel_groups[new_idx]) {
                                 ui.current_edited_channel_group_id = new_idx as i64;
+                                //ui.send_data();
                             }
                             println!("{:?}", ui.frontend_data.switches[switch_id].channel_groups);
                         })
@@ -686,6 +712,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                             .label("Delete")
                             .react(|| {
                                 ui.frontend_data.remove_channel_group(switch_id, id_string.clone());
+                                //ui.send_data();
                             })
                             .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
                             editor_switch_button_count += 1;
@@ -707,7 +734,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                                 .label_color(color::WHITE)
                                 .react(|new_value: f32| {
                                     ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().values[index] = new_value as u8;
-                                    //TODO send change to server
+                                    //ui.send_data();
                                 })
                                 .set(EDITOR_SWITCH_SLIDER + editor_switch_slider_count, conrod_ui);
                             editor_switch_slider_count += 1;
@@ -729,6 +756,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                                 .label_color(color::WHITE)
                                 .react(|_: &mut Option<usize>, new_idx, _: &str| {
                                     data.curve_in = FadeCurve::get_by_id(new_idx, "x".to_string());
+                                    //ui.send_data();
                                 })
                                 .set(EDITOR_SWITCH_DROP_DOWNS + editor_switch_drop_downs_count, conrod_ui);
                             editor_switch_drop_downs_count += 1;
@@ -745,13 +773,32 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                                     .color(bg_color.plain_contrast())
                                     .react(|new_name: &mut String| {
                                         data.curve_in = FadeCurve::Custom(new_name.clone());
-                                        // ui.current_edited_curve_strings.lock().unwrap()[0] = new_name.clone();
-                                        //TODO send change to server
+                                        //ui.send_data();
                                     })
                                     .enabled(true)
                                     .set(EDITOR_CURVE_STRING1, conrod_ui);
                                 y_pos = y_pos - 60.0;
                             }
+
+                            let label = {
+                                let mut text = "Time in: ".to_string();
+                                text.push_str(&data.time_in.to_string());
+                                text
+                            };
+
+                            Slider::new(data.time_in as f32, 0.0, 10000.0)
+                                .w_h(item_width - item_x_offset, item_height)
+                                .xy_relative_to(TITLE, [x_pos + item_x_offset/2.0, y_pos])
+                                .rgb(0.5, 0.3, 0.6)
+                                .frame(2.0)
+                                .label(&label)
+                                .label_color(color::WHITE)
+                                .react(|new_value: f32| {
+                                    data.time_in = new_value as FadeTime;
+                                })
+                                .set(EDITOR_SWITCH_SLIDER + editor_switch_slider_count, conrod_ui);
+                            editor_switch_slider_count += 1;
+                            y_pos = y_pos - 60.0;
 
                             let fade_curve_id = data.curve_out.get_id();
                             DropDownList::new(&mut fade_curve_list, &mut Some(fade_curve_id))
@@ -763,6 +810,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                                 .label_color(color::WHITE)
                                 .react(|_: &mut Option<usize>, new_idx, _: &str| {
                                     data.curve_out = FadeCurve::get_by_id(new_idx, "x".to_string());
+                                    //ui.send_data();
                                 })
                                 .set(EDITOR_SWITCH_DROP_DOWNS + editor_switch_drop_downs_count, conrod_ui);
                             editor_switch_drop_downs_count += 1;
@@ -779,13 +827,32 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                                     .color(bg_color.plain_contrast())
                                     .react(|new_name: &mut String| {
                                         data.curve_out = FadeCurve::Custom(new_name.clone());
-                                        // ui.current_edited_curve_strings.lock().unwrap()[0] = new_name.clone();
-                                        //TODO send change to server
+                                        //ui.send_data();
                                     })
                                     .enabled(true)
                                     .set(EDITOR_CURVE_STRING2, conrod_ui);
                                 y_pos = y_pos - 60.0;
                             }
+
+                            let label = {
+                                let mut text = "Time out: ".to_string();
+                                text.push_str(&data.time_out.to_string());
+                                text
+                            };
+
+                            Slider::new(data.time_out as f32, 0.0, 10000.0)
+                                .w_h(item_width - item_x_offset, item_height)
+                                .xy_relative_to(TITLE, [x_pos + item_x_offset/2.0, y_pos])
+                                .rgb(0.5, 0.3, 0.6)
+                                .frame(2.0)
+                                .label(&label)
+                                .label_color(color::WHITE)
+                                .react(|new_value: f32| {
+                                    data.time_out = new_value as FadeTime;
+                                })
+                                .set(EDITOR_SWITCH_SLIDER + editor_switch_slider_count, conrod_ui);
+                            editor_switch_slider_count += 1;
+                            y_pos = y_pos - 60.0;
                         }
                     }
                 }

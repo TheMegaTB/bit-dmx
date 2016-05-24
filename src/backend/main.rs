@@ -9,6 +9,7 @@ use std::thread::{self, sleep};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
+use std::io::prelude::*;
 
 mod interface_handler;
 use interface_handler::*;
@@ -116,7 +117,7 @@ fn main() {
             test_v2.insert((1, 0), ChannelGroupValue::from_tuple((vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
             test_v2.insert((2, 0), ChannelGroupValue::from_tuple((vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
             stage_locked.add_switch(Switch::new("CYAN".to_string(), test_v2, "Multi Color".to_string(), 3000));
-            UDPSocket::new().start_frontend_client().send_to_multicast(&[255, 255, 255, 255]); //TODO make this server public (see todo above)
+            UDPSocket::new().start_frontend_client().send_to_multicast(&[255, 255, 255, 255]);
         });
     }
 
@@ -127,15 +128,37 @@ fn main() {
             use std::net::TcpListener;
 
             let listener = TcpListener::bind("0.0.0.0:8000").unwrap();
-            info!("listening started, ready to accept");
+            info!("listening (send) started, ready to accept");
             for stream in listener.incoming() {
                 let stage = stage.clone();
                 thread::spawn(move || {
                     let stage_locked = stage.lock().unwrap();
                     let mut stream = stream.unwrap();
-                    //TODO: receive data and update stage
 
                     stream.write(json::encode(&stage_locked.get_frontend_data()).unwrap().as_bytes()).unwrap();
+                });
+            }
+        });
+    }
+
+    {
+        let stage = stage.clone();
+        thread::spawn(move || {
+            use std::net::TcpListener;
+
+            let listener = TcpListener::bind("0.0.0.0:8001").unwrap();
+            info!("listening (receive) started, ready to accept");
+            for stream in listener.incoming() {
+                let stage = stage.clone();
+                thread::spawn(move || {
+                    let mut stream = stream.unwrap();
+                    let mut buffer = String::new();
+                    let _ = stream.read_to_string(&mut buffer);
+                    let frontend_data: FrontendData = json::decode(&buffer).unwrap();
+                    {stage.lock().unwrap().from_frontend_data(frontend_data);}
+                    //TODO: receive data and update stage
+                    UDPSocket::new().start_frontend_client().send_to_multicast(&[255, 255, 255, 255]);
+                    //stream.write(json::encode(&stage_locked.get_frontend_data()).unwrap().as_bytes()).unwrap();
                 });
             }
         }).join().unwrap();
