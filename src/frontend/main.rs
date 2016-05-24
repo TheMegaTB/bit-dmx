@@ -7,7 +7,6 @@ extern crate rand;
 extern crate structures;
 extern crate rustc_serialize;
 use structures::*;
-//use std::io::Read;
 use std::time::Duration;
 use std::thread;
 
@@ -676,7 +675,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
 
 
                     if dropdown_index as i64 == ui.current_edited_channel_group_id {
-                        for (index, &value) in data.0.iter().enumerate() {
+                        for (index, &value) in data.values.iter().enumerate() {
                             let label = {
                                 let mut text = "Value: ".to_string();
                                 text.push_str(&value.to_string());
@@ -691,7 +690,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                                 .label(&label)
                                 .label_color(color::WHITE)
                                 .react(|new_value: f32| {
-                                    ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().0[index] = new_value as u8;
+                                    ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().values[index] = new_value as u8;
                                     //TODO send change to server
                                 })
                                 .set(EDITOR_SWITCH_SLIDER + editor_switch_slider_count, conrod_ui);
@@ -699,16 +698,38 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                             y_pos = y_pos - 60.0;
                         }
 
+                        let mut fade_curve_list = vec!("Linear".to_string(), "Squared".to_string(), "Square root".to_string(), "Custom".to_string());
+
+                        {
+                            let mut data = ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap();
+
+                            //let dropdown_index = (ui.frontend_data.switches[switch_id].channel_groups.get(id_string).unwrap().clone().1).0.get_id();
+                            DropDownList::new(&mut fade_curve_list, &mut Some(data.clone().curve_in.get_id()))
+                                .w_h(item_width - item_x_offset, item_height)
+                                .xy_relative_to(TITLE, [x_pos + item_x_offset/2.0, y_pos])
+                                .rgb(0.5, 0.3, 0.6)
+                                .frame(2.0)
+                                .label(&cloned_ui.frontend_data.fixtures[fixture_id].name.clone())
+                                .label_color(color::WHITE)
+                                .react(|_: &mut Option<usize>, new_idx, _: &str| {
+                                    data.curve_in = FadeCurve::get_by_id(new_idx, "x".to_string());
+                                })
+                                .set(EDITOR_SWITCH_DROP_DOWNS + editor_switch_drop_downs_count, conrod_ui);
+                            editor_switch_drop_downs_count += 1;
+                            y_pos = y_pos - 60.0;
+                        }
+
+
                         Button::new()
-                            .w_h(item_width - item_x_offset, item_height)
-                            .xy_relative_to(TITLE, [x_pos + item_x_offset/2.0, y_pos])
-                            .rgb(0.9, 0.1, 0.1)
-                            .frame(1.0)
-                            .label("Delete")
-                            .react(|| {
-                                ui.frontend_data.remove_channel_group(switch_id, id_string.clone());
-                            })
-                            .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
+                        .w_h(item_width - item_x_offset, item_height)
+                        .xy_relative_to(TITLE, [x_pos + item_x_offset/2.0, y_pos])
+                        .rgb(0.9, 0.1, 0.1)
+                        .frame(1.0)
+                        .label("Delete")
+                        .react(|| {
+                            ui.frontend_data.remove_channel_group(switch_id, id_string.clone());
+                        })
+                        .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
                         editor_switch_button_count += 1;
                         y_pos = y_pos - 60.0;
                     }

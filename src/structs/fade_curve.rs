@@ -31,6 +31,24 @@ impl FadeCurve {
             FadeCurve::Sin(i) => Expr::from_str("-cos(".to_string() + &i.to_string() + &".5*6.28318530718*x)*0.5+0.5".to_string()).unwrap().bind("x").unwrap(),
             FadeCurve::Custom(e) => Expr::from_str(e).unwrap().bind("x").unwrap()
         }
+    }
+    pub fn get_id(self) -> usize {
+        match self {
+            FadeCurve::Linear => 0,
+            FadeCurve::Squared => 1,
+            FadeCurve::SquareRoot => 2,
+            FadeCurve::Custom(_) => 3,
+            _ => 0
+        }
+    }
 
+    pub fn get_by_id(id: usize, custom_string: String) -> FadeCurve {
+        match id {
+            0 => FadeCurve::Linear,
+            1 => FadeCurve::Squared,
+            2 => FadeCurve::SquareRoot,
+            3 => FadeCurve::Custom(custom_string),
+            _ => FadeCurve::Linear,
+        }
     }
 }

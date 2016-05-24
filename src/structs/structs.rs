@@ -10,7 +10,7 @@ pub const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 pub type FadeTime = usize;
 pub type DmxAddress = u16;
 pub type DmxValue = u8;
-pub type ChannelGroupValue = (Vec<DmxValue>, (FadeCurve, FadeTime), (FadeCurve, FadeTime));
+pub type ChannelGroupValueTuple = (Vec<DmxValue>, (FadeCurve, FadeTime), (FadeCurve, FadeTime));
 pub const FADE_TICKS: FadeTime = 30;
 
 pub mod git_hash;
@@ -24,6 +24,9 @@ pub use udp_socket::*;
 
 pub mod channel;
 pub use channel::*;
+
+pub mod channel_group_value;
+pub use channel_group_value::*;
 
 pub mod dmx_parser;
 pub use dmx_parser::*;

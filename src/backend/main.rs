@@ -9,6 +9,9 @@ use std::thread::{self, sleep};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
+mod channel_group_value;
+use channel_group_value::ChannelGroupValue;
+
 mod interface_handler;
 use interface_handler::*;
 
@@ -28,30 +31,29 @@ fn main() {
 
     let mut stage = Parser::new(Stage::new(tx)).parse();
 
-    println!("{:?}", stage.fixtures);
 
     let mut v1 = HashMap::new();
-    v1.insert((0, 0), (vec![255], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
-    v1.insert((1, 0), (vec![255], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
-    v1.insert((2, 0), (vec![255], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
+    v1.insert((0, 0), ChannelGroupValue::from_tuple((vec![255], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
+    v1.insert((1, 0), ChannelGroupValue::from_tuple((vec![255], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
+    v1.insert((2, 0), ChannelGroupValue::from_tuple((vec![255], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
     stage.add_switch(Switch::new("RGB full on".to_string(), v1, "Full".to_string(), 3000));
 
     let mut v1 = HashMap::new();
-    v1.insert((0, 0), (vec![0], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
-    v1.insert((1, 0), (vec![0], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
-    v1.insert((2, 0), (vec![0], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000)));
+    v1.insert((0, 0), ChannelGroupValue::from_tuple((vec![0], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
+    v1.insert((1, 0), ChannelGroupValue::from_tuple((vec![0], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
+    v1.insert((2, 0), ChannelGroupValue::from_tuple((vec![0], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
     stage.add_switch(Switch::new("Blackout".to_string(), v1, "Full".to_string(), 3000));
 
     let mut v2 = HashMap::new();
-    v2.insert((0, 0), (vec![20], (FadeCurve::Squared, 0), (FadeCurve::Linear, 0)));
+    v2.insert((0, 0), ChannelGroupValue::from_tuple((vec![20], (FadeCurve::Squared, 0), (FadeCurve::Linear, 0))));
     stage.add_switch(Switch::new("RED".to_string(), v2, "Single Colors".to_string(), 1000));
 
     let mut test_v = HashMap::new();
-    test_v.insert((1, 0), (vec![20], (FadeCurve::Squared, 0), (FadeCurve::Linear, 5000)));
+    test_v.insert((1, 0), ChannelGroupValue::from_tuple((vec![20], (FadeCurve::Squared, 0), (FadeCurve::Linear, 5000))));
     stage.add_switch(Switch::new("GREEN".to_string(), test_v, "Single Colors".to_string(), 1000));
 
     let mut test_v2 = HashMap::new();
-    test_v2.insert((2, 0), (vec![20], (FadeCurve::Squared, 500), (FadeCurve::Linear, 0)));
+    test_v2.insert((2, 0), ChannelGroupValue::from_tuple((vec![20], (FadeCurve::Squared, 500), (FadeCurve::Linear, 0))));
     stage.add_switch(Switch::new("BLUE".to_string(), test_v2, "Single Colors".to_string(), 800));
 
 
@@ -167,14 +169,7 @@ fn test_fade_curve() {
 
     match test_group {
         ChannelGroup::Single(mut group) => {
-            //group.fade_simple(curve.clone(), 500, 255);
-            //sleep(Duration::from_millis(2000));
-            //group.activate_preheat(curve.clone(), 500);
-            //println!("pre");
             group.fade_simple(curve.clone(), 5000, 255);
-            //group.deactivate_preheat(curve.clone(), 500);
-            //sleep(Duration::from_millis(2000));
-            //group.fade_simple(curve.clone(), 1000, 0);
         },
         ChannelGroup::RGB(mut group) => {
             group.fade_rgb(curve.clone(), 1000, 255, 0, 0);
