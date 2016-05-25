@@ -540,7 +540,6 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
 
                 y_pos = y_pos - 60.0;
 
-
                 let time = ui.frontend_data.switches[switch_id].before_chaser;
                 let item_width = 320.0;
                 let item_height = 40.0;
@@ -548,6 +547,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                 let line = "-----------------------------------------";
                 let ref mut switch_name = switch_name.lock().unwrap()[0];
                 //println!("name: {:?}", switch_name);
+
 
                 TextBox::new(switch_name)
                     .font_size(20)
@@ -599,20 +599,6 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                     .color(bg_color.plain_contrast())
                     .set(EDITOR_SWITCH_TEXT + editor_switch_text_count, conrod_ui);
                 editor_switch_text_count += 1;
-                y_pos = y_pos - 60.0;
-
-                Button::new()
-                    .w_h(item_width, item_height)
-                    .xy_relative_to(TITLE, [x_pos, y_pos])
-                    .rgb(0.9, 0.9, 0.1)
-                    .frame(1.0)
-                    .label("Add")
-                    .react(|| {
-                        ui.frontend_data.add_channel_group(switch_id);
-                        //ui.send_data();
-                    })
-                    .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
-                editor_switch_button_count += 1;
                 y_pos = y_pos - 60.0;
 
                 let cloned_ui = ui.clone();
@@ -668,7 +654,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                                 ui.current_edited_channel_group_id = new_idx as i64;
                                 //ui.send_data();
                             }
-                            println!("{:?}", ui.frontend_data.switches[switch_id].channel_groups);
+                            //println!("{:?}", ui.frontend_data.switches[switch_id].channel_groups);
                         })
                         .set(EDITOR_SWITCH_DROP_DOWNS + editor_switch_drop_downs_count, conrod_ui);
                         editor_switch_drop_downs_count += 1;
@@ -703,20 +689,6 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
 
 
                     if dropdown_index as i64 == ui.current_edited_channel_group_id {
-
-                        Button::new()
-                            .w_h(item_width - item_x_offset, item_height)
-                            .xy_relative_to(TITLE, [x_pos + item_x_offset/2.0, y_pos])
-                            .rgb(0.9, 0.1, 0.1)
-                            .frame(1.0)
-                            .label("Delete")
-                            .react(|| {
-                                ui.frontend_data.remove_channel_group(switch_id, id_string.clone());
-                                //ui.send_data();
-                            })
-                            .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
-                            editor_switch_button_count += 1;
-                        y_pos = y_pos - 60.0;
 
                         for (index, &value) in data.values.iter().enumerate() {
                             let label = {
@@ -854,8 +826,51 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                             editor_switch_slider_count += 1;
                             y_pos = y_pos - 60.0;
                         }
+
+                        Button::new()
+                            .w_h(item_width - item_x_offset, item_height)
+                            .xy_relative_to(TITLE, [x_pos + item_x_offset/2.0, y_pos])
+                            .rgb(0.9, 0.1, 0.1)
+                            .frame(1.0)
+                            .label("Delete")
+                            .react(|| {
+                                ui.frontend_data.remove_channel_group(switch_id, id_string.clone());
+                                println!("removed");
+                                //ui.send_data();
+                            })
+                            .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
+                            editor_switch_button_count += 1;
+                        y_pos = y_pos - 60.0;
                     }
                 }
+                Button::new()
+                    .w_h(item_width, item_height)
+                    .xy_relative_to(TITLE, [x_pos, y_pos])
+                    .rgb(0.1, 0.9, 0.1)
+                    .frame(1.0)
+                    .label("Add")
+                    .react(|| {
+                        ui.frontend_data.add_channel_group(switch_id);
+                        //ui.send_data();
+                    })
+                    .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
+                editor_switch_button_count += 1;
+                y_pos = y_pos - 60.0;
+
+                Button::new()
+                    .w_h(item_width, item_height)
+                    .xy_relative_to(TITLE, [x_pos, y_pos])
+                    .rgb(0.9, 0.1, 0.1)
+                    .frame(1.0)
+                    .label("Delete")
+                    .react(|| {
+                        ui.frontend_data.remove_switch_with_id(switch_id);
+                        ui.current_edited_switch_id.lock().unwrap()[0] = None;
+                        println!("finished");
+                    })
+                    .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
+                // editor_switch_button_count += 1;
+                // y_pos = y_pos - 60.0;
             }
             None => {
                 Text::new("No switch selected")

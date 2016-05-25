@@ -87,6 +87,12 @@ impl FrontendData {
             _ => {}
         }
     }
+    pub fn remove_switch_with_id(&mut self, switch_id: usize) {
+        for (_, chaser) in self.chasers.iter_mut() {
+            chaser.remove_switch_with_id(switch_id);
+        }
+        self.switches.remove(switch_id);
+    }
 }
 
 
@@ -95,6 +101,15 @@ impl FrontendData {
 pub struct FrontendChaser {
     pub switches: Vec<usize>,
     pub current_thread: bool
+}
+
+impl FrontendChaser {
+    pub fn remove_switch_with_id(&mut self, switch_id: usize) {
+        println!(" ++ {:?}", self.switches);
+        self.switches.retain(|&id| id != switch_id);
+        self.switches = self.switches.iter().map(|x| if *x < switch_id {*x} else {x - 1}).collect();
+        println!(" -> {:?}", self.switches);
+    }
 }
 
 #[derive(Debug, Clone)]

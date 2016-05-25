@@ -6,8 +6,8 @@ Fixture {
 Fixture {
     name("PAR");
     rgb(0, 1, 2);
-    single(0);
-    rgb(0, 1, 2);
+    single(3);
+    rgb(4, 5, 6);
 }
 
 
