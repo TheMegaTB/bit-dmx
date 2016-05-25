@@ -12,7 +12,6 @@ use GIT_HASH;
 
 pub const INPUT_BUFFER: usize = 4;
 pub const WATCHDOG_TTL: u64 = 5;
-// const WATCHDOG_DATA: [u8; 3] = [68, 77, 88]; // "DMX" as bytes
 
 #[derive(Debug)]
 pub struct UDPSocket {
@@ -37,7 +36,7 @@ impl UDPSocket {
     pub fn new() -> UDPSocket {
         UDPSocket {
             local_addr: Ipv4Addr::new(0, 0, 0, 0),
-            multicast_addr: Ipv4Addr::new(228, 228, 228, 228),
+            multicast_addr: if cfg!(feature = "local") { Ipv4Addr::new(127, 0, 0, 1) } else { Ipv4Addr::new(228, 228, 228, 228) },
             port: 8000
         }
     }
@@ -59,7 +58,7 @@ impl UDPSocket {
 
     pub fn assemble_socket(&self, port: u16, multicast: bool) -> UdpSocket {
         let sock = UdpSocket::bind(SocketAddrV4::new(self.local_addr, port)).unwrap();
-        if multicast { sock.join_multicast_v4(&self.multicast_addr, &self.local_addr).ok().expect("Failed to join multicast."); }
+        if multicast && !cfg!(feature = "local") { sock.join_multicast_v4(&self.multicast_addr, &self.local_addr).ok().expect("Failed to join multicast."); }
         sock
     }
 
