@@ -24,6 +24,7 @@ path = "src/structs/structs.rs"
 [features] #TODO: Make this automagically and send it to the interface
 default = []
 fake_if = []
+local = []
 
 [dependencies]
 conrod = "0.34.0"

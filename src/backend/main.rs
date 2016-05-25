@@ -20,6 +20,7 @@ use structures::*;
 
 fn main() {
     println!("BitDMX backend v{}-{}", VERSION, GIT_HASH);
+    if cfg!(feature = "local") { println!("HEUREKA") };
 
     env_logger::init().unwrap();
 
