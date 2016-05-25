@@ -91,7 +91,35 @@ impl FrontendData {
         for (_, chaser) in self.chasers.iter_mut() {
             chaser.remove_switch_with_id(switch_id);
         }
+        println!("{:?}", switch_id);
+        println!("{:?}", self.switches);
         self.switches.remove(switch_id);
+    }
+
+    fn add_fixture_to_switch_group(&mut self, switch_id:usize, chaser_id: String) {
+        // if !self.chasers.contains_key(&chaser_id) {
+        //     self.chasers.insert(chaser_id.clone(), FrontendChaser::new());
+        // }
+        self.chasers.get_mut(&chaser_id).unwrap().switches.push(switch_id);
+    }
+
+    pub fn add_switch(&mut self, switch: JsonSwitch) -> usize {
+        let id = self.switches.len();
+        self.add_fixture_to_switch_group(id, switch.chaser_id.clone());
+        self.switches.push(switch);
+
+        id
+    }
+    pub fn delete_chaser(&mut self, chaser_id: String) {
+
+        while !self.chasers.clone().get(&chaser_id).unwrap().switches.is_empty() {
+            let switch_id = self.chasers.get_mut(&chaser_id).unwrap().switches[0];
+            self.remove_switch_with_id(switch_id);
+        }
+        self.chasers.remove(&chaser_id);
+    }
+    pub fn add_chaser(&mut self) {
+        self.chasers.insert("Untitled".to_string(), FrontendChaser::new());
     }
 }
 
@@ -104,11 +132,18 @@ pub struct FrontendChaser {
 }
 
 impl FrontendChaser {
+    pub fn new() -> FrontendChaser {
+        FrontendChaser {
+            switches: Vec::new(),
+            current_thread: true
+        }
+    }
     pub fn remove_switch_with_id(&mut self, switch_id: usize) {
-        println!(" ++ {:?}", self.switches);
+        println!("remove {:?}", switch_id);
+        println!("{:?}", self.switches);
         self.switches.retain(|&id| id != switch_id);
         self.switches = self.switches.iter().map(|x| if *x < switch_id {*x} else {x - 1}).collect();
-        println!(" -> {:?}", self.switches);
+        println!("{:?}", self.switches);
     }
 }
 
