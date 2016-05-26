@@ -516,10 +516,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
                 .set(current_button_id, conrod_ui);
                 current_button_id = current_button_id + 1;
         }
-        let y_pos = y_offset - 50.0 - (chaser.switches.len() as f64 - 0.25)*button_height;
-        if y_pos - button_height < next_y_offset {
-            next_y_offset = y_pos - button_height;
-        }
+        let mut y_pos = y_offset - 50.0 - (chaser.switches.len() as f64 - 0.25)*button_height;
         if !ui.edit_state {
             {
                 let tx = tx.clone();
@@ -640,10 +637,15 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
                     })
                     .set(current_button_id, conrod_ui);
                     current_button_id = current_button_id + 1;
+
+            y_pos = y_pos - button_height;
             if test
             {
                 return;
             }
+        }
+        if y_pos - button_height < next_y_offset {
+            next_y_offset = y_pos - button_height;
         }
     }
     if ui.edit_state {

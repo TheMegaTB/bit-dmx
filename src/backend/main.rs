@@ -4,9 +4,7 @@ extern crate structures;
 extern crate net2;
 extern crate rustc_serialize;
 
-use std::time::Duration;
-use std::thread::{self, sleep};
-use std::collections::HashMap;
+use std::thread;
 use std::sync::{Arc, Mutex};
 
 use std::io::prelude::*;
