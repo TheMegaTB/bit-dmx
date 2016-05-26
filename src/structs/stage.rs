@@ -24,6 +24,7 @@ use UDPSocket;
 
 #[derive(Debug, Clone, RustcDecodable, RustcEncodable)]
 pub struct FrontendData {
+    pub name: String,
     pub max_dmx_address: DmxAddress,
     pub fixtures: Vec<EmptyFixture>,
     pub switches: Vec<JsonSwitch>,
@@ -31,8 +32,9 @@ pub struct FrontendData {
 }
 
 impl FrontendData {
-    pub fn new() -> FrontendData {
+    pub fn new(name: String) -> FrontendData {
         FrontendData {
+            name: name,
             max_dmx_address: 0,
             fixtures: Vec::new(),
             switches: Vec::new(),
@@ -118,8 +120,26 @@ impl FrontendData {
         }
         self.chasers.remove(&chaser_id);
     }
-    pub fn add_chaser(&mut self) {
-        self.chasers.insert("Untitled".to_string(), FrontendChaser::new());
+    pub fn add_chaser(&mut self) -> Option<String> {
+        let name = "Untitled".to_string();
+        if !self.chasers.contains_key(&name.clone()) {
+            self.chasers.insert(name.clone(), FrontendChaser::new());
+            Some(name)
+        }
+        else {
+            None
+        }
+    }
+    pub fn rename_chaser(&mut self, old_name: String, new_name: String) -> bool {
+        if !self.chasers.contains_key(&new_name) {
+            let data = self.chasers.get(&old_name).unwrap().clone();
+            self.chasers.insert(new_name, data);
+            self.chasers.remove(&old_name);
+            true
+        }
+        else {
+            false
+        }
     }
 }
 
@@ -187,6 +207,7 @@ impl Chaser {
 
 #[derive(Debug)]
 pub struct Stage {
+    name: String,
     pub channels: Vec<Arc<Mutex<Channel>>>,
     pub fixtures: Vec<Fixture>,
     switches: Vec<Switch>,
@@ -195,8 +216,9 @@ pub struct Stage {
 }
 
 impl Stage {
-    pub fn new(dmx_tx: mpsc::Sender<(DmxAddress, DmxValue)>) -> Stage {
+    pub fn new(name: String, dmx_tx: mpsc::Sender<(DmxAddress, DmxValue)>) -> Stage {
         Stage {
+            name: name,
             channels: Vec::new(),
             fixtures: Vec::new(),
             switches: Vec::new(),
@@ -207,6 +229,7 @@ impl Stage {
 
     pub fn get_frontend_data(&self) -> FrontendData {
         FrontendData {
+            name: self.name.clone(),
             max_dmx_address: self.channels.len() as DmxAddress,
             fixtures: self.fixtures.iter().map(|x| x.to_empty_fixture()).collect(),
             switches: self.switches.iter().map(|x| x.with_json_hashmap()).collect(),
@@ -351,13 +374,13 @@ pub fn start_chaser_of_switch(stage: Arc<Mutex<Stage>>, switch_id: usize, dimmer
         loop {
             {stage.lock().unwrap().deactivate_group_of_switch(chaser.switches[current_switch_id_in_chaser]);}
             {stage.lock().unwrap().set_switch(chaser.switches[current_switch_id_in_chaser], dimmer_value);}
-            current_switch_id_in_chaser = (current_switch_id_in_chaser + 1) % chaser.switches.len();
             let sleep_time = {
                 let stage_locked = stage.lock().unwrap();
                 stage_locked.switches[chaser.switches[current_switch_id_in_chaser]].before_chaser as u64
             };
             sleep(Duration::from_millis(sleep_time));
             if rx.try_recv().is_ok() { return };
+            current_switch_id_in_chaser = (current_switch_id_in_chaser + 1) % chaser.switches.len();
         }
     });
 }

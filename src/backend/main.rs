@@ -10,6 +10,7 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
 use std::io::prelude::*;
+use std::env;
 
 mod interface_handler;
 use interface_handler::*;
@@ -24,12 +25,22 @@ fn main() {
 
     env_logger::init().unwrap();
 
+    let args: Vec<_> = env::args().collect();
+    let instance_name = if args.len() > 1 {
+        args[1].clone()
+    }
+    else {
+        "Untitled".to_string()
+    };
+
+    println!("Server started as \"{}\"", instance_name);
+
     //let interface = Interface::new().port("/dev/tty.usbmodem40131".to_string()).connect();
     let interface = Interface::new().port("/dev/ttyACM0".to_string()).connect();
     if interface.is_err() { panic!(interface) }
     let (tx, _interrupt_tx) = interface.unwrap().to_thread();
 
-    let mut stage = Parser::new(Stage::new(tx)).parse();
+    let mut stage = Parser::new(Stage::new(instance_name, tx)).parse();
 
 
     let mut v1 = HashMap::new();

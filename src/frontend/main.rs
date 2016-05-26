@@ -11,7 +11,7 @@ use std::time::Duration;
 use std::thread;
 
 use std::io::prelude::*;
-use std::io::BufReader;
+use std::io::{BufReader, BufWriter};
 use std::fs::File;
 
 use std::net::{TcpStream, SocketAddr};
@@ -58,6 +58,7 @@ widget_ids! {
     EDITOR_TITLE,
     EDITOR_INFO,
     EDITOR_TIME_SLIDER,
+    EDITOR_CHASER_TITLE with 4000,
     EDITOR_CONTENT with 4000,
     BUTTON with 4000,
     CHASER_TITLE with 4000,
@@ -76,10 +77,12 @@ struct UI {
     frontend_data: FrontendData,
     shift_state: bool,
     edit_state: bool,
+    chasers: Vec<String>,
     current_edited_switch_id: Arc<Mutex<[Option<usize>; 1]>>,
     current_edited_channel_group_id: i64,
     current_edited_switch_name: Arc<Mutex<[String; 1]>>,
-    current_edited_curve_strings: Arc<Mutex<[String; 2]>>
+    current_edited_curve_strings: Arc<Mutex<[String; 2]>>,
+    current_edited_chaser_names: Arc<Mutex<Vec<String>>>
 }
 
 impl UI {
@@ -87,7 +90,7 @@ impl UI {
         let socket = UDPSocket::new();
         let watchdog = socket.create_watchdog_client();
         let frontend_client = socket.start_frontend_client();
-        let frontend_data = FrontendData::new();
+        let frontend_data = FrontendData::new("Default".to_string());
 
         let (tx, rx) = mpsc::channel::<Vec<u8>>();
         {
@@ -117,10 +120,12 @@ impl UI {
             frontend_data: frontend_data,
             shift_state: false,
             edit_state: false,
+            chasers: Vec::new(),
             current_edited_switch_id: Arc::new(Mutex::new([None])),
             current_edited_channel_group_id: -1,
             current_edited_switch_name: Arc::new(Mutex::new(["".to_string()])),
-            current_edited_curve_strings: Arc::new(Mutex::new(["".to_string(), "".to_string()]))
+            current_edited_curve_strings: Arc::new(Mutex::new(["".to_string(), "".to_string()])),
+            current_edited_chaser_names: Arc::new(Mutex::new(Vec::new()))
         };
 
         let ui = Arc::new(Mutex::new(ui));
@@ -128,6 +133,35 @@ impl UI {
         UI::start_udp_server(ui.clone(), UDPSocket::new());
         UI::start_watchdog_client(ui.clone(), UDPSocket::new());
         ui
+    }
+
+    fn get_chaser_config_path(&self) -> std::path::PathBuf {
+        let assets = find_folder::Search::KidsThenParents(3, 5)
+            .for_folder("assets").unwrap();
+        assets.join(self.frontend_data.name.clone()  + ".local_dmx")
+    }
+
+    fn load_chaser_config(&mut self) {
+        let path = self.get_chaser_config_path();
+        match File::open(path) {
+            Ok(file) => {
+                let buf = BufReader::new(file);
+                self.chasers = buf.lines().map(|l| l.expect("Could not parse line")).collect();
+            },
+            _ => {
+                self.chasers = self.frontend_data.chasers.keys().map(|x| x.clone()).collect();
+                self.save_chaser_config();
+            }
+        }
+    }
+
+    fn save_chaser_config(&self) {
+        let path = self.get_chaser_config_path();
+        let file = File::create(path).expect("no such file");
+        let mut buf = BufWriter::new(file);
+        for line in self.chasers.iter() {
+            buf.write_all((line.clone() + "\n").as_bytes()).unwrap();
+        }
     }
 
     fn start_udp_server(ui: Arc<Mutex<UI>>, socket: UDPSocket) {
@@ -219,6 +253,8 @@ impl UI {
                     let mut buffer = String::new();
                     let _ = stream.read_to_string(&mut buffer);
                     self.frontend_data = json::decode(&buffer).unwrap();
+                    println!("Connected to \"{}\"", self.frontend_data.name);
+                    self.load_chaser_config();
                     println!("TCP update");
                     true
                 }
@@ -254,7 +290,7 @@ impl UI {
     }
 }
 
-fn create_output_window(ui: Arc<Mutex<UI>>, chasers: Vec<String>) {
+fn create_output_window(ui: Arc<Mutex<UI>>) {
     let mut window: PistonWindow = WindowSettings::new("Sushi Reloaded!", [1100, 560])
                                     .exit_on_esc(false).vsync(true).build().unwrap();
 
@@ -285,12 +321,12 @@ fn create_output_window(ui: Arc<Mutex<UI>>, chasers: Vec<String>) {
             }
         };
         conrod_ui.handle_event(&event);
-        event.update(|_| conrod_ui.set_widgets(|mut conrod_ui| set_widgets(&mut conrod_ui, &mut ui_locked, chasers.clone(), window.size().width)));
+        event.update(|_| conrod_ui.set_widgets(|mut conrod_ui| set_widgets(&mut conrod_ui, &mut ui_locked, window.size().width)));
         window.draw_2d(&event, |c, g| conrod_ui.draw_if_changed(c, g));
     }
 }
 
-fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, window_width: u32) {
+fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
     let bg_color = color::rgb(0.236, 0.239, 0.241);
 
     Canvas::new()
@@ -343,6 +379,9 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
             if ui.edit_state {
                 ui.send_data();
             }
+            else {
+                ui.current_edited_chaser_names = Arc::new(Mutex::new(ui.chasers.clone()));
+            }
             ui.edit_state = !ui.edit_state;
         })
         .set(EDITOR_BUTTON, conrod_ui);
@@ -362,8 +401,16 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                 }
             })
             .react(|| {
-                ui.frontend_data.add_chaser();
-                ui.send_data();
+                let name = ui.frontend_data.add_chaser();
+                match name {
+                    Some(name) => {
+                        ui.chasers.push(name);
+                        ui.current_edited_chaser_names = Arc::new(Mutex::new(ui.chasers.clone()));
+                        ui.save_chaser_config();
+                        ui.send_data();
+                    }
+                    _ => {}
+                }
             })
             .set(ADD_CHASER_BUTTON, conrod_ui);
     }
@@ -377,8 +424,8 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
 
     let chasers = {
         let mut tmp_chasers = Vec::new();
-        for chaser_name in chasers.iter() {
-            if ui.frontend_data.chasers.get(chaser_name).is_some() {
+        for chaser_name in ui.chasers.iter() {
+            if ui.frontend_data.chasers.contains_key(chaser_name) {
                 tmp_chasers.push(chaser_name.clone());
             }
         }
@@ -407,11 +454,36 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
             rightmost = tmp_rightmost + button_width;
         }
         let mut last_active_switch_id = None;
-        Text::new(name)
-            .xy_relative_to(TITLE, [x_pos, y_offset])
-            .font_size(15)
-            .color(bg_color.plain_contrast())
-            .set(CHASER_TITLE + id, conrod_ui);
+        let current_edited_chaser_names = ui.current_edited_chaser_names.clone();
+        if ui.edit_state {
+            // let tmp_name = {current_edited_chaser_names.lock().unwrap()[id].clone()};
+            let ref mut current_chaser_name = current_edited_chaser_names.lock().unwrap()[id];
+
+            // let ref mut switch_name = switch_name.lock().unwrap()[0];
+            TextBox::new(current_chaser_name)
+                .font_size(14)
+                .xy_relative_to(TITLE, [x_pos, y_offset])
+                .w_h(button_width, button_height)
+                .frame(2.0)
+                .frame_color(bg_color.invert().plain_contrast())
+                .color(bg_color.plain_contrast())
+                .react(|new_name: &mut String| {
+                    let old_name = ui.chasers[id].clone();
+                    ui.frontend_data.rename_chaser(old_name.clone(), new_name.clone());
+                    ui.chasers = ui.chasers.iter().map(|x| if *x == old_name {new_name.clone()} else {x.clone()}).collect();
+                    ui.save_chaser_config();
+                    ui.send_data();
+                })
+                .enabled(true)
+                .set(EDITOR_CHASER_TITLE + id, conrod_ui);
+        }
+        else {
+            Text::new(name)
+                .xy_relative_to(TITLE, [x_pos, y_offset])
+                .font_size(14)
+                .color(bg_color.plain_contrast())
+                .set(CHASER_TITLE + id, conrod_ui);
+        }
 
         for (switch_id_in_chaser, (switch_id, switch)) in chaser.switches.iter().map(|&switch_id| (switch_id, &ui.frontend_data.switches[switch_id])).enumerate() {
             let y_pos = y_offset - 50.0 - switch_id_in_chaser as f64*button_height;
@@ -559,10 +631,9 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                     .frame(1.0)
                     .label(&"Delete".to_string())
                     .react(|| {
-                        println!("len: {:?}", ui.frontend_data.switches.len());
                         ui.frontend_data.delete_chaser(name.clone());
-                        println!("len: {:?}", ui.frontend_data.switches.len());
-
+                        ui.chasers.retain(|x| x != name);
+                        ui.save_chaser_config();
                         ui.send_data();
                         test = true;
                     })
@@ -613,7 +684,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
 
 
                 TextBox::new(switch_name)
-                    .font_size(20)
+                    .font_size(14)
                     .xy_relative_to(TITLE, [x_pos, y_pos])
                     .w_h(item_width, item_height)
                     .frame(2.0)
@@ -803,6 +874,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, chasers: Vec<String>, wi
                                 TextBox::new(curve_string)
                                     .w_h(item_width - item_x_offset, item_height)
                                     .xy_relative_to(TITLE, [x_pos + item_x_offset/2.0, y_pos])
+                                    .font_size(14)
                                     .frame(2.0)
                                     .frame_color(bg_color.invert().plain_contrast())
                                     .color(bg_color.plain_contrast())
@@ -991,21 +1063,10 @@ fn create_splash_window(ui: Arc<Mutex<UI>>) {
     }
 }
 
-fn lines_from_file() -> Vec<String>
-{
-    let assets = find_folder::Search::KidsThenParents(3, 5)
-        .for_folder("assets").unwrap();
-    let path = assets.join("chasers.dmx");
-    let file = File::open(path).expect("no such file");
-    let buf = BufReader::new(file);
-    buf.lines().map(|l| l.expect("Could not parse line")).collect()
-}
-
 
 fn main() {
     println!("BitDMX frontend v{}-{}", VERSION, GIT_HASH);
-    let chasers = lines_from_file();
     let ui = UI::new();
     create_splash_window(ui.clone());
-    create_output_window(ui.clone(), chasers);
+    create_output_window(ui.clone());
 }

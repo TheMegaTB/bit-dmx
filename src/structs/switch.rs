@@ -18,7 +18,7 @@ impl JsonSwitch {
         JsonSwitch {
             channel_groups: HashMap::new(),
             chaser_id: chaser_id,
-            dimmer_value: 255.0,
+            dimmer_value: 0.0,
             before_chaser: 0,
             name: name
         }
