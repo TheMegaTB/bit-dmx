@@ -11,7 +11,7 @@ use VERSION;
 use GIT_HASH;
 
 pub const INPUT_BUFFER: usize = 4;
-pub const WATCHDOG_TTL: u64 = 5;
+pub const WATCHDOG_TTL: u64 = 1;
 
 #[derive(Debug)]
 pub struct UDPSocket {

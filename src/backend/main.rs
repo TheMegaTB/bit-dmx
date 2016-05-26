@@ -41,31 +41,31 @@ fn main() {
     let (tx, _interrupt_tx) = interface.unwrap().to_thread();
 
     let mut stage = Parser::new(Stage::new(instance_name, tx)).parse();
+    stage.load_config();
 
-
-    let mut v1 = HashMap::new();
-    v1.insert((0, 0), ChannelGroupValue::from_tuple((vec![255], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
-    v1.insert((1, 0), ChannelGroupValue::from_tuple((vec![255], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
-    v1.insert((2, 0), ChannelGroupValue::from_tuple((vec![255], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
-    stage.add_switch(Switch::new("RGB full on".to_string(), v1, "Full".to_string(), 3000));
-
-    let mut v1 = HashMap::new();
-    v1.insert((0, 0), ChannelGroupValue::from_tuple((vec![0], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
-    v1.insert((1, 0), ChannelGroupValue::from_tuple((vec![0], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
-    v1.insert((2, 0), ChannelGroupValue::from_tuple((vec![0], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
-    stage.add_switch(Switch::new("Blackout".to_string(), v1, "Full".to_string(), 3000));
-
-    let mut v2 = HashMap::new();
-    v2.insert((0, 0), ChannelGroupValue::from_tuple((vec![20], (FadeCurve::Squared, 0), (FadeCurve::Linear, 0))));
-    stage.add_switch(Switch::new("RED".to_string(), v2, "Single Colors".to_string(), 1000));
-
-    let mut test_v = HashMap::new();
-    test_v.insert((1, 0), ChannelGroupValue::from_tuple((vec![20], (FadeCurve::Squared, 0), (FadeCurve::Linear, 5000))));
-    stage.add_switch(Switch::new("GREEN".to_string(), test_v, "Single Colors".to_string(), 1000));
-
-    let mut test_v2 = HashMap::new();
-    test_v2.insert((2, 0), ChannelGroupValue::from_tuple((vec![20], (FadeCurve::Squared, 500), (FadeCurve::Linear, 0))));
-    stage.add_switch(Switch::new("BLUE".to_string(), test_v2, "Single Colors".to_string(), 800));
+    // let mut v1 = HashMap::new();
+    // v1.insert((0, 0), ChannelGroupValue::from_tuple((vec![255], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
+    // v1.insert((1, 0), ChannelGroupValue::from_tuple((vec![255], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
+    // v1.insert((2, 0), ChannelGroupValue::from_tuple((vec![255], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
+    // stage.add_switch(Switch::new("RGB full on".to_string(), v1, "Full".to_string(), 3000));
+    //
+    // let mut v1 = HashMap::new();
+    // v1.insert((0, 0), ChannelGroupValue::from_tuple((vec![0], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
+    // v1.insert((1, 0), ChannelGroupValue::from_tuple((vec![0], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
+    // v1.insert((2, 0), ChannelGroupValue::from_tuple((vec![0], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
+    // stage.add_switch(Switch::new("Blackout".to_string(), v1, "Full".to_string(), 3000));
+    //
+    // let mut v2 = HashMap::new();
+    // v2.insert((0, 0), ChannelGroupValue::from_tuple((vec![20], (FadeCurve::Squared, 0), (FadeCurve::Linear, 0))));
+    // stage.add_switch(Switch::new("RED".to_string(), v2, "Single Colors".to_string(), 1000));
+    //
+    // let mut test_v = HashMap::new();
+    // test_v.insert((1, 0), ChannelGroupValue::from_tuple((vec![20], (FadeCurve::Squared, 0), (FadeCurve::Linear, 5000))));
+    // stage.add_switch(Switch::new("GREEN".to_string(), test_v, "Single Colors".to_string(), 1000));
+    //
+    // let mut test_v2 = HashMap::new();
+    // test_v2.insert((2, 0), ChannelGroupValue::from_tuple((vec![20], (FadeCurve::Squared, 500), (FadeCurve::Linear, 0))));
+    // stage.add_switch(Switch::new("BLUE".to_string(), test_v2, "Single Colors".to_string(), 800));
 
 
     for fixture in stage.fixtures.iter_mut() {
@@ -120,18 +120,18 @@ fn main() {
         });
     }
 
-    {
-        let stage = stage.clone();
-        thread::spawn(move || {
-            sleep(Duration::from_millis(10000));
-            let mut stage_locked = stage.lock().unwrap();
-            let mut test_v2 = HashMap::new();
-            test_v2.insert((1, 0), ChannelGroupValue::from_tuple((vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
-            test_v2.insert((2, 0), ChannelGroupValue::from_tuple((vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
-            stage_locked.add_switch(Switch::new("CYAN".to_string(), test_v2, "Multi Color".to_string(), 3000));
-            UDPSocket::new().start_frontend_client().send_to_multicast(&[255, 255, 255, 255]);
-        });
-    }
+    // {
+    //     let stage = stage.clone();
+    //     thread::spawn(move || {
+    //         sleep(Duration::from_millis(10000));
+    //         let mut stage_locked = stage.lock().unwrap();
+    //         let mut test_v2 = HashMap::new();
+    //         test_v2.insert((1, 0), ChannelGroupValue::from_tuple((vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
+    //         test_v2.insert((2, 0), ChannelGroupValue::from_tuple((vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
+    //         stage_locked.add_switch(Switch::new("CYAN".to_string(), test_v2, "Multi Color".to_string(), 3000));
+    //         UDPSocket::new().start_frontend_client().send_to_multicast(&[255, 255, 255, 255]);
+    //     });
+    // }
 
     {
         let stage = stage.clone();
@@ -147,7 +147,8 @@ fn main() {
                     let stage_locked = stage.lock().unwrap();
                     let mut stream = stream.unwrap();
 
-                    stream.write(json::encode(&stage_locked.get_frontend_data()).unwrap().as_bytes()).unwrap();
+
+                    stream.write(stage_locked.get_frontend_data().get_json_string().as_bytes()).unwrap();
                 });
             }
         });
@@ -167,10 +168,12 @@ fn main() {
                     let mut buffer = String::new();
                     let _ = stream.read_to_string(&mut buffer);
                     let frontend_data: FrontendData = json::decode(&buffer).unwrap();
-                    {stage.lock().unwrap().from_frontend_data(frontend_data);}
-                    //TODO: receive data and update stage
+                    {
+                        let mut stage_locked = stage.lock().unwrap();
+                        stage_locked.from_frontend_data(frontend_data);
+                        stage_locked.save_config();
+                    }
                     UDPSocket::new().start_frontend_client().send_to_multicast(&[255, 255, 255, 255]);
-                    //stream.write(json::encode(&stage_locked.get_frontend_data()).unwrap().as_bytes()).unwrap();
                 });
             }
         }).join().unwrap();

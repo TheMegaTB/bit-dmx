@@ -1,8 +1,15 @@
+extern crate find_folder;
+
 use std::sync::{Arc, Mutex};
 use std::sync::mpsc;
 use std::collections::HashMap;
 use std::time::Duration;
 use std::thread::{self, sleep};
+use rustc_serialize::json;
+use std::io::prelude::*;
+use std::io::{BufReader, BufWriter};
+use std::fs::File;
+use std::path::PathBuf;
 
 use DmxAddress;
 use DmxValue;
@@ -12,7 +19,6 @@ use Fixture;
 use EmptyFixture;
 use ChannelGroup;
 use Channel;
-use rustc_serialize::json;
 
 use ChannelGroupValue;
 use Switch;
@@ -40,6 +46,9 @@ impl FrontendData {
             switches: Vec::new(),
             chasers: HashMap::new()
         }
+    }
+    pub fn get_json_string(&self) -> String {
+        json::encode(self).unwrap()
     }
     pub fn get_empty_data(&self, new_fixture_id: usize, new_channel_group_id: usize) -> Vec<DmxValue> {
         match self.fixtures[new_fixture_id].channel_groups[new_channel_group_id].0 { //ids are defind in fixtures.rs::50
@@ -235,6 +244,33 @@ impl Stage {
             switches: self.switches.iter().map(|x| x.with_json_hashmap()).collect(),
             chasers: self.chasers.iter().map(|(name, data)| (name.clone(), data.get_frontend_data())).collect()
         }
+    }
+
+    fn get_config_filename(&self) -> PathBuf {
+        let assets = find_folder::Search::KidsThenParents(3, 5)
+            .for_folder("assets").unwrap();
+        assets.join(self.name.clone()  + ".server_dmx")
+    }
+
+    pub fn load_config(&mut self) {
+        let path = self.get_config_filename();
+        match File::open(path) {
+            Ok(file) => {
+                let mut buf = BufReader::new(file);
+                let mut json_data: String = String::new();
+                let _ = buf.read_to_string(&mut json_data);
+                let frontend_data = json::decode(&json_data).unwrap();
+                self.from_frontend_data(frontend_data);
+            },
+            _ => {}
+        }
+    }
+
+    pub fn save_config(&self) {
+        let path = self.get_config_filename();
+        let file = File::create(path).expect("no such file");
+        let mut buf = BufWriter::new(file);
+        buf.write_all(self.get_frontend_data().get_json_string().as_bytes()).unwrap();
     }
 
     pub fn from_frontend_data(&mut self, frontend_data: FrontendData) {

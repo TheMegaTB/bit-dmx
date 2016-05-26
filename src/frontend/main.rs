@@ -274,7 +274,8 @@ impl UI {
         if self.watchdog.get_server_addr().is_some() {
             match TcpStream::connect((&*self.watchdog.get_server_addr().unwrap().to_string(), 8001)) {
                 Ok(mut stream) => {
-                    stream.write(json::encode(&self.frontend_data).unwrap().as_bytes()).unwrap();
+                    stream.write(self.frontend_data.get_json_string().as_bytes()).unwrap();
+                    // stream.write(json::encode(&self.frontend_data).unwrap().as_bytes()).unwrap();
                     true
                 }
                 Err(_) => {

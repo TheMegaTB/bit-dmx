@@ -21,3 +21,4 @@ Cargo.lock
 
 git_hash.rs
 *.local_dmx
+*.server_dmx
