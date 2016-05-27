@@ -30,7 +30,7 @@ fn main() {
         "Untitled".to_string()
     };
 
-    let port = if args.len() > 2 {
+    let interface_port = if args.len() > 2 {
         args[2].clone()
     }
     else {
@@ -40,7 +40,7 @@ fn main() {
     println!("Server started as \"{}\"", instance_name);
 
     //let interface = Interface::new().port("/dev/tty.usbmodem40131".to_string()).connect();
-    let interface = Interface::new().port(port).connect();
+    let interface = Interface::new().port(interface_port).connect();
     if interface.is_err() { panic!(interface) }
     let (tx, _interrupt_tx) = interface.unwrap().to_thread();
 
