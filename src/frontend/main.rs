@@ -40,13 +40,15 @@ use conrod::{
     // WidgetMatrix,
     // XYPad,
 };
-use piston_window::{ EventLoop, Glyphs, PistonWindow, UpdateEvent, WindowSettings, PressEvent, ReleaseEvent, Window };
+use piston_window::{ EventLoop, OpenGL, Glyphs, PistonWindow, UpdateEvent, WindowSettings, PressEvent, ReleaseEvent, Window };
 use rustc_serialize::json;
 
 
 type Backend = (<piston_window::G2d<'static> as conrod::Graphics>::Texture, Glyphs);
 type Ui = conrod::Ui<Backend>;
 type UiCell<'a> = conrod::UiCell<'a, Backend>;
+
+const OPEN_GL: OpenGL = OpenGL::V3_2;
 
 
 widget_ids! {
@@ -293,7 +295,7 @@ impl UI {
 
 fn create_output_window(ui: Arc<Mutex<UI>>) {
     let mut window: PistonWindow = WindowSettings::new("Sushi Reloaded!", [1100, 560])
-                                    .exit_on_esc(false).vsync(true).build().unwrap();
+                                   .opengl(OPEN_GL).exit_on_esc(false).vsync(true).build().unwrap();
 
     let mut conrod_ui = {
         let assets = find_folder::Search::KidsThenParents(3, 5)
@@ -1036,7 +1038,7 @@ fn get_start_chaser(shift_state: bool, addr: u16, value: u8) -> Vec<u8> {
 
 fn create_splash_window(ui: Arc<Mutex<UI>>) {
     let mut window: PistonWindow = WindowSettings::new("BitDMX Splashscreen", [500, 300])
-                                    .exit_on_esc(true).vsync(true).build().unwrap();
+                                    .opengl(OPEN_GL).exit_on_esc(true).vsync(true).build().unwrap();
 
     let mut conrod_ui = {
         let assets = find_folder::Search::KidsThenParents(3, 5)
@@ -1047,12 +1049,12 @@ fn create_splash_window(ui: Arc<Mutex<UI>>) {
         Ui::new(glyph_cache.unwrap(), theme)
     };
 
-    window.set_ups(30);
+    window.set_ups(1);
 
     // Poll events from the window.
     while let Some(event) = window.next() {
         conrod_ui.handle_event(&event);
-        window.draw_2d(&event, |c, g| conrod_ui.draw_if_changed(c, g));
+        window.draw_2d(&event, |c, g| conrod_ui.draw(c, g));
 
         event.update(|_| conrod_ui.set_widgets(|mut conrod_ui| {
             Canvas::new()
@@ -1071,5 +1073,5 @@ fn main() {
     println!("BitDMX frontend v{}-{}", VERSION, GIT_HASH);
     let ui = UI::new();
     create_splash_window(ui.clone());
-    create_output_window(ui.clone());
+    if {ui.lock().unwrap().watchdog.is_alive()} { create_output_window(ui.clone()); }
 }
