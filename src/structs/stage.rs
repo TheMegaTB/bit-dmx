@@ -62,14 +62,14 @@ impl FrontendData {
     pub fn change_channel_group(&mut self, switch_id: usize, old_id: String, new_fixture_id: usize, new_channel_group_id: usize) -> bool {
         let new_id = json::encode(&(new_fixture_id, new_channel_group_id)).unwrap();
         if !self.switches[switch_id].channel_groups.contains_key(&new_id) {
-            println!("{:?}", self.switches[switch_id].channel_groups);
-            println!("{:?} -> {:?}", old_id, new_id);
+            trace!("{:?}", self.switches[switch_id].channel_groups);
+            trace!("{:?} -> {:?}", old_id, new_id);
             let new_values = self.get_empty_data(new_fixture_id, new_channel_group_id);
             let mut new_data = self.switches[switch_id].channel_groups.get(&old_id).unwrap().clone();
             new_data.values = new_values;
             self.switches[switch_id].channel_groups.remove(&old_id);
             self.switches[switch_id].channel_groups.insert(new_id, new_data);
-            println!("{:?}", self.switches[switch_id].channel_groups);
+            trace!("{:?}", self.switches[switch_id].channel_groups);
             true
         }
         else {
@@ -102,8 +102,8 @@ impl FrontendData {
         for (_, chaser) in self.chasers.iter_mut() {
             chaser.remove_switch_with_id(switch_id);
         }
-        println!("{:?}", switch_id);
-        println!("{:?}", self.switches);
+        trace!("{:?}", switch_id);
+        trace!("{:?}", self.switches);
         self.switches.remove(switch_id);
     }
 
@@ -168,11 +168,11 @@ impl FrontendChaser {
         }
     }
     pub fn remove_switch_with_id(&mut self, switch_id: usize) {
-        println!("remove {:?}", switch_id);
-        println!("{:?}", self.switches);
+        debug!("remove {:?}", switch_id);
+        trace!("{:?}", self.switches);
         self.switches.retain(|&id| id != switch_id);
         self.switches = self.switches.iter().map(|x| if *x < switch_id {*x} else {x - 1}).collect();
-        println!("{:?}", self.switches);
+        trace!("{:?}", self.switches);
     }
 }
 
@@ -198,7 +198,7 @@ impl Chaser {
     pub fn stop_chaser(&mut self) {
         match self.current_thread {
             Some(ref tx) => {
-                if tx.send(()).is_ok() {println!("chaser killed")}
+                if tx.send(()).is_ok() {debug!("chaser killed")}
             },
             None => {}
         }

@@ -30,7 +30,9 @@ int serialport_init(const char* serialport, int baud)
     fd = open(serialport, O_RDWR | O_NONBLOCK );
 
     if (fd == -1)  {
+#ifdef SERIALPORTDEBUG
         perror("serialport_init: Unable to open port ");
+#endif
         return -1;
     }
 
@@ -39,7 +41,7 @@ int serialport_init(const char* serialport, int baud)
     //ioctl(fd, TIOCMBIC, &iflags);    // turn off DTR
 
     if (tcgetattr(fd, &toptions) < 0) {
-        perror("serialport_init: Couldn't get term attributes");
+        //perror("serialport_init: Couldn't get term attributes");
         return -1;
     }
     speed_t brate = baud; // let you override switch below if needed
@@ -83,7 +85,9 @@ int serialport_init(const char* serialport, int baud)
 
     tcsetattr(fd, TCSANOW, &toptions);
     if( tcsetattr(fd, TCSAFLUSH, &toptions) < 0) {
+#ifdef SERIALPORTDEBUG
         perror("init_serialport: Couldn't set term attributes");
+#endif
         return -1;
     }
 
@@ -111,7 +115,9 @@ int serialport_write(int fd, const char* str)
     int len = strlen(str);
     int n = write(fd, str, len);
     if( n!=len ) {
+#ifdef SERIALPORTDEBUG
         perror("serialport_write: couldn't write whole string\n");
+#endif
         return -1;
     }
     return 0;

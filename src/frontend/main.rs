@@ -103,7 +103,7 @@ impl UI {
                     if watchdog.is_alive() {
                         frontend_client.send(data.as_slice(), SocketAddr::new(watchdog.get_server_addr().unwrap(), 8001));
                     } else {
-                        println!("Could not send data. No server available");
+                        warn!("Could not send data. No server available");
                     }
                 }
             });
@@ -197,7 +197,7 @@ impl UI {
                         chaser.current_thread = value != 0;
                     }
                 }
-                info!("{:?}", buf);
+                trace!("{:?}", buf);
             }
         });
     }
@@ -230,7 +230,6 @@ impl UI {
                                     s_addr.lock().unwrap()[0] = None;
                                 }
                             } else {
-                                println!("RECEIVED INVALID WATCHDOG DATA");
                                 trace!("received invalid watchdog data");
                                 s.lock().unwrap()[0] = false;
                                 s_addr.lock().unwrap()[0] = None;
@@ -254,19 +253,18 @@ impl UI {
                     let mut buffer = String::new();
                     let _ = stream.read_to_string(&mut buffer);
                     self.frontend_data = json::decode(&buffer).unwrap();
-                    println!("Connected to \"{}\"", self.frontend_data.name);
+                    info!("Connected to \"{}\"", self.frontend_data.name);
                     self.load_chaser_config();
-                    println!("TCP update");
+                    debug!("TCP update");
                     true
                 }
                 Err(_) => {
-                    println!("Error while connecting");
+                    warn!("Error while connecting");
                     false
                 }
             }
-        }
-        else {
-            println!("No server ip");
+        } else {
+            warn!("No server ip");
             false
         }
     }
@@ -280,13 +278,13 @@ impl UI {
                     true
                 }
                 Err(_) => {
-                    println!("Error while connecting");
+                    error!("Error while connecting");
                     false
                 }
             }
         }
         else {
-            println!("No server ip");
+            warn!("No server ip");
             false
         }
     }
@@ -1064,6 +1062,7 @@ fn create_splash_window(ui: Arc<Mutex<UI>>) {
 
 fn main() {
     println!("BitDMX frontend v{}-{}", VERSION, GIT_HASH);
+    env_logger::init().unwrap();
     let ui = UI::new();
     create_splash_window(ui.clone());
     if {ui.lock().unwrap().watchdog.is_alive()} { create_output_window(ui.clone()); }

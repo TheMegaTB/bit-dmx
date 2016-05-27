@@ -64,7 +64,7 @@ impl Interface {
             true => Ok(InterfaceHandle {interface: self}),
             false => {
                 unsafe { set_fake_interface_mode(true); }
-                info!("Enabled fake interfaces as no hardware interface was detected.");
+                info!("Enabled fake interfaces since no hardware interface is detected.");
                 Ok(InterfaceHandle {interface: self})
             }
         }
@@ -105,7 +105,7 @@ impl InterfaceHandle {
                                     Ok(elem) => {
                                         insert_to_vector(&mut cache, elem);
                                     },
-                                    Err(e) => {println!("Receive error: {:?}", e)}
+                                    Err(e) => {error!("Receive error: {:?}", e)}
                                 }
                             } else {
                                 rx_available = false;

@@ -25,19 +25,17 @@ fn main() {
     let args: Vec<_> = env::args().collect();
     let instance_name = if args.len() > 1 {
         args[1].clone()
-    }
-    else {
+    } else {
         "Untitled".to_string()
     };
 
     let interface_port = if args.len() > 2 {
         args[2].clone()
-    }
-    else {
+    } else {
         "/dev/ttyACM0".to_string()
     };
 
-    println!("Server started as \"{}\"", instance_name);
+    info!("Server started as \"{}\"", instance_name);
 
     let interface = Interface::new().port(interface_port).connect();
     if interface.is_err() { panic!(interface) }
@@ -66,7 +64,7 @@ fn main() {
         thread::spawn(move || {
             loop {
                 let (d, _) = server.receive();
-                debug!("{:?}", d);
+                trace!("{:?}", d);
 
                 let address_type:u8 = d[0] & 127;
                 let shift: bool = d[0] & 128 != 0;
@@ -83,7 +81,7 @@ fn main() {
                 else if address_type == 1 {
                     // Switch
                     let mut stage_locked = stage.lock().unwrap();
-                    println!("Set switch with address {:?} to {:?} (shifted: {:?})", address, value, shift);
+                    debug!("Set switch with address {:?} to {:?} (shifted: {:?})", address, value, shift);
                     if shift {
                         stage_locked.deactivate_group_of_switch(address as usize)
                     }
@@ -91,7 +89,7 @@ fn main() {
                 }
                 else if address_type == 2 {
                     // Chaser
-                    println!("Start chaser with switch with address {:?} to {:?} (shifted: {:?})", address, value, shift);
+                    debug!("Start chaser with switch with address {:?} to {:?} (shifted: {:?})", address, value, shift);
                     start_chaser_of_switch(stage.clone(), address as usize, value as f64);
                 }
             }
@@ -105,7 +103,7 @@ fn main() {
             use std::net::TcpListener;
 
             let listener = TcpListener::bind("0.0.0.0:8000").unwrap();
-            info!("listening (send) started, ready to accept");
+            debug!("listening (send) started, ready to accept");
             for stream in listener.incoming() {
                 let stage = stage.clone();
                 thread::spawn(move || {
@@ -125,7 +123,7 @@ fn main() {
             use std::net::TcpListener;
 
             let listener = TcpListener::bind("0.0.0.0:8001").unwrap();
-            info!("listening (receive) started, ready to accept");
+            debug!("listening (receive) started, ready to accept");
             for stream in listener.incoming() {
                 let stage = stage.clone();
                 thread::spawn(move || {
@@ -198,6 +196,6 @@ fn test_fade_curve() {
 
 
     sleep(Duration::from_millis(500));
-    println!("Disconnecting...");
+    info!("Disconnecting...");
     interrupt_tx.send(true).unwrap();
 }

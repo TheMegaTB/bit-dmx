@@ -28,6 +28,9 @@
 
 #include "arduino-serial-lib.h"
 
+// Comment out to supress printing of fake interface state
+//#define PRINT_FAKE
+
 const int buf_max = 10;
 
 int fd = -1;
@@ -100,6 +103,7 @@ void write_dmx(uint16_t channel, uint8_t value) { //TODO: Write to file. Format:
   }
   write_to_serial(0); //get into value mode
   write_to_serial(value);
+#ifdef PRINT_FAKE
   if (fake) { printf("FAKE-IF => set %d to %d\n", channel, value); }
-  //TODO: Return value
+#endif
 }
