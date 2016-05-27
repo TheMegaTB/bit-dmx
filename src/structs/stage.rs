@@ -419,8 +419,7 @@ pub fn start_chaser_of_switch(stage: Arc<Mutex<Stage>>, switch_id: usize, dimmer
     });
 }
 
-fn remove_from_active_switches(active_switches:
-    &mut Vec<(usize, ChannelGroupValue)>, switch_id: usize) -> bool {
+fn remove_from_active_switches(active_switches: &mut Vec<(usize, ChannelGroupValue)>, switch_id: usize) -> bool {
     if active_switches.len() > 0 { //TODO: Replace this workaround.
         let last_index = active_switches.len() - 1;
         let last_id = active_switches[last_index].0;

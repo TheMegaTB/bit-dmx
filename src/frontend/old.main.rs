@@ -119,7 +119,6 @@ struct Channel {
     mode_selected_idx: Option<usize>,
     fader_value: u8,
     fader_enabled: bool
-    //TODO: Store active 'scenes'/pending values with ID's here
 }
 
 impl Channel {

@@ -39,7 +39,6 @@ fn main() {
 
     println!("Server started as \"{}\"", instance_name);
 
-    //let interface = Interface::new().port("/dev/tty.usbmodem40131".to_string()).connect();
     let interface = Interface::new().port(interface_port).connect();
     if interface.is_err() { panic!(interface) }
     let (tx, _interrupt_tx) = interface.unwrap().to_thread();
@@ -58,7 +57,7 @@ fn main() {
 
    let socket = UDPSocket::new();
     socket.start_watchdog_server();
-    let server = socket.start_backend_server(); //receiving updates (DMX values etc. from frontend)`
+    let server = socket.start_backend_server();
 
     let stage = Arc::new(Mutex::new(stage));
 
