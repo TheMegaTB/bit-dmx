@@ -292,7 +292,6 @@ impl UI {
     }
 }
 
-#[allow(broken_MIR)]
 fn create_output_window(ui: Arc<Mutex<UI>>) {
     let mut window: PistonWindow = WindowSettings::new("Sushi Reloaded!", [1100, 560])
                                    .opengl(OPEN_GL).exit_on_esc(false).vsync(true).build().unwrap();
