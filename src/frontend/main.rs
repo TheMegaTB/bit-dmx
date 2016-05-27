@@ -405,15 +405,10 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
             })
             .react(|| {
                 let name = ui.frontend_data.add_chaser();
-                match name {
-                    Some(name) => {
-                        ui.chasers.push(name);
-                        ui.current_edited_chaser_names = Arc::new(Mutex::new(ui.chasers.clone()));
-                        ui.save_chaser_config();
-                        ui.send_data();
-                    }
-                    _ => {}
-                }
+                ui.chasers.push(name);
+                ui.current_edited_chaser_names = Arc::new(Mutex::new(ui.chasers.clone()));
+                ui.save_chaser_config();
+                ui.send_data();
             })
             .set(ADD_CHASER_BUTTON, conrod_ui);
     }
