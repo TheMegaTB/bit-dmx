@@ -1049,7 +1049,7 @@ fn create_splash_window(ui: Arc<Mutex<UI>>) {
         Ui::new(glyph_cache.unwrap(), theme)
     };
 
-    window.set_ups(2);
+    window.set_ups(1);
 
     while let Some(event) = window.next() {
         conrod_ui.handle_event(&event);
