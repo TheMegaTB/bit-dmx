@@ -6,14 +6,9 @@ Fixture {
 Fixture {
     name("PAR");
     rgb(0, 1, 2);
-    single(3);
-    rgb(4, 5, 6);
 }
 
 
 Stage {
-    1 -> DPAR("Trav1");
-    2 -> DPAR("Trav2");
-    3 -> DPAR("Trav4");
-    4 -> PAR("RGBPar1");
+    1 -> PAR("RGBPar1");
 }
