@@ -3,7 +3,6 @@ extern crate env_logger;
 #[macro_use] extern crate conrod;
 extern crate piston_window;
 extern crate find_folder;
-extern crate rand;
 extern crate structures;
 extern crate rustc_serialize;
 use structures::*;

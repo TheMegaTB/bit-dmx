@@ -21,27 +21,27 @@ path = "src/test_frontend/main.rs"
 name = "structures"
 path = "src/structs/structs.rs"
 
-[features] #TODO: Make this automagically and send it to the interface
+[features]
 default = []
-fake_if = []
+fake_if = [] #TODO: Make this automagically & dynamically
 local = []
 
 [dependencies]
 conrod = "0.35.0"
-daggy = "0.4.0"
-piston = "0.17.0"
+#daggy = "0.4.0"
+#piston = "0.17.0"
 piston_window = "0.47.0"
-pistoncore-input = "0.12.0"
-piston2d-graphics = "0.16.0"
+#pistoncore-input = "0.12.0"
+#piston2d-graphics = "0.16.0"
 find_folder = "0.3.0"
-num = "0.1.30"
-rand = "0.3.13"
-time = "0.1.34"
+#num = "0.1.30"
+#rand = "0.3.13"
+#time = "0.1.34"
 net2 = "0.2.23"
 log = "0.3.6"
 env_logger = "0.3.3"
 meval = { git = "https://github.com/rekka/meval-rs" }
-vecmath = "0.2.0"
+#vecmath = "0.2.0"
 rustc-serialize = "0.3.19"
 
 [build-dependencies]
