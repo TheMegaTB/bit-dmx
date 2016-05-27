@@ -321,6 +321,7 @@ impl Stage {
             for (&(fixture_id, channel_group_id), data) in self.switches[switch_id].channel_groups.iter() {
                 let new_values: Vec<_> = data.values.iter().map(|a| (*a as f64 * (dimmer_value / 255.0)) as DmxValue).collect();
                 match self.fixtures[fixture_id].channel_groups[channel_group_id] {
+                    //TODO Check if there are enough values in new_values
                     ChannelGroup::Single(ref mut group) => {
                         group.active_switches.push((switch_id, ChannelGroupValue::from_tuple((new_values.clone(), (data.curve_in.clone(), data.time_in), (data.curve_out.clone(), data.time_out)))));
                         group.fade_simple(data.curve_in.clone(), data.time_in, new_values[0]);
@@ -419,8 +420,7 @@ pub fn start_chaser_of_switch(stage: Arc<Mutex<Stage>>, switch_id: usize, dimmer
     });
 }
 
-fn remove_from_active_switches(active_switches:
-    &mut Vec<(usize, ChannelGroupValue)>, switch_id: usize) -> bool {
+fn remove_from_active_switches(active_switches: &mut Vec<(usize, ChannelGroupValue)>, switch_id: usize) -> bool {
     if active_switches.len() > 0 { //TODO: Replace this workaround.
         let last_index = active_switches.len() - 1;
         let last_id = active_switches[last_index].0;

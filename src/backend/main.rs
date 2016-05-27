@@ -30,40 +30,21 @@ fn main() {
         "Untitled".to_string()
     };
 
+    let interface_port = if args.len() > 2 {
+        args[2].clone()
+    }
+    else {
+        "/dev/ttyACM0".to_string()
+    };
+
     println!("Server started as \"{}\"", instance_name);
 
-    //let interface = Interface::new().port("/dev/tty.usbmodem40131".to_string()).connect();
-    let interface = Interface::new().port("/dev/ttyACM0".to_string()).connect();
-    if interface.is_err() { panic!(interface) } // TODO: Replace this w/ fake if
+    let interface = Interface::new().port(interface_port).connect();
+    if interface.is_err() { panic!(interface) }
     let (tx, _interrupt_tx) = interface.unwrap().to_thread();
 
     let mut stage = Parser::new(Stage::new(instance_name, tx)).parse();
     stage.load_config();
-
-    // let mut v1 = HashMap::new();
-    // v1.insert((0, 0), ChannelGroupValue::from_tuple((vec![255], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
-    // v1.insert((1, 0), ChannelGroupValue::from_tuple((vec![255], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
-    // v1.insert((2, 0), ChannelGroupValue::from_tuple((vec![255], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
-    // stage.add_switch(Switch::new("RGB full on".to_string(), v1, "Full".to_string(), 3000));
-    //
-    // let mut v1 = HashMap::new();
-    // v1.insert((0, 0), ChannelGroupValue::from_tuple((vec![0], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
-    // v1.insert((1, 0), ChannelGroupValue::from_tuple((vec![0], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
-    // v1.insert((2, 0), ChannelGroupValue::from_tuple((vec![0], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
-    // stage.add_switch(Switch::new("Blackout".to_string(), v1, "Full".to_string(), 3000));
-    //
-    // let mut v2 = HashMap::new();
-    // v2.insert((0, 0), ChannelGroupValue::from_tuple((vec![20], (FadeCurve::Squared, 0), (FadeCurve::Linear, 0))));
-    // stage.add_switch(Switch::new("RED".to_string(), v2, "Single Colors".to_string(), 1000));
-    //
-    // let mut test_v = HashMap::new();
-    // test_v.insert((1, 0), ChannelGroupValue::from_tuple((vec![20], (FadeCurve::Squared, 0), (FadeCurve::Linear, 5000))));
-    // stage.add_switch(Switch::new("GREEN".to_string(), test_v, "Single Colors".to_string(), 1000));
-    //
-    // let mut test_v2 = HashMap::new();
-    // test_v2.insert((2, 0), ChannelGroupValue::from_tuple((vec![20], (FadeCurve::Squared, 500), (FadeCurve::Linear, 0))));
-    // stage.add_switch(Switch::new("BLUE".to_string(), test_v2, "Single Colors".to_string(), 800));
-
 
     for fixture in stage.fixtures.iter_mut() {
         match fixture.channel_groups[0] {
@@ -76,7 +57,7 @@ fn main() {
 
    let socket = UDPSocket::new();
     socket.start_watchdog_server();
-    let server = socket.start_backend_server(); //receiving updates (DMX values etc. from frontend)`
+    let server = socket.start_backend_server();
 
     let stage = Arc::new(Mutex::new(stage));
 
@@ -116,19 +97,6 @@ fn main() {
             }
         });
     }
-
-    // {
-    //     let stage = stage.clone();
-    //     thread::spawn(move || {
-    //         sleep(Duration::from_millis(10000));
-    //         let mut stage_locked = stage.lock().unwrap();
-    //         let mut test_v2 = HashMap::new();
-    //         test_v2.insert((1, 0), ChannelGroupValue::from_tuple((vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
-    //         test_v2.insert((2, 0), ChannelGroupValue::from_tuple((vec![20], (FadeCurve::Squared, 1000), (FadeCurve::Linear, 1000))));
-    //         stage_locked.add_switch(Switch::new("CYAN".to_string(), test_v2, "Multi Color".to_string(), 3000));
-    //         UDPSocket::new().start_frontend_client().send_to_multicast(&[255, 255, 255, 255]);
-    //     });
-    // }
 
     {
         let stage = stage.clone();
