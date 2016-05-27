@@ -34,7 +34,7 @@ fn main() {
 
     //let interface = Interface::new().port("/dev/tty.usbmodem40131".to_string()).connect();
     let interface = Interface::new().port("/dev/ttyACM0".to_string()).connect();
-    if interface.is_err() { panic!(interface) }
+    if interface.is_err() { panic!(interface) } // TODO: Replace this w/ fake if
     let (tx, _interrupt_tx) = interface.unwrap().to_thread();
 
     let mut stage = Parser::new(Stage::new(instance_name, tx)).parse();

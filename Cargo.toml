@@ -23,7 +23,6 @@ path = "src/structs/structs.rs"
 
 [features]
 default = []
-fake_if = [] #TODO: Make this automagically & dynamically
 local = []
 
 [dependencies]

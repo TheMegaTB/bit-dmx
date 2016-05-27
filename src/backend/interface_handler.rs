@@ -60,17 +60,12 @@ impl Interface {
     }
 
     pub fn connect(self) -> Result<InterfaceHandle, &'static str> {
-        if cfg!( feature = "fake_if" ) {
-            unsafe { set_fake_interface_mode(true); }
-            Ok(InterfaceHandle {
-                interface: self
-            })
-        } else {
-            match connect(self.baudrate, self.port.clone()) {
-                true => Ok(InterfaceHandle {
-                    interface: self
-                }),
-                false => Err("Couldn't connect.")
+        match connect(self.baudrate, self.port.clone()) {
+            true => Ok(InterfaceHandle {interface: self}),
+            false => {
+                unsafe { set_fake_interface_mode(true); }
+                info!("Enabled fake interfaces as no hardware interface was detected.");
+                Ok(InterfaceHandle {interface: self})
             }
         }
     }
