@@ -292,6 +292,7 @@ impl UI {
     }
 }
 
+#[allow(broken_MIR)]
 fn create_output_window(ui: Arc<Mutex<UI>>) {
     let mut window: PistonWindow = WindowSettings::new("Sushi Reloaded!", [1100, 560])
                                    .opengl(OPEN_GL).exit_on_esc(false).vsync(true).build().unwrap();
@@ -1048,9 +1049,8 @@ fn create_splash_window(ui: Arc<Mutex<UI>>) {
         Ui::new(glyph_cache.unwrap(), theme)
     };
 
-    window.set_ups(1);
+    window.set_ups(2);
 
-    // Poll events from the window.
     while let Some(event) = window.next() {
         conrod_ui.handle_event(&event);
         window.draw_2d(&event, |c, g| conrod_ui.draw(c, g));
