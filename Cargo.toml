@@ -1,6 +1,6 @@
 [package]
 name = "dmx"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Til Blechschmidt <til@blechschmidt.de>"]
 links = "interface"
 build = "build.rs"
