@@ -1045,7 +1045,6 @@ fn create_splash_window(ui: Arc<Mutex<UI>>) {
 
     window.set_ups(1);
 
-    // Poll events from the window.
     while let Some(event) = window.next() {
         conrod_ui.handle_event(&event);
         window.draw_2d(&event, |c, g| conrod_ui.draw(c, g));
