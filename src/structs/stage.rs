@@ -129,15 +129,15 @@ impl FrontendData {
         }
         self.chasers.remove(&chaser_id);
     }
-    pub fn add_chaser(&mut self) -> Option<String> {
-        let name = "Untitled".to_string();
-        if !self.chasers.contains_key(&name.clone()) {
-            self.chasers.insert(name.clone(), FrontendChaser::new());
-            Some(name)
+    pub fn add_chaser(&mut self) -> String {
+        let mut name = "Untitled".to_string();
+        let mut i = 1;
+        while self.chasers.contains_key(&name.clone()) {
+            i += 1;
+            name = "Untitled ".to_string() + &i.to_string();
         }
-        else {
-            None
-        }
+        self.chasers.insert(name.clone(), FrontendChaser::new());
+        name
     }
     pub fn rename_chaser(&mut self, old_name: String, new_name: String) -> bool {
         if !self.chasers.contains_key(&new_name) {
