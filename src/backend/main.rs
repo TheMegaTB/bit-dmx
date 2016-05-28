@@ -1,6 +1,6 @@
 #[macro_use] extern crate log;
 extern crate env_logger;
-extern crate structures;
+#[macro_use] extern crate structures;
 extern crate net2;
 extern crate rustc_serialize;
 
@@ -18,9 +18,8 @@ use rustc_serialize::json;
 use structures::*;
 
 fn main() {
-    println!("BitDMX backend v{}-{}", VERSION, GIT_HASH);
-
-    env_logger::init().unwrap();
+    init_logger().unwrap();
+    info!("BitDMX backend v{}-{}", VERSION, GIT_HASH);
 
     let args: Vec<_> = env::args().collect();
     let instance_name = if args.len() > 1 {

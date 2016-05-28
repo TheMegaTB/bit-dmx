@@ -874,10 +874,9 @@ fn get_start_chaser(shift_state: bool, addr: u16, value: u8) -> Vec<u8> {
 
 
 fn main() {
-    println!("BitDMX frontend v{}-{}", VERSION, GIT_HASH);
-    env_logger::init().unwrap();
+    init_logger().unwrap();
+    info!("BitDMX frontend v{}-{}", VERSION, GIT_HASH);
     let ui = UI::new();
-    //create_splash_window(ui.clone());
     SplashWindow::new(ui.clone()).join().unwrap();
     if {ui.lock().unwrap().watchdog.is_alive()} { create_output_window(ui.clone()); }
 }
