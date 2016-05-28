@@ -496,16 +496,12 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Them
 }
 
 fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme, usable_width: f64) {
-    let x_pos = 0.0;
-    let mut y_pos = - 30.0 * application_theme.ui_scale;
-
     Text::new("Editor")
         .top_left_of(EDITOR_COLUMN)
         .font_size((22.0 * application_theme.ui_scale) as u32)
         .color(application_theme.bg_color.plain_contrast())
         .set(EDITOR_TITLE, conrod_ui);
 
-    y_pos = y_pos - 40.0 * application_theme.ui_scale;
 
     let current_edited_switch = {
         ui.current_edited_switch_id.lock().unwrap()[0].clone()
@@ -515,15 +511,6 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
 
     match current_edited_switch {
         Some(switch_id) => {
-
-            Text::new(&("Switch #".to_string() + &switch_id.to_string() + ": " + &ui.frontend_data.switches[switch_id].name.clone()))
-                .down(20.0 * application_theme.ui_scale)
-                .align_left_of(EDITOR_TITLE)
-                .font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
-                .color(application_theme.bg_color.plain_contrast())
-                .set(EDITOR_INFO, conrod_ui);
-
-            y_pos = y_pos - 60.0 * application_theme.ui_scale;
 
             let time = ui.frontend_data.switches[switch_id].before_chaser;
             let item_width = usable_width * application_theme.ui_scale;
@@ -547,8 +534,6 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
                 })
                 .enabled(true)
                 .set(EDITOR_CONTENT, conrod_ui);
-
-            y_pos = y_pos - 60.0 * application_theme.ui_scale;
 
             let time_string = time.to_string();
             let label = {
@@ -582,9 +567,6 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
                 }
             };
 
-
-
-            y_pos = y_pos - 60.0 * application_theme.ui_scale;
             let mut editor_switch_slider_count = 0;
             let mut editor_switch_button_count = 0;
             let mut editor_switch_text_count = 0;
@@ -604,7 +586,6 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
             })
             .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
             editor_switch_button_count += 1;
-            y_pos = y_pos - 60.0 * application_theme.ui_scale;
 
             Text::new(line)
             .down(20.0 * application_theme.ui_scale)
@@ -613,7 +594,6 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
                 .color(application_theme.bg_color.plain_contrast())
                 .set(EDITOR_SWITCH_TEXT + editor_switch_text_count, conrod_ui);
             editor_switch_text_count += 1;
-            y_pos = y_pos - 60.0 * application_theme.ui_scale;
 
             let cloned_ui = ui.clone();
 
@@ -699,7 +679,6 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
                     })
                     .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
                 editor_switch_button_count += 1;
-                y_pos = y_pos - 60.0 * application_theme.ui_scale;
 
 
                 if dropdown_index as i64 == ui.current_edited_channel_group_id {
@@ -726,7 +705,6 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
                             })
                             .set(EDITOR_SWITCH_SLIDER + editor_switch_slider_count, conrod_ui);
                         editor_switch_slider_count += 1;
-                        y_pos = y_pos - 60.0 * application_theme.ui_scale;
                     }
 
                     let mut fade_curve_list = vec!("Linear".to_string(), "Squared".to_string(), "Square root".to_string(), "Custom".to_string());
@@ -750,7 +728,6 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
                             })
                             .set(EDITOR_SWITCH_DROP_DOWNS + editor_switch_drop_downs_count, conrod_ui);
                         editor_switch_drop_downs_count += 1;
-                        y_pos = y_pos - 60.0 * application_theme.ui_scale;
 
                         if fade_curve_id == 3 {
                             let ref mut curve_string = {ui.current_edited_curve_strings.lock().unwrap()[0].clone()};
@@ -769,7 +746,6 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
                                 })
                                 .enabled(true)
                                 .set(EDITOR_CURVE_STRING1, conrod_ui);
-                            y_pos = y_pos - 60.0 * application_theme.ui_scale;
                         }
 
                         let label = {
@@ -793,7 +769,6 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
                             })
                             .set(EDITOR_SWITCH_SLIDER + editor_switch_slider_count, conrod_ui);
                         editor_switch_slider_count += 1;
-                        y_pos = y_pos - 60.0 * application_theme.ui_scale;
 
                         let fade_curve_id = data.curve_out.get_id();
                         DropDownList::new(&mut fade_curve_list, &mut Some(fade_curve_id))
@@ -811,7 +786,6 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
                             })
                             .set(EDITOR_SWITCH_DROP_DOWNS + editor_switch_drop_downs_count, conrod_ui);
                         editor_switch_drop_downs_count += 1;
-                        y_pos = y_pos - 60.0 * application_theme.ui_scale;
 
                         if fade_curve_id == 3 {
                             let ref mut curve_string = {ui.current_edited_curve_strings.lock().unwrap()[1].clone()};
@@ -829,7 +803,6 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
                                 })
                                 .enabled(true)
                                 .set(EDITOR_CURVE_STRING2, conrod_ui);
-                            y_pos = y_pos - 60.0 * application_theme.ui_scale;
                         }
 
                         let label = {
@@ -853,7 +826,6 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
                             })
                             .set(EDITOR_SWITCH_SLIDER + editor_switch_slider_count, conrod_ui);
                         editor_switch_slider_count += 1;
-                        y_pos = y_pos - 60.0 * application_theme.ui_scale;
                     }
 
                     Button::new()
@@ -870,7 +842,6 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
                         })
                         .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
                         editor_switch_button_count += 1;
-                    y_pos = y_pos - 60.0 * application_theme.ui_scale;
                 }
             }
             Button::new()
@@ -887,7 +858,6 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
                 })
                 .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
             editor_switch_button_count += 1;
-            y_pos = y_pos - 60.0 * application_theme.ui_scale;
 
             Button::new()
                 .w_h(item_width, item_height)
