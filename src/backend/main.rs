@@ -73,6 +73,7 @@ fn main() {
 
 
                 if address_type == 0 {
+                    // Channel
                     let stage_locked = stage.lock().unwrap();
                     let mut channel_locked = stage_locked.channels[address as usize].lock().unwrap();
                     channel_locked.stop_fade();
