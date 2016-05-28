@@ -15,22 +15,13 @@ use conrod::{
     Frameable,
     Positionable,
     Text,
-    //Theme,
     Widget,
     Button,
-    // Circle,
-    // Color,
     DropDownList,
-    // EnvelopeEditor,
     Labelable,
-    // NumberDialer,
-    // Point,
     Sizeable,
     Slider,
-    TextBox,
-    // Toggle,
-    // WidgetMatrix,
-    // XYPad,
+    TextBox
 };
 use piston_window::{ UpdateEvent, PressEvent, ReleaseEvent, Window };
 
@@ -70,6 +61,8 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
     // Poll events from the window.
     while let Some(event) = window.next() {
         let mut ui_locked = ui.lock().unwrap();
+
+        // Button/Mouse events
         if let Some(button) = event.press_args() {
             println!("button {:?} pressed", button);
             if button == piston_window::Button::Keyboard(piston_window::Key::LShift){    //Button::Mouse(piston_window::MouseButton::Left) {
@@ -115,6 +108,8 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
                 ui_locked.shift_state = false;
             }
         };
+
+        //Drawing
         conrod_ui.handle_event(&event);
         event.update(|_| conrod_ui.set_widgets(|mut conrod_ui| set_widgets(&mut conrod_ui, &mut ui_locked, window.size().width)));
         window.draw_2d(&event, |c, g| conrod_ui.draw_if_changed(c, g));
@@ -133,18 +128,18 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
 
     Text::new("Moonshadow 2016!")
         .top_left_with_margin_on(CANVAS, 0.0)
-        .font_size(32)
+        .font_size((32.0 * UI_SCALE) as u32)
         .color(bg_color.plain_contrast())
         .set(TITLE, conrod_ui);
 
     let connected = ui.watchdog.is_alive();
     let label = if connected { "Connected".to_string() } else { "Disconnected".to_string() };
     Button::new()
-        .w_h(105.0, 35.0)
-        .down_from(TITLE, 5.0)
+        .w_h(105.0 * UI_SCALE, 35.0 * UI_SCALE)
+        .down_from(TITLE, 5.0 * UI_SCALE)
         .frame(1.0)
         .label(&label)
-        .label_font_size(11)
+        .label_font_size((BASE_FONT_SIZE * UI_SCALE) as u32)
         .and(|b| {
             if connected {
                 b.rgb(0.1, 0.9, 0.1)
@@ -156,11 +151,11 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
         .set(CONNECTED_BUTTON, conrod_ui);
 
     Button::new()
-        .w_h(105.0, 35.0)
-        .right_from(CONNECTED_BUTTON, 5.0)
+        .w_h(105.0 * UI_SCALE, 35.0 * UI_SCALE)
+        .right_from(CONNECTED_BUTTON, 5.0 * UI_SCALE)
         .frame(1.0)
         .label(&"Edit Mode".to_string())
-        .label_font_size(11)
+        .label_font_size((BASE_FONT_SIZE * UI_SCALE) as u32)
         .and(|b| {
             if ui.edit_state {
                 b.rgb(0.1, 0.9, 0.1)
@@ -183,11 +178,11 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
 
     if ui.edit_state {
         Button::new()
-            .w_h(105.0, 35.0)
-            .right_from(EDITOR_BUTTON, 5.0)
+            .w_h(105.0 * UI_SCALE, 35.0 * UI_SCALE)
+            .right_from(EDITOR_BUTTON, 5.0 * UI_SCALE)
             .frame(1.0)
             .label(&"Add Chaser".to_string())
-            .label_font_size(11)
+            .label_font_size((BASE_FONT_SIZE * UI_SCALE) as u32)
             .and(|b| {
                 if ui.edit_state {
                     b.rgb(0.1, 0.9, 0.1)
@@ -204,12 +199,10 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
             })
             .set(ADD_CHASER_BUTTON, conrod_ui);
     }
-
-    // let mut id = None;
     let tx = ui.tx.clone();
 
-    let button_width = 200.0;
-    let button_height = 50.0;
+    let button_width = 200.0 * UI_SCALE;
+    let button_height = 50.0 * UI_SCALE;
     let mut current_button_id = BUTTON;
 
     let chasers = {
@@ -224,7 +217,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
 
     let mut next_y_offset = 0f64;
     let mut x_pos = -button_width;
-    let mut y_offset = -90.0;
+    let mut y_offset = -90.0 * UI_SCALE;
     let mut rightmost = 0.0;
 
     let cloned_ui = ui.clone();
@@ -232,7 +225,6 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
 
     for (id, (name, chaser)) in chasers.iter().map(|x| (x, cloned_ui.frontend_data.chasers.get(x).unwrap())).enumerate() {
         x_pos = x_pos + button_width;
-        //let x_pos = (id as f64 - 0.5) * button_width;
         let usable_width = if ui.edit_state {2*window_width/3} else {window_width};
         let tmp_rightmost = x_pos + 0.5*button_width;
         if (x_pos + 1.5*button_width) as u32 >= usable_width {
@@ -251,7 +243,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
 
             // let ref mut switch_name = switch_name.lock().unwrap()[0];
             TextBox::new(current_chaser_name)
-                .font_size(14)
+                .font_size((BASE_FONT_SIZE * UI_SCALE) as u32)
                 .xy_relative_to(TITLE, [x_pos, y_offset])
                 .w_h(button_width, button_height)
                 .frame(2.0)
@@ -270,13 +262,13 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
         else {
             Text::new(name)
                 .xy_relative_to(TITLE, [x_pos, y_offset])
-                .font_size(14)
+                .font_size((BASE_FONT_SIZE * UI_SCALE) as u32)
                 .color(bg_color.plain_contrast())
                 .set(CHASER_TITLE + id, conrod_ui);
         }
 
         for (switch_id_in_chaser, (switch_id, switch)) in chaser.switches.iter().map(|&switch_id| (switch_id, &ui.frontend_data.switches[switch_id])).enumerate() {
-            let y_pos = y_offset - 50.0 - switch_id_in_chaser as f64*button_height;
+            let y_pos = y_offset - 50.0 * UI_SCALE - switch_id_in_chaser as f64*button_height;
             let current_edited_switch = ui.current_edited_switch_id.clone();
 
             let label = match switch.get_keybinding_as_text() {
@@ -296,6 +288,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
                 })
                 .frame(1.0)
                 .label(&label)
+                .label_font_size((BASE_FONT_SIZE * UI_SCALE) as u32)
                 .react(|| {
                     if ui.edit_state {
                         current_edited_switch.lock().unwrap()[0] = Some(switch_id);
@@ -310,7 +303,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
                 .set(current_button_id, conrod_ui);
                 current_button_id = current_button_id + 1;
         }
-        let mut y_pos = y_offset - 50.0 - (chaser.switches.len() as f64 - 0.25)*button_height;
+        let mut y_pos = y_offset - 50.0 * UI_SCALE - (chaser.switches.len() as f64 - 0.25)*button_height;
         if !ui.edit_state {
             {
                 let tx = tx.clone();
@@ -321,6 +314,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
                     .rgb(0.9, 0.9, 0.1)
                     .frame(1.0)
                     .label(&"<<".to_string())
+                    .label_font_size((BASE_FONT_SIZE * UI_SCALE) as u32)
                     .react(|| {
                         println!("<<");
                         let next_switch_id = {
@@ -353,6 +347,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
                     .rgb(r, 0.9, 0.1)
                     .frame(1.0)
                     .label(&label)
+                    .label_font_size((BASE_FONT_SIZE * UI_SCALE) as u32)
                     .react(|| {
                         println!(">");
                         let next_switch_id = {
@@ -381,6 +376,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
                     .rgb(0.9, 0.9, 0.1)
                     .frame(1.0)
                     .label(&">>".to_string())
+                    .label_font_size((BASE_FONT_SIZE * UI_SCALE) as u32)
                     .react(|| {
                         println!(">>");
                         let next_switch_id = {
@@ -405,6 +401,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
                 .rgb(0.9, 0.9, 0.1)
                 .frame(1.0)
                 .label(&"Add".to_string())
+                .label_font_size((BASE_FONT_SIZE * UI_SCALE) as u32)
                 .react(|| {
                     let switch_id = ui.frontend_data.add_switch(JsonSwitch::new("Untitled".to_string(), name.clone()));
                     ui.current_edited_switch_id.lock().unwrap()[0] = Some(switch_id);
@@ -422,6 +419,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
                     .rgb(0.9, 0.1, 0.1)
                     .frame(1.0)
                     .label(&"Delete".to_string())
+                    .label_font_size((BASE_FONT_SIZE * UI_SCALE) as u32)
                     .react(|| {
                         ui.frontend_data.delete_chaser(name.clone());
                         ui.chasers.retain(|x| x != name);
@@ -444,15 +442,15 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
     }
     if ui.edit_state {
         let x_pos = rightmost;
-        let mut y_pos = - 30.0;
+        let mut y_pos = - 30.0 * UI_SCALE;
 
         Text::new("Editor")
             .xy_relative_to(TITLE, [x_pos, y_pos])
-            .font_size(22)
+            .font_size((22.0 * UI_SCALE) as u32)
             .color(bg_color.plain_contrast())
             .set(EDITOR_TITLE, conrod_ui);
 
-        y_pos = y_pos - 40.0;
+        y_pos = y_pos - 40.0 * UI_SCALE;
 
         let current_edited_switch = {
             ui.current_edited_switch_id.lock().unwrap()[0].clone()
@@ -465,23 +463,23 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
 
                 Text::new(&("Switch #".to_string() + &switch_id.to_string() + ": " + &ui.frontend_data.switches[switch_id].name.clone()))
                     .xy_relative_to(TITLE, [x_pos, y_pos])
-                    .font_size(14)
+                    .font_size((BASE_FONT_SIZE * UI_SCALE) as u32)
                     .color(bg_color.plain_contrast())
                     .set(EDITOR_INFO, conrod_ui);
 
-                y_pos = y_pos - 60.0;
+                y_pos = y_pos - 60.0 * UI_SCALE;
 
                 let time = ui.frontend_data.switches[switch_id].before_chaser;
-                let item_width = 320.0;
-                let item_height = 40.0;
-                let item_x_offset = 20.0;
+                let item_width = 320.0 * UI_SCALE;
+                let item_height = 40.0 * UI_SCALE;
+                let item_x_offset = 20.0 * UI_SCALE;
                 let line = "-----------------------------------------";
                 let ref mut switch_name = switch_name.lock().unwrap()[0];
                 //println!("name: {:?}", switch_name);
 
 
                 TextBox::new(switch_name)
-                    .font_size(14)
+                    .font_size((BASE_FONT_SIZE * UI_SCALE) as u32)
                     .xy_relative_to(TITLE, [x_pos, y_pos])
                     .w_h(item_width, item_height)
                     .frame(2.0)
@@ -494,7 +492,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
                     .enabled(true)
                     .set(EDITOR_CONTENT, conrod_ui);
 
-                y_pos = y_pos - 60.0;
+                y_pos = y_pos - 60.0 * UI_SCALE;
 
                 let time_string = time.to_string();
                 let label = {
@@ -528,7 +526,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
 
 
 
-                y_pos = y_pos - 60.0;
+                y_pos = y_pos - 60.0 * UI_SCALE;
                 let mut editor_switch_slider_count = 0;
                 let mut editor_switch_button_count = 0;
                 let mut editor_switch_text_count = 0;
@@ -541,20 +539,21 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
                 .rgb(0.9, 0.9, 0.1)
                 .frame(1.0)
                 .label(&label)
+                .label_font_size((BASE_FONT_SIZE * UI_SCALE) as u32)
                 .react(|| {
                     ui.waiting_for_keybinding = true;
                 })
                 .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
                 editor_switch_button_count += 1;
-                y_pos = y_pos - 60.0;
+                y_pos = y_pos - 60.0 * UI_SCALE;
 
                 Text::new(line)
                     .xy_relative_to(TITLE, [x_pos, y_pos])
-                    .font_size(14)
+                    .font_size((BASE_FONT_SIZE * UI_SCALE) as u32)
                     .color(bg_color.plain_contrast())
                     .set(EDITOR_SWITCH_TEXT + editor_switch_text_count, conrod_ui);
                 editor_switch_text_count += 1;
-                y_pos = y_pos - 60.0;
+                y_pos = y_pos - 60.0 * UI_SCALE;
 
                 let cloned_ui = ui.clone();
 
@@ -627,6 +626,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
                         .rgb(0.9, 0.9, 0.1)
                         .frame(1.0)
                         .label(&label)
+                        .label_font_size((BASE_FONT_SIZE * UI_SCALE) as u32)
                         .react(|| {
                             if dropdown_index as i64 == ui.current_edited_channel_group_id {
                                 ui.current_edited_channel_group_id = -1;
@@ -640,7 +640,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
                         })
                         .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
                     editor_switch_button_count += 1;
-                    y_pos = y_pos - 60.0;
+                    y_pos = y_pos - 60.0 * UI_SCALE;
 
 
                     if dropdown_index as i64 == ui.current_edited_channel_group_id {
@@ -665,7 +665,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
                                 })
                                 .set(EDITOR_SWITCH_SLIDER + editor_switch_slider_count, conrod_ui);
                             editor_switch_slider_count += 1;
-                            y_pos = y_pos - 60.0;
+                            y_pos = y_pos - 60.0 * UI_SCALE;
                         }
 
                         let mut fade_curve_list = vec!("Linear".to_string(), "Squared".to_string(), "Square root".to_string(), "Custom".to_string());
@@ -687,7 +687,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
                                 })
                                 .set(EDITOR_SWITCH_DROP_DOWNS + editor_switch_drop_downs_count, conrod_ui);
                             editor_switch_drop_downs_count += 1;
-                            y_pos = y_pos - 60.0;
+                            y_pos = y_pos - 60.0 * UI_SCALE;
 
                             if fade_curve_id == 3 {
                                 let ref mut curve_string = {ui.current_edited_curve_strings.lock().unwrap()[0].clone()};
@@ -695,7 +695,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
                                 TextBox::new(curve_string)
                                     .w_h(item_width - item_x_offset, item_height)
                                     .xy_relative_to(TITLE, [x_pos + item_x_offset/2.0, y_pos])
-                                    .font_size(14)
+                                    .font_size((BASE_FONT_SIZE * UI_SCALE) as u32)
                                     .frame(2.0)
                                     .frame_color(bg_color.invert().plain_contrast())
                                     .color(bg_color.plain_contrast())
@@ -705,7 +705,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
                                     })
                                     .enabled(true)
                                     .set(EDITOR_CURVE_STRING1, conrod_ui);
-                                y_pos = y_pos - 60.0;
+                                y_pos = y_pos - 60.0 * UI_SCALE;
                             }
 
                             let label = {
@@ -727,7 +727,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
                                 })
                                 .set(EDITOR_SWITCH_SLIDER + editor_switch_slider_count, conrod_ui);
                             editor_switch_slider_count += 1;
-                            y_pos = y_pos - 60.0;
+                            y_pos = y_pos - 60.0 * UI_SCALE;
 
                             let fade_curve_id = data.curve_out.get_id();
                             DropDownList::new(&mut fade_curve_list, &mut Some(fade_curve_id))
@@ -743,7 +743,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
                                 })
                                 .set(EDITOR_SWITCH_DROP_DOWNS + editor_switch_drop_downs_count, conrod_ui);
                             editor_switch_drop_downs_count += 1;
-                            y_pos = y_pos - 60.0;
+                            y_pos = y_pos - 60.0 * UI_SCALE;
 
                             if fade_curve_id == 3 {
                                 let ref mut curve_string = {ui.current_edited_curve_strings.lock().unwrap()[1].clone()};
@@ -760,7 +760,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
                                     })
                                     .enabled(true)
                                     .set(EDITOR_CURVE_STRING2, conrod_ui);
-                                y_pos = y_pos - 60.0;
+                                y_pos = y_pos - 60.0 * UI_SCALE;
                             }
 
                             let label = {
@@ -782,7 +782,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
                                 })
                                 .set(EDITOR_SWITCH_SLIDER + editor_switch_slider_count, conrod_ui);
                             editor_switch_slider_count += 1;
-                            y_pos = y_pos - 60.0;
+                            y_pos = y_pos - 60.0 * UI_SCALE;
                         }
 
                         Button::new()
@@ -791,13 +791,14 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
                             .rgb(0.9, 0.1, 0.1)
                             .frame(1.0)
                             .label("Delete")
+                            .label_font_size((BASE_FONT_SIZE * UI_SCALE) as u32)
                             .react(|| {
                                 ui.frontend_data.remove_channel_group(switch_id, id_string.clone());
                                 ui.send_data();
                             })
                             .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
                             editor_switch_button_count += 1;
-                        y_pos = y_pos - 60.0;
+                        y_pos = y_pos - 60.0 * UI_SCALE;
                     }
                 }
                 Button::new()
@@ -806,13 +807,14 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
                     .rgb(0.1, 0.9, 0.1)
                     .frame(1.0)
                     .label("Add")
+                    .label_font_size((BASE_FONT_SIZE * UI_SCALE) as u32)
                     .react(|| {
                         ui.frontend_data.add_channel_group(switch_id);
                         ui.send_data();
                     })
                     .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
                 editor_switch_button_count += 1;
-                y_pos = y_pos - 60.0;
+                y_pos = y_pos - 60.0 * UI_SCALE;
 
                 Button::new()
                     .w_h(item_width, item_height)
@@ -820,19 +822,18 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
                     .rgb(0.9, 0.1, 0.1)
                     .frame(1.0)
                     .label("Delete")
+                    .label_font_size((BASE_FONT_SIZE * UI_SCALE) as u32)
                     .react(|| {
                         ui.frontend_data.remove_switch_with_id(switch_id);
                         ui.current_edited_switch_id.lock().unwrap()[0] = None;
                         ui.send_data();
                     })
                     .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
-                // editor_switch_button_count += 1;
-                // y_pos = y_pos - 60.0;
             }
             None => {
                 Text::new("No switch selected")
                     .xy_relative_to(TITLE, [x_pos, y_pos])
-                    .font_size(14)
+                    .font_size((BASE_FONT_SIZE * UI_SCALE) as u32)
                     .color(bg_color.plain_contrast())
                     .set(EDITOR_INFO, conrod_ui);
             }

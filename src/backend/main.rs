@@ -73,6 +73,7 @@ fn main() {
 
 
                 if address_type == 0 {
+                    // Channel
                     let stage_locked = stage.lock().unwrap();
                     let mut channel_locked = stage_locked.channels[address as usize].lock().unwrap();
                     channel_locked.stop_fade();
@@ -109,8 +110,6 @@ fn main() {
                 thread::spawn(move || {
                     let stage_locked = stage.lock().unwrap();
                     let mut stream = stream.unwrap();
-
-
                     stream.write(stage_locked.get_frontend_data().get_json_string().as_bytes()).unwrap();
                 });
             }
@@ -141,61 +140,4 @@ fn main() {
             }
         }).join().unwrap();
     }
-}
-
-
-#[test]
-fn test_fade_curve() {
-    use std::time::Duration;
-    use std::thread::sleep;
-    use interface_handler::*;
-    use structures::*;
-
-    let interface = Interface::new().connect();
-    if interface.is_err() { panic!(interface) }
-    let (tx, interrupt_tx) = interface.unwrap().to_thread();
-
-    //let curve = FadeCurve::Custom("-cos(1.5*6.28318530718*x)*0.5+0.5".to_string());
-    let curve = FadeCurve::Squared;
-    let curve = FadeCurve::Sin(0);
-    let mut stage = Stage::new(tx);
-
-
-    let mut test_group = ChannelGroup::Single(Single::new(stage.get_channel_object(1)));
-    // let mut test_group = ChannelGroup::Moving2D(Moving2D::new(stage.get_channel_object(1), stage.get_channel_object(2)));
-    // let mut test_group = ChannelGroup::RGB(RGB::new(stage.get_channel_object(1), stage.get_channel_object(2), stage.get_channel_object(3)));
-    //let test_group = ChannelGroup::RGBA(RGBA::new(stage.get_channel_object(1), stage.get_channel_object(2), stage.get_channel_object(3), stage.get_channel_object(4)));
-
-    match test_group {
-        ChannelGroup::Single(mut group) => {
-            group.fade_simple(curve.clone(), 5000, 255);
-        },
-        ChannelGroup::RGB(mut group) => {
-            group.fade_rgb(curve.clone(), 1000, 255, 0, 0);
-            sleep(Duration::from_millis(1000));
-            group.fade_rgb(curve.clone(), 1000, 0, 255, 0);
-            sleep(Duration::from_millis(1000));
-            group.fade_rgb(curve.clone(), 1000, 0, 0, 255);
-            sleep(Duration::from_millis(1000));
-        },
-        ChannelGroup::RGBA(mut group) => {
-            group.fade_rgb(curve.clone(), 1000, 255, 0, 0, 1);
-            sleep(Duration::from_millis(1000));
-            group.fade_rgb(curve.clone(), 1000, 0, 255, 0, 1);
-            sleep(Duration::from_millis(1000));
-            group.fade_rgb(curve.clone(), 1000, 0, 0, 255, 1);
-            sleep(Duration::from_millis(1000));
-        },
-        ChannelGroup::Moving2D(mut group) => {
-            group.fade_simple(curve.clone(), 1000, 255, 255);
-            sleep(Duration::from_millis(1000));
-            group.fade_simple(curve.clone(), 1000, 0, 0);
-        }//,
-        //_ => {}
-    }
-
-
-    sleep(Duration::from_millis(500));
-    info!("Disconnecting...");
-    interrupt_tx.send(true).unwrap();
 }
