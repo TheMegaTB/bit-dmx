@@ -13,6 +13,9 @@ use GIT_HASH;
 pub const INPUT_BUFFER: usize = 4;
 pub const WATCHDOG_TTL: u64 = 1;
 
+const MULTICAST: &'static str = "228.228.228.228";
+const BASE_PORT: u16 = 8000;
+
 #[derive(Debug)]
 pub struct UDPSocket {
     local_addr: Ipv4Addr,
@@ -36,8 +39,8 @@ impl UDPSocket {
     pub fn new() -> UDPSocket {
         UDPSocket {
             local_addr: Ipv4Addr::new(0, 0, 0, 0),
-            multicast_addr: if cfg!(feature = "local") { Ipv4Addr::new(127, 0, 0, 1) } else { Ipv4Addr::new(228, 228, 228, 228) },
-            port: 8000
+            multicast_addr: Ipv4Addr::from_str(MULTICAST).unwrap(),
+            port: BASE_PORT
         }
     }
 
@@ -56,35 +59,45 @@ impl UDPSocket {
         self
     }
 
-    pub fn assemble_socket(&self, port: u16, multicast: bool) -> UdpSocket {
+    pub fn assemble_socket(&mut self, delta_opt: Option<u16>) -> UdpSocket {
+        let port = match delta_opt {
+            Some(delta) => self.port+delta,
+            None => 0
+        };
         let sock = UdpSocket::bind(SocketAddrV4::new(self.local_addr, port)).unwrap();
-        if multicast && !cfg!(feature = "local") { sock.join_multicast_v4(&self.multicast_addr, &self.local_addr).ok().expect("Failed to join multicast."); }
-        sock
+        match sock.join_multicast_v4(&self.multicast_addr, &self.local_addr) {
+            Ok(_) => sock,
+            Err(_) => {
+                warn!("Falling back to local mode since multicast is not available.");
+                self.multicast_addr = Ipv4Addr::new(127, 0, 0, 1);
+                sock
+            }
+        }
     }
 
-    pub fn start_frontend_server(&self) -> UDPSocketHandle {
+    pub fn start_frontend_server(&mut self) -> UDPSocketHandle {
         UDPSocketHandle {
-            socket: self.assemble_socket(self.port, true),
+            socket: self.assemble_socket(Some(0)),
             multicast_addr: SocketAddr::V4(SocketAddrV4::new(self.multicast_addr, self.port))
         }
     }
 
-    pub fn start_frontend_client(&self) -> UDPSocketHandle {
+    pub fn start_frontend_client(&mut self) -> UDPSocketHandle {
         UDPSocketHandle {
-            socket: self.assemble_socket(0, true),
+            socket: self.assemble_socket(None),
             multicast_addr: SocketAddr::V4(SocketAddrV4::new(self.multicast_addr, self.port))
         }
     }
 
-    pub fn start_backend_server(&self) -> UDPSocketHandle {
+    pub fn start_backend_server(&mut self) -> UDPSocketHandle {
         UDPSocketHandle {
-            socket: self.assemble_socket(self.port + 1, true),
+            socket: self.assemble_socket(Some(1)),
             multicast_addr: SocketAddr::V4(SocketAddrV4::new(self.multicast_addr, self.port))
         }
     }
 
-    pub fn start_watchdog_server(&self) {
-        let sock = self.assemble_socket(0, true);
+    pub fn start_watchdog_server(&mut self) {
+        let sock = self.assemble_socket(None);
         let target_addr = SocketAddr::V4(SocketAddrV4::new(self.multicast_addr, self.port+2));
         thread::Builder::new().name("WatchDog-Server".to_string()).spawn(move|| {
             let payload = VERSION.to_string() + &GIT_HASH.to_string();

@@ -2,6 +2,7 @@
 extern crate rustc_serialize;
 extern crate net2;
 extern crate piston_window;
+extern crate ansi_term;
 
 extern crate meval;
 pub use meval::*;
@@ -19,6 +20,9 @@ pub use git_hash::*;
 
 pub mod helpers;
 pub use helpers::*;
+
+pub mod logger;
+pub use logger::*;
 
 pub mod udp_socket;
 pub use udp_socket::*;

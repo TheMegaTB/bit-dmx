@@ -922,10 +922,9 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
 }
 
 fn main() {
-    println!("BitDMX frontend v{}-{}", VERSION, GIT_HASH);
-    env_logger::init().unwrap();
+    init_logger().unwrap();
+    info!("BitDMX frontend v{}-{}", VERSION, GIT_HASH);
     let ui = UI::new();
-    //create_splash_window(ui.clone());
     SplashWindow::new(ui.clone()).join().unwrap();
     if {ui.lock().unwrap().watchdog.is_alive()} { create_output_window(ui.clone()); }
 }

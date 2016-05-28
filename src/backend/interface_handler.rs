@@ -6,6 +6,7 @@ use std::os::raw::c_char;
 
 use structures::DmxAddress;
 use structures::DmxValue;
+use structures::fake_if_print;
 
 #[allow(dead_code)]
 extern {
@@ -36,7 +37,8 @@ pub struct Interface {
 }
 
 pub struct InterfaceHandle {
-    interface: Interface
+    interface: Interface,
+    fake: bool
 }
 
 impl Interface {
@@ -61,11 +63,11 @@ impl Interface {
 
     pub fn connect(self) -> Result<InterfaceHandle, &'static str> {
         match connect(self.baudrate, self.port.clone()) {
-            true => Ok(InterfaceHandle {interface: self}),
+            true => Ok(InterfaceHandle {interface: self, fake: false}),
             false => {
                 unsafe { set_fake_interface_mode(true); }
-                info!("Enabled fake interfaces since no hardware interface is detected.");
-                Ok(InterfaceHandle {interface: self})
+                warn!("Enabled fake interface since no hardware interface is detected.");
+                Ok(InterfaceHandle {interface: self, fake: true})
             }
         }
     }
@@ -127,6 +129,7 @@ impl InterfaceHandle {
     }
 
     pub fn write_to_dmx(&self, address: DmxAddress, value: DmxValue) {
+        if self.fake { fake_if_print(address, value); }
         write_to_dmx(address, value);
     }
 
