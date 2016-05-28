@@ -853,7 +853,6 @@ fn get_start_chaser(shift_state: bool, addr: u16, value: u8) -> Vec<u8> {
     vec![if shift_state {130} else {2}, addr_high, addr_low, value]
 }
 
-
 fn main() {
     init_logger().unwrap();
     info!("BitDMX frontend v{}-{}", VERSION, GIT_HASH);
