@@ -471,6 +471,7 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Them
                     .react(|| {
                         ui.frontend_data.delete_chaser(name.clone());
                         ui.chasers.retain(|x| x != name);
+                        ui.current_edited_chaser_names = Arc::new(Mutex::new(ui.chasers.clone()));
                         ui.save_chaser_config();
                         ui.send_data();
                         test = true;
