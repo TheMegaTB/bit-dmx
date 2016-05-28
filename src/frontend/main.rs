@@ -165,7 +165,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
     draw_chasers(conrod_ui, ui, application_theme.clone(), chasers_usable_width);
 
     if ui.edit_state {
-        draw_editor(conrod_ui, ui, application_theme.clone(), editor_width-2.0*application_theme.ui_padding);
+        draw_editor(conrod_ui, ui, application_theme.clone(), editor_width);
     }
 }
 
