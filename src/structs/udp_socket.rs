@@ -68,7 +68,7 @@ impl UDPSocket {
         match sock.join_multicast_v4(&self.multicast_addr, &self.local_addr) {
             Ok(_) => sock,
             Err(_) => {
-                warn!("Falling back to local mode since multicast join failed.");
+                warn!("Falling back to local mode since multicast is not available.");
                 self.multicast_addr = Ipv4Addr::new(127, 0, 0, 1);
                 sock
             }
