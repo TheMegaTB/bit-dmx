@@ -335,7 +335,7 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
                     None => {}
                 }
             }
-            else {
+            else if !ui_locked.edit_state {
                 match button {
                     piston_window::Button::Keyboard(key) =>  {
                         for (switch_id, switch) in ui_locked.frontend_data.switches.iter().enumerate() {
