@@ -28,7 +28,7 @@ pub struct UI {
 
 impl UI {
     pub fn new() -> Arc<Mutex<UI>> {
-        let socket = UDPSocket::new();
+        let mut socket = UDPSocket::new();
         let watchdog = socket.create_watchdog_client();
         let frontend_client = socket.start_frontend_client();
         let frontend_data = FrontendData::new("Default".to_string());
@@ -106,7 +106,7 @@ impl UI {
         }
     }
 
-    pub fn start_udp_server(ui: Arc<Mutex<UI>>, socket: UDPSocket) {
+    pub fn start_udp_server(ui: Arc<Mutex<UI>>, mut socket: UDPSocket) {
         thread::spawn(move || {
             let socket = socket.start_frontend_server();
             loop {
@@ -143,8 +143,8 @@ impl UI {
         });
     }
 
-    pub fn start_watchdog_client(ui: Arc<Mutex<UI>>, socket: UDPSocket) {
-        let sock = socket.assemble_socket(socket.port + 2, true);
+    pub fn start_watchdog_client(ui: Arc<Mutex<UI>>, mut socket: UDPSocket) {
+        let sock = socket.assemble_socket(Some(2));
         {
             let (s, s_addr) = {
                 let ui_locked = ui.lock().unwrap();

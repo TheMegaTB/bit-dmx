@@ -23,7 +23,6 @@ path = "src/structs/structs.rs"
 
 [features]
 default = []
-local = []
 
 [dependencies]
 conrod = "0.35.0"
