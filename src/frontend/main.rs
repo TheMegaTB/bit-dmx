@@ -20,7 +20,7 @@ use conrod::{
     DropDownList,
     Labelable,
     Sizeable,
-    Slider,
+    NumberDialer,
     TextBox
 };
 use piston_window::{ UpdateEvent, PressEvent, ReleaseEvent, Window };
@@ -62,12 +62,12 @@ widget_ids! {
     ADD_CHASER_BUTTON,
     EDITOR_TITLE,
     EDITOR_INFO,
-    EDITOR_TIME_SLIDER,
+    EDITOR_TIME_NUMBER_DIALER,
     EDITOR_CHASER_TITLE with 4000,
     EDITOR_CONTENT with 4000,
     BUTTON with 4000,
     CONTROL_CHASER_TITLE with 4000,
-    EDITOR_SWITCH_SLIDER with 4000,
+    EDITOR_SWITCH_NUMBER_DIALER with 4000,
     EDITOR_SWITCH_BUTTON with 4000,
     EDITOR_SWITCH_TEXT with 4000,
     EDITOR_SWITCH_DROP_DOWNS with 4000,
@@ -182,7 +182,7 @@ fn draw_header(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
     let connected = ui.watchdog.is_alive();
     let label = if connected { "Connected".to_string() } else { "Disconnected".to_string() };
     Button::new()
-        .w_h(105.0 * application_theme.ui_scale, 35.0 * application_theme.ui_scale)
+        .w_h(140.0 * application_theme.ui_scale, 35.0 * application_theme.ui_scale)
         .down_from(TITLE, 7.0 * application_theme.ui_scale)
         .frame(1.0)
         .label(&label)
@@ -198,7 +198,7 @@ fn draw_header(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
         .set(CONNECTED_BUTTON, conrod_ui);
 
     Button::new()
-        .w_h(105.0 * application_theme.ui_scale, 35.0 * application_theme.ui_scale)
+        .w_h(140.0 * application_theme.ui_scale, 35.0 * application_theme.ui_scale)
         .right_from(CONNECTED_BUTTON, 5.0 * application_theme.ui_scale)
         .frame(1.0)
         .label(&"Edit Mode".to_string())
@@ -225,7 +225,7 @@ fn draw_header(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
 
     if ui.edit_state {
         Button::new()
-            .w_h(105.0 * application_theme.ui_scale, 35.0 * application_theme.ui_scale)
+            .w_h(140.0 * application_theme.ui_scale, 35.0 * application_theme.ui_scale)
             .right_from(EDITOR_BUTTON, 5.0 * application_theme.ui_scale)
             .frame(1.0)
             .label(&"Add Chaser".to_string())
@@ -535,27 +535,20 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
                 .enabled(true)
                 .set(EDITOR_CONTENT, conrod_ui);
 
-            let time_string = time.to_string();
-            let label = {
-                let mut text = "Chaser time: ".to_string();
-                text.push_str(&time_string);
-                text
-            };
-
-            Slider::new(time as f32, 0.0, 10000.0)
+            NumberDialer::new(time as f32, 0.0, 99999.0, 0)
                 .w_h(item_width, item_height)
                 .down(20.0 * application_theme.ui_scale)
                 .align_left_of(EDITOR_TITLE)
                 .rgb(0.5, 0.3, 0.6)
                 .frame(2.0)
-                .label(&label)
+                .label(&"Chaser time".to_string())
                 .label_color(color::WHITE)
                 .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
                 .react(|new_time: f32| {
                     ui.frontend_data.switches[switch_id].before_chaser = new_time as FadeTime;
                     ui.send_data();
                 })
-                .set(EDITOR_TIME_SLIDER, conrod_ui);
+                .set(EDITOR_TIME_NUMBER_DIALER, conrod_ui);
 
             let label = if ui.waiting_for_keybinding {
                 "Keybinding: ?".to_string()
@@ -567,7 +560,7 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
                 }
             };
 
-            let mut editor_switch_slider_count = 0;
+            let mut editor_switch_number_dialer_count = 0;
             let mut editor_switch_button_count = 0;
             let mut editor_switch_text_count = 0;
             let mut editor_switch_drop_downs_count = 0;
@@ -684,27 +677,21 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
                 if dropdown_index as i64 == ui.current_edited_channel_group_id {
 
                     for (index, &value) in data.values.iter().enumerate() {
-                        let label = {
-                            let mut text = "Value: ".to_string();
-                            text.push_str(&value.to_string());
-                            text
-                        };
-
-                        Slider::new(value as f32, 0.0, 255.0)
+                        NumberDialer::new(value as f32, 0.0, 255.0, 0)
                             .w_h(item_width - item_x_offset, item_height)
                             .down(20.0 * application_theme.ui_scale)
                             .align_right_of(EDITOR_CONTENT)
                             .rgb(0.5, 0.3, 0.6)
                             .frame(2.0)
-                            .label(&label)
+                            .label(&"Value".to_string())
                             .label_color(color::WHITE)
                             .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
                             .react(|new_value: f32| {
                                 ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().values[index] = new_value as u8;
                                 ui.send_data();
                             })
-                            .set(EDITOR_SWITCH_SLIDER + editor_switch_slider_count, conrod_ui);
-                        editor_switch_slider_count += 1;
+                            .set(EDITOR_SWITCH_NUMBER_DIALER + editor_switch_number_dialer_count, conrod_ui);
+                        editor_switch_number_dialer_count += 1;
                     }
 
                     let mut fade_curve_list = vec!("Linear".to_string(), "Squared".to_string(), "Square root".to_string(), "Custom".to_string());
@@ -748,27 +735,21 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
                                 .set(EDITOR_CURVE_STRING1, conrod_ui);
                         }
 
-                        let label = {
-                            let mut text = "Time in: ".to_string();
-                            text.push_str(&data.time_in.to_string());
-                            text
-                        };
-
-                        Slider::new(data.time_in as f32, 0.0, 10000.0)
+                        NumberDialer::new(data.time_in as f32, 0.0, 99999.0, 0)
                             .w_h(item_width - item_x_offset, item_height)
                             .down(20.0 * application_theme.ui_scale)
                             .align_right_of(EDITOR_CONTENT)
                             .rgb(0.5, 0.3, 0.6)
                             .frame(2.0)
-                            .label(&label)
+                            .label(&"Time in".to_string())
                             .label_color(color::WHITE)
                             .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
                             .react(|new_value: f32| {
                                 ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().time_in = new_value as FadeTime;
                                 ui.send_data();
                             })
-                            .set(EDITOR_SWITCH_SLIDER + editor_switch_slider_count, conrod_ui);
-                        editor_switch_slider_count += 1;
+                            .set(EDITOR_SWITCH_NUMBER_DIALER + editor_switch_number_dialer_count, conrod_ui);
+                        editor_switch_number_dialer_count += 1;
 
                         let fade_curve_id = data.curve_out.get_id();
                         DropDownList::new(&mut fade_curve_list, &mut Some(fade_curve_id))
@@ -805,27 +786,21 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
                                 .set(EDITOR_CURVE_STRING2, conrod_ui);
                         }
 
-                        let label = {
-                            let mut text = "Time out: ".to_string();
-                            text.push_str(&data.time_out.to_string());
-                            text
-                        };
-
-                        Slider::new(data.time_out as f32, 0.0, 10000.0)
+                        NumberDialer::new(data.time_out as f32, 0.0, 99999.0, 0)
                             .w_h(item_width - item_x_offset, item_height)
                             .down(20.0 * application_theme.ui_scale)
                             .align_right_of(EDITOR_CONTENT)
                             .rgb(0.5, 0.3, 0.6)
                             .frame(2.0)
-                            .label(&label)
+                            .label(&"Time out".to_string())
                             .label_color(color::WHITE)
                             .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
                             .react(|new_value: f32| {
                                 ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().time_out = new_value as FadeTime;
                                 ui.send_data();
                             })
-                            .set(EDITOR_SWITCH_SLIDER + editor_switch_slider_count, conrod_ui);
-                        editor_switch_slider_count += 1;
+                            .set(EDITOR_SWITCH_NUMBER_DIALER + editor_switch_number_dialer_count, conrod_ui);
+                        editor_switch_number_dialer_count += 1;
                     }
 
                     Button::new()
