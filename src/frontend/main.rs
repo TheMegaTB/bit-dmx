@@ -6,15 +6,8 @@ extern crate find_folder;
 extern crate structures;
 extern crate rustc_serialize;
 use structures::*;
-use std::time::Duration;
-use std::thread;
 
-use std::io::prelude::*;
-use std::io::{BufReader, BufWriter};
-use std::fs::File;
-
-use std::net::{TcpStream, SocketAddr};
-use std::sync::{Arc, Mutex, mpsc};
+use std::sync::{Arc, Mutex};
 use conrod::{
     color,
     Canvas,
@@ -22,7 +15,7 @@ use conrod::{
     Frameable,
     Positionable,
     Text,
-    Theme,
+    //Theme,
     Widget,
     Button,
     // Circle,
@@ -39,16 +32,16 @@ use conrod::{
     // WidgetMatrix,
     // XYPad,
 };
-use piston_window::{ EventLoop, OpenGL, Glyphs, PistonWindow, UpdateEvent, WindowSettings, PressEvent, ReleaseEvent, Window };
-use rustc_serialize::json;
+use piston_window::{ UpdateEvent, PressEvent, ReleaseEvent, Window };
 
+mod ui;
+use ui::UI;
 
-type Backend = (<piston_window::G2d<'static> as conrod::Graphics>::Texture, Glyphs);
-type Ui = conrod::Ui<Backend>;
-type UiCell<'a> = conrod::UiCell<'a, Backend>;
+mod window;
+use window::*;
 
-const OPEN_GL: OpenGL = OpenGL::V3_2;
-
+mod splash;
+use splash::*;
 
 widget_ids! {
     CANVAS,
@@ -71,239 +64,8 @@ widget_ids! {
     EDITOR_CURVE_STRING2
 }
 
-#[derive(Debug, Clone)]
-struct UI {
-    pub watchdog: WatchDogClient,
-    tx: mpsc::Sender<Vec<u8>>,
-    frontend_data: FrontendData,
-    shift_state: bool,
-    edit_state: bool,
-    chasers: Vec<String>,
-    current_edited_switch_id: Arc<Mutex<[Option<usize>; 1]>>,
-    current_edited_channel_group_id: i64,
-    current_edited_switch_name: Arc<Mutex<[String; 1]>>,
-    current_edited_curve_strings: Arc<Mutex<[String; 2]>>,
-    current_edited_chaser_names: Arc<Mutex<Vec<String>>>
-}
-
-impl UI {
-    fn new() -> Arc<Mutex<UI>> {
-        let socket = UDPSocket::new();
-        let watchdog = socket.create_watchdog_client();
-        let frontend_client = socket.start_frontend_client();
-        let frontend_data = FrontendData::new("Default".to_string());
-
-        let (tx, rx) = mpsc::channel::<Vec<u8>>();
-        {
-            let watchdog = watchdog.clone();
-            thread::spawn(move || {
-                let mut data;
-                loop {
-                    data = rx.recv().unwrap();
-                    if watchdog.is_alive() {
-                        frontend_client.send(data.as_slice(), SocketAddr::new(watchdog.get_server_addr().unwrap(), 8001));
-                    } else {
-                        warn!("Could not send data. No server available");
-                    }
-                }
-            });
-        }
-
-        {
-            thread::spawn(move || {
-
-            });
-        }
-
-        let ui = UI {
-            watchdog: watchdog,
-            tx: tx,
-            frontend_data: frontend_data,
-            shift_state: false,
-            edit_state: false,
-            chasers: Vec::new(),
-            current_edited_switch_id: Arc::new(Mutex::new([None])),
-            current_edited_channel_group_id: -1,
-            current_edited_switch_name: Arc::new(Mutex::new(["".to_string()])),
-            current_edited_curve_strings: Arc::new(Mutex::new(["".to_string(), "".to_string()])),
-            current_edited_chaser_names: Arc::new(Mutex::new(Vec::new()))
-        };
-
-        let ui = Arc::new(Mutex::new(ui));
-
-        UI::start_udp_server(ui.clone(), UDPSocket::new());
-        UI::start_watchdog_client(ui.clone(), UDPSocket::new());
-        ui
-    }
-
-    fn get_chaser_config_path(&self) -> std::path::PathBuf {
-        let assets = find_folder::Search::KidsThenParents(3, 5)
-            .for_folder("assets").unwrap();
-        assets.join(self.frontend_data.name.clone()  + ".local_dmx")
-    }
-
-    fn load_chaser_config(&mut self) {
-        let path = self.get_chaser_config_path();
-        match File::open(path) {
-            Ok(file) => {
-                let buf = BufReader::new(file);
-                self.chasers = buf.lines().map(|l| l.expect("Could not parse line")).collect();
-            },
-            _ => {
-                self.chasers = self.frontend_data.chasers.keys().map(|x| x.clone()).collect();
-                self.save_chaser_config();
-            }
-        }
-    }
-
-    fn save_chaser_config(&self) {
-        let path = self.get_chaser_config_path();
-        let file = File::create(path).expect("no such file");
-        let mut buf = BufWriter::new(file);
-        for line in self.chasers.iter() {
-            buf.write_all((line.clone() + "\n").as_bytes()).unwrap();
-        }
-    }
-
-    fn start_udp_server(ui: Arc<Mutex<UI>>, socket: UDPSocket) {
-        thread::spawn(move || {
-            let socket = socket.start_frontend_server();
-            loop {
-                let buf = socket.receive().0;
-                let mut ui_locked = ui.lock().unwrap();
-
-                if buf == [255, 255, 255, 255] {
-                    ui_locked.fetch_data();
-                }
-                else {
-                    let address_type:u8 = buf[0] & 127;
-                    let address: u16 = ((buf[1] as u16) << 8) + (buf[2] as u16);
-                    let value: u8 = buf[3];
-
-
-
-                    if address_type == 0 {
-                        //TODO Channel view
-                    }
-                    else if address_type == 1 {
-                        // Switch
-                        ui_locked.frontend_data.switches[address as usize].dimmer_value = value as f64;
-                    }
-                    else if address_type == 2 {
-                        // chaser
-                        let chaser_id = ui_locked.frontend_data.switches[address as usize].clone().chaser_id;
-                        let mut chaser = ui_locked.frontend_data.chasers.get_mut(&chaser_id).unwrap();
-
-                        chaser.current_thread = value != 0;
-                    }
-                }
-                trace!("{:?}", buf);
-            }
-        });
-    }
-
-    fn start_watchdog_client(ui: Arc<Mutex<UI>>, socket: UDPSocket) {
-        let sock = socket.assemble_socket(socket.port + 2, true);
-        {
-            let (s, s_addr) = {
-                let ui_locked = ui.lock().unwrap();
-                (ui_locked.watchdog.state.clone(), ui_locked.watchdog.server_addr.clone())
-            };
-            thread::Builder::new().name("WatchDog-Client".to_string()).spawn(move || {
-                sock.set_read_timeout(Some(Duration::from_secs(WATCHDOG_TTL + 1))).unwrap();
-                let payload = VERSION.to_string() + &GIT_HASH.to_string();
-                let mut buf = (0..(payload.as_bytes().len())).map(|_| 0).collect::<Vec<_>>();
-                loop {
-                    match sock.recv_from(&mut buf) {
-                        Ok((_, addr)) => {
-                            if buf == payload.as_bytes() {
-                                trace!("received valid watchdog data");
-                                s.lock().unwrap()[0] = true;
-                                let ip_changed = {
-                                    let mut s_addr_locked = s_addr.lock().unwrap();
-                                    if s_addr_locked[0] != Some(addr.ip()) {
-                                        s_addr_locked[0] = Some(addr.ip());
-                                        true
-                                    } else {false}
-                                };
-                                if ip_changed && !ui.lock().unwrap().fetch_data() {
-                                    s_addr.lock().unwrap()[0] = None;
-                                }
-                            } else {
-                                trace!("received invalid watchdog data");
-                                s.lock().unwrap()[0] = false;
-                                s_addr.lock().unwrap()[0] = None;
-                            }
-                        },
-                        Err(_) => {
-                            trace!("watchdog timeout");
-                            s.lock().unwrap()[0] = false;
-                            s_addr.lock().unwrap()[0] = None;
-                        }
-                    }
-                }
-            }).unwrap();
-        }
-    }
-
-    fn fetch_data(&mut self) -> bool {
-        if self.watchdog.get_server_addr().is_some() {
-            match TcpStream::connect((&*self.watchdog.get_server_addr().unwrap().to_string(), 8000)) {
-                Ok(mut stream) => {
-                    let mut buffer = String::new();
-                    let _ = stream.read_to_string(&mut buffer);
-                    self.frontend_data = json::decode(&buffer).unwrap();
-                    info!("Connected to \"{}\"", self.frontend_data.name);
-                    self.load_chaser_config();
-                    debug!("TCP update");
-                    true
-                }
-                Err(_) => {
-                    warn!("Error while connecting");
-                    false
-                }
-            }
-        } else {
-            warn!("No server ip");
-            false
-        }
-    }
-
-    fn send_data(&mut self) -> bool {
-        if self.watchdog.get_server_addr().is_some() {
-            match TcpStream::connect((&*self.watchdog.get_server_addr().unwrap().to_string(), 8001)) {
-                Ok(mut stream) => {
-                    stream.write(self.frontend_data.get_json_string().as_bytes()).unwrap();
-                    // stream.write(json::encode(&self.frontend_data).unwrap().as_bytes()).unwrap();
-                    true
-                }
-                Err(_) => {
-                    error!("Error while connecting");
-                    false
-                }
-            }
-        }
-        else {
-            warn!("No server ip");
-            false
-        }
-    }
-}
-
 fn create_output_window(ui: Arc<Mutex<UI>>) {
-    let mut window: PistonWindow = WindowSettings::new("Sushi Reloaded!", [1100, 560])
-                                   .opengl(OPEN_GL).exit_on_esc(false).vsync(true).build().unwrap();
-
-    let mut conrod_ui = {
-        let assets = find_folder::Search::KidsThenParents(3, 5)
-            .for_folder("assets").unwrap();
-        let font_path = assets.join("fonts/NotoSans/NotoSans-Regular.ttf");
-        let theme = Theme::default();
-        let glyph_cache = Glyphs::new(&font_path, window.factory.clone());
-        Ui::new(glyph_cache.unwrap(), theme)
-    };
-
-    window.set_ups(30);
+    let (mut window, mut conrod_ui) = create_window("Sushi Reloaded!".to_string(), (1100, 560), 30, false);
 
     // Poll events from the window.
     while let Some(event) = window.next() {
@@ -1028,42 +790,31 @@ fn get_start_chaser(shift_state: bool, addr: u16, value: u8) -> Vec<u8> {
     vec![if shift_state {130} else {2}, addr_high, addr_low, value]
 }
 
-fn create_splash_window(ui: Arc<Mutex<UI>>) {
-    let mut window: PistonWindow = WindowSettings::new("BitDMX Splashscreen", [500, 300])
-                                    .opengl(OPEN_GL).exit_on_esc(true).vsync(true).build().unwrap();
-
-    let mut conrod_ui = {
-        let assets = find_folder::Search::KidsThenParents(3, 5)
-            .for_folder("assets").unwrap();
-        let font_path = assets.join("fonts/NotoSans/NotoSans-Regular.ttf");
-        let theme = Theme::default();
-        let glyph_cache = Glyphs::new(&font_path, window.factory.clone());
-        Ui::new(glyph_cache.unwrap(), theme)
-    };
-
-    window.set_ups(1);
-
-    while let Some(event) = window.next() {
-        conrod_ui.handle_event(&event);
-        window.draw_2d(&event, |c, g| conrod_ui.draw(c, g));
-
-        event.update(|_| conrod_ui.set_widgets(|mut conrod_ui| {
-            Canvas::new()
-                .frame(1.0)
-                .pad(30.0)
-                .color(color::rgb(0.236, 0.239, 0.900))
-                .set(CANVAS, &mut conrod_ui);
-        }));
-
-        if ui.lock().unwrap().watchdog.is_alive() { break }
-    }
-}
+// fn create_splash_window(ui: Arc<Mutex<UI>>) {
+//     let (mut window, mut conrod_ui) = create_window("BitDMX Splashscreen".to_string(), (500, 300), 1, true);
+//
+//     while let Some(event) = window.next() {
+//         conrod_ui.handle_event(&event);
+//         window.draw_2d(&event, |c, g| conrod_ui.draw(c, g));
+//
+//         event.update(|_| conrod_ui.set_widgets(|mut conrod_ui| {
+//             Canvas::new()
+//                 .frame(1.0)
+//                 .pad(30.0)
+//                 .color(color::rgb(0.236, 0.239, 0.900))
+//                 .set(CANVAS, &mut conrod_ui);
+//         }));
+//
+//         if ui.lock().unwrap().watchdog.is_alive() { break }
+//     }
+// }
 
 
 fn main() {
     println!("BitDMX frontend v{}-{}", VERSION, GIT_HASH);
     env_logger::init().unwrap();
     let ui = UI::new();
-    create_splash_window(ui.clone());
+    //create_splash_window(ui.clone());
+    SplashWindow::new(ui.clone()).join().unwrap();
     if {ui.lock().unwrap().watchdog.is_alive()} { create_output_window(ui.clone()); }
 }
