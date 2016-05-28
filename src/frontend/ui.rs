@@ -194,9 +194,8 @@ impl UI {
                     let mut buffer = String::new();
                     let _ = stream.read_to_string(&mut buffer);
                     self.frontend_data = json::decode(&buffer).unwrap();
-                    info!("Connected to \"{}\"", self.frontend_data.name);
+                    debug!("TCP update from \"{}\"", self.frontend_data.name);
                     self.load_chaser_config();
-                    debug!("TCP update");
                     true
                 }
                 Err(_) => {
