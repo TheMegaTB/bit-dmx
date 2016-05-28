@@ -37,6 +37,12 @@ pub use fixture::*;
 pub mod switch;
 pub use switch::*;
 
+pub mod chaser;
+pub use chaser::*;
+
+pub mod frontend_data;
+pub use frontend_data::*;
+
 pub mod stage;
 pub use stage::*;
 
