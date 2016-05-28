@@ -86,6 +86,9 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
 
         // Button/Mouse events
         if let Some(button) = event.press_args() {
+            if button == piston_window::Button::Keyboard(piston_window::Key::LShift) {
+                ui_locked.shift_state = true;
+            }
             if ui_locked.waiting_for_keybinding {
                 let switch_id = ui_locked.current_edited_switch_id.lock().unwrap()[0];
                 match switch_id {
