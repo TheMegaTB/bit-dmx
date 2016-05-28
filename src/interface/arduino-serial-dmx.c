@@ -29,7 +29,7 @@
 #include "arduino-serial-lib.h"
 
 // Comment out to supress printing of fake interface state
-#define PRINT_FAKE
+//#define PRINT_FAKE
 
 const int buf_max = 10;
 
