@@ -110,8 +110,6 @@ fn main() {
                 thread::spawn(move || {
                     let stage_locked = stage.lock().unwrap();
                     let mut stream = stream.unwrap();
-
-
                     stream.write(stage_locked.get_frontend_data().get_json_string().as_bytes()).unwrap();
                 });
             }
