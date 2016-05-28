@@ -1,6 +1,7 @@
 #[macro_use] extern crate log;
 extern crate rustc_serialize;
 extern crate net2;
+extern crate piston_window;
 
 extern crate meval;
 pub use meval::*;
@@ -36,6 +37,12 @@ pub use fixture::*;
 
 pub mod switch;
 pub use switch::*;
+
+pub mod chaser;
+pub use chaser::*;
+
+pub mod frontend_data;
+pub use frontend_data::*;
 
 pub mod stage;
 pub use stage::*;
