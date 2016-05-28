@@ -79,6 +79,7 @@ struct UI {
     shift_state: bool,
     edit_state: bool,
     chasers: Vec<String>,
+    waiting_for_keybinding: bool,
     current_edited_switch_id: Arc<Mutex<[Option<usize>; 1]>>,
     current_edited_channel_group_id: i64,
     current_edited_switch_name: Arc<Mutex<[String; 1]>>,
@@ -122,6 +123,7 @@ impl UI {
             shift_state: false,
             edit_state: false,
             chasers: Vec::new(),
+            waiting_for_keybinding: false,
             current_edited_switch_id: Arc::new(Mutex::new([None])),
             current_edited_channel_group_id: -1,
             current_edited_switch_name: Arc::new(Mutex::new(["".to_string()])),
@@ -313,9 +315,42 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
             if button == piston_window::Button::Keyboard(piston_window::Key::LShift){    //Button::Mouse(piston_window::MouseButton::Left) {
                 ui_locked.shift_state = true;
             }
+            if ui_locked.waiting_for_keybinding {
+                let switch_id = ui_locked.current_edited_switch_id.lock().unwrap()[0];
+                match switch_id {
+                    Some(switch_id) => {
+                        match button {
+                            piston_window::Button::Keyboard(key) =>  {
+                                ui_locked.frontend_data.switches[switch_id].keybinding = Some(key);
+                                ui_locked.waiting_for_keybinding = false;
+                                ui_locked.send_data();
+                            },
+                            _ => {
+                                ui_locked.frontend_data.switches[switch_id].keybinding = None;
+                                ui_locked.waiting_for_keybinding = false;
+                                ui_locked.send_data();
+                            }
+                        }
+                    },
+                    None => {}
+                }
+            }
+            else {
+                match button {
+                    piston_window::Button::Keyboard(key) =>  {
+                        for (switch_id, switch) in ui_locked.frontend_data.switches.iter().enumerate() {
+                            if switch.keybinding == Some(key) {
+                                let new_value = if switch.dimmer_value == 0.0 {255} else {0};
+                                ui_locked.tx.send(get_switch_update(ui_locked.shift_state, switch_id as u16, new_value)).unwrap();
+                            }
+                        }
+                    },
+                    _ => {}
+                }
+            }
         };
         if let Some(button) = event.release_args() {
-            println!("button {:?} pressed", button);
+            println!("button {:?} released", button);
             if button == piston_window::Button::Keyboard(piston_window::Key::LShift){    //Button::Mouse(piston_window::MouseButton::Left) {
                 ui_locked.shift_state = false;
             }
@@ -483,6 +518,11 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
         for (switch_id_in_chaser, (switch_id, switch)) in chaser.switches.iter().map(|&switch_id| (switch_id, &ui.frontend_data.switches[switch_id])).enumerate() {
             let y_pos = y_offset - 50.0 - switch_id_in_chaser as f64*button_height;
             let current_edited_switch = ui.current_edited_switch_id.clone();
+
+            let label = match switch.get_keybinding_as_text() {
+                Some(keybinding) => switch.name.clone() + ": " + &keybinding,
+                None => switch.name.clone()
+            };
             Button::new()
                 .w_h(button_width, button_height)
                 .xy_relative_to(TITLE, [x_pos, y_pos])
@@ -495,7 +535,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
                     }
                 })
                 .frame(1.0)
-                .label(&switch.name)
+                .label(&label)
                 .react(|| {
                     if ui.edit_state {
                         current_edited_switch.lock().unwrap()[0] = Some(switch_id);
@@ -716,6 +756,17 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
                     })
                     .set(EDITOR_TIME_SLIDER, conrod_ui);
 
+                let label = if ui.waiting_for_keybinding {
+                    "Keybinding: ?".to_string()
+                }
+                else {
+                    match ui.frontend_data.switches[switch_id].get_keybinding_as_text() {
+                        Some(keybinding) => "Keybinding: ".to_string() + &keybinding,
+                        None => "No keybinding".to_string()
+                    }
+                };
+
+
 
                 y_pos = y_pos - 60.0;
                 let mut editor_switch_slider_count = 0;
@@ -723,6 +774,19 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, window_width: u32) {
                 let mut editor_switch_text_count = 0;
                 let mut editor_switch_drop_downs_count = 0;
 
+
+                Button::new()
+                .w_h(item_width, item_height)
+                .xy_relative_to(TITLE, [x_pos, y_pos])
+                .rgb(0.9, 0.9, 0.1)
+                .frame(1.0)
+                .label(&label)
+                .react(|| {
+                    ui.waiting_for_keybinding = true;
+                })
+                .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
+                editor_switch_button_count += 1;
+                y_pos = y_pos - 60.0;
 
                 Text::new(line)
                     .xy_relative_to(TITLE, [x_pos, y_pos])

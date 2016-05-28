@@ -3,6 +3,8 @@ use std::collections::HashMap;
 use ChannelGroupValue;
 use rustc_serialize::json;
 use FadeTime;
+use piston_window::keyboard::Key;
+
 
 #[derive(Debug, Clone, RustcDecodable, RustcEncodable)]
 pub struct JsonSwitch {
@@ -10,7 +12,8 @@ pub struct JsonSwitch {
     pub chaser_id: String,
     pub dimmer_value: f64,
     pub before_chaser: FadeTime,
-    pub name: String
+    pub name: String,
+    pub keybinding: Option<Key>
 }
 
 impl JsonSwitch {
@@ -20,7 +23,14 @@ impl JsonSwitch {
             chaser_id: chaser_id,
             dimmer_value: 0.0,
             before_chaser: 0,
-            name: name
+            name: name,
+            keybinding: None
+        }
+    }
+    pub fn get_keybinding_as_text(&self) -> Option<String> {
+        match self.keybinding {
+            Some(keybinding) => Some(format!("{:?}", keybinding)),
+            None => None
         }
     }
 }
@@ -31,7 +41,8 @@ pub struct Switch {
     pub chaser_id: String,
     pub dimmer_value: f64,
     pub before_chaser: FadeTime,
-    name: String
+    name: String,
+    keybinding: Option<Key>
 }
 
 impl Switch {
@@ -41,7 +52,8 @@ impl Switch {
             chaser_id: chaser_id,
             dimmer_value: 0.0,
             before_chaser: before_chaser,
-            name: name
+            name: name,
+            keybinding: None
         }
     }
 
@@ -51,7 +63,8 @@ impl Switch {
             chaser_id: self.chaser_id.clone(),
             dimmer_value: self.dimmer_value,
             before_chaser: self.before_chaser,
-            name: self.name.clone()
+            name: self.name.clone(),
+            keybinding: self.keybinding.clone()
         }
     }
 
@@ -69,7 +82,8 @@ impl Switch {
             chaser_id: json_switch.chaser_id.clone(),
             dimmer_value: json_switch.dimmer_value,
             before_chaser: json_switch.before_chaser,
-            name: json_switch.name.clone()
+            name: json_switch.name.clone(),
+            keybinding: json_switch.keybinding.clone()
         }
     }
 }

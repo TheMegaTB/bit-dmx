@@ -1,6 +1,7 @@
 #[macro_use] extern crate log;
 extern crate rustc_serialize;
 extern crate net2;
+extern crate piston_window;
 
 extern crate meval;
 pub use meval::*;
