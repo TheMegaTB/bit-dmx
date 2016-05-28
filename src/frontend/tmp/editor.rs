@@ -85,7 +85,6 @@ pub fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: T
             let item_x_offset = 20.0 * application_theme.ui_scale;
             let line = "-----------------------------------------";
             let ref mut switch_name = switch_name.lock().unwrap()[0];
-            //println!("name: {:?}", switch_name);
 
 
             TextBox::new(switch_name)
@@ -170,8 +169,6 @@ pub fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: T
             let mut data: Vec<String> = cloned_ui.frontend_data.switches[switch_id].channel_groups.keys().map(|x| x.clone()).collect();
             data.sort();
 
-            //println!("{:?}", cloned_ui.frontend_data.switches[switch_id].channel_groups);
-
             let mut dropdown_list = Vec::new();
             let mut dropdown_background_list_fixture = Vec::new();
             let mut dropdown_background_list_channel_groups = Vec::new();
@@ -218,7 +215,6 @@ pub fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: T
                             ui.current_edited_channel_group_id = new_idx as i64;
                             ui.send_data();
                         }
-                        //println!("{:?}", ui.frontend_data.switches[switch_id].channel_groups);
                     })
                     .set(EDITOR_SWITCH_DROP_DOWNS + editor_switch_drop_downs_count, conrod_ui);
                     editor_switch_drop_downs_count += 1;

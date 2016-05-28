@@ -145,7 +145,6 @@ pub fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: 
                     if ui.edit_state {
                         current_edited_switch.lock().unwrap()[0] = Some(switch_id);
                         ui.current_edited_switch_name.lock().unwrap()[0] = switch.name.clone();
-                        println!("set to {:?}", switch.name);
                     }
                     else {
                         let new_value = if switch.dimmer_value == 0.0 {255} else {0};
@@ -168,7 +167,6 @@ pub fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: 
                     .label(&"<<".to_string())
                     .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
                     .react(|| {
-                        println!("<<");
                         let next_switch_id = {
                             match last_active_switch_id {
                                 Some(last_active_switch_id) => {
@@ -201,7 +199,6 @@ pub fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: 
                     .label(&label)
                     .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
                     .react(|| {
-                        println!(">");
                         let next_switch_id = {
                             match last_active_switch_id {
                                 Some(last_active_switch_id) => {
@@ -230,7 +227,6 @@ pub fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: 
                     .label(&">>".to_string())
                     .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
                     .react(|| {
-                        println!(">>");
                         let next_switch_id = {
                             match last_active_switch_id {
                                 Some(last_active_switch_id) => {

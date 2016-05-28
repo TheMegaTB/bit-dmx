@@ -86,7 +86,6 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
 
         // Button/Mouse events
         if let Some(button) = event.press_args() {
-            println!("button {:?} pressed", button);
             if ui_locked.waiting_for_keybinding {
                 let switch_id = ui_locked.current_edited_switch_id.lock().unwrap()[0];
                 match switch_id {
@@ -122,7 +121,6 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
             }
         }
         else if let Some(button) = event.release_args() {
-            println!("button {:?} released", button);
             if button == piston_window::Button::Keyboard(piston_window::Key::LShift) {
                 ui_locked.shift_state = false;
             }
@@ -347,7 +345,6 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Them
                     if ui.edit_state {
                         current_edited_switch.lock().unwrap()[0] = Some(switch_id);
                         ui.current_edited_switch_name.lock().unwrap()[0] = switch.name.clone();
-                        println!("set to {:?}", switch.name);
                     }
                     else {
                         let new_value = if switch.dimmer_value == 0.0 {255} else {0};
@@ -370,7 +367,6 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Them
                     .label(&"<<".to_string())
                     .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
                     .react(|| {
-                        println!("<<");
                         let next_switch_id = {
                             match last_active_switch_id {
                                 Some(last_active_switch_id) => {
@@ -403,7 +399,6 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Them
                     .label(&label)
                     .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
                     .react(|| {
-                        println!(">");
                         let next_switch_id = {
                             match last_active_switch_id {
                                 Some(last_active_switch_id) => {
@@ -432,7 +427,6 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Them
                     .label(&">>".to_string())
                     .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
                     .react(|| {
-                        println!(">>");
                         let next_switch_id = {
                             match last_active_switch_id {
                                 Some(last_active_switch_id) => {
@@ -533,7 +527,6 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
             let item_x_offset = 20.0 * application_theme.ui_scale;
             let line = "-----------------------------------------";
             let ref mut switch_name = switch_name.lock().unwrap()[0];
-            //println!("name: {:?}", switch_name);
 
 
             TextBox::new(switch_name)
@@ -623,8 +616,6 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
             let mut data: Vec<String> = cloned_ui.frontend_data.switches[switch_id].channel_groups.keys().map(|x| x.clone()).collect();
             data.sort();
 
-            //println!("{:?}", cloned_ui.frontend_data.switches[switch_id].channel_groups);
-
             let mut dropdown_list = Vec::new();
             let mut dropdown_background_list_fixture = Vec::new();
             let mut dropdown_background_list_channel_groups = Vec::new();
@@ -673,7 +664,6 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
                             ui.current_edited_channel_group_id = new_idx as i64;
                             ui.send_data();
                         }
-                        //println!("{:?}", ui.frontend_data.switches[switch_id].channel_groups);
                     })
                     .set(EDITOR_SWITCH_DROP_DOWNS + editor_switch_drop_downs_count, conrod_ui);
                     editor_switch_drop_downs_count += 1;

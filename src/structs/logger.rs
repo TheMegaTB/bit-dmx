@@ -17,7 +17,6 @@ impl log::Log for SimpleLogger {
     }
 
     fn log(&self, record: &LogRecord) {
-        //println!("level {}", self.level);
         if self.enabled(record.metadata()) {
             // I can probably change colors here
             let path = match self.level {

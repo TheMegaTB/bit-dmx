@@ -97,7 +97,7 @@ impl Parser {
                         let command_type_str = vec_as_str(command_type.clone());
                         let command_content_str = vec_as_str(command_chars.clone());
                         trace!("Got new command of type {} with content {}", command_type_str, command_content_str);
-                        
+
                         if command_type_str == "preheat".to_string() {
                             trace!("PREHEAT WOHOOOO");
                             let cg = channel_groups.pop().expect(&format!("No channel group defined for preheat. ({})", command));
@@ -171,7 +171,6 @@ impl Parser {
         let mut f = File::open(path).unwrap();
         let mut s = String::new();
         f.read_to_string(&mut s).unwrap();
-        //println!("{}", s);
 
         let mut blocks_open = 0;
         let mut fixtures = HashMap::new();
