@@ -14,8 +14,6 @@ pub type DmxAddress = u16;
 pub type DmxValue = u8;
 pub type ChannelGroupValueTuple = (Vec<DmxValue>, (FadeCurve, FadeTime), (FadeCurve, FadeTime));
 pub const FADE_TICKS: FadeTime = 30;
-pub const UI_SCALE: f64 = 0.8;
-pub const BASE_FONT_SIZE: f64 = 16.0;
 
 pub mod git_hash;
 pub use git_hash::*;
