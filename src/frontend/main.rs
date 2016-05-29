@@ -77,6 +77,7 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
     let app_theme = Theme::default();
 
     // Poll events from the window.
+    let mut button_pressed = false;
     while let Some(event) = window.next() {
         let mut ui_locked = ui.lock().unwrap();
 
@@ -121,6 +122,9 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
                     _ => {}
                 }
             }
+            else {
+                button_pressed = true;
+            }
         }
         else if let Some(button) = event.release_args() {
             if button == piston_window::Button::Keyboard(piston_window::Key::LShift) {
@@ -133,13 +137,16 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
 
         //Drawing
         conrod_ui.handle_event(&event);
-        event.update(|_| conrod_ui.set_widgets(|mut conrod_ui| set_widgets(&mut conrod_ui, &mut ui_locked, app_theme.clone(), window.size().width as f64)));
+        event.update(|_| {
+            conrod_ui.set_widgets(|mut conrod_ui| set_widgets(&mut conrod_ui, &mut ui_locked, app_theme.clone(), window.size().width as f64, button_pressed));
+            button_pressed = false;
+        });
         window.draw_2d(&event, |c, g| conrod_ui.draw_if_changed(c, g));
     }
 }
 
 
-fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, window_width: f64) {
+fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, window_width: f64, button_pressed: bool) {
 
     let editor_width = if ui.edit_state {
         (window_width/3.0).min(350.0)
@@ -164,13 +171,14 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, window
           ])
         .set(CANVAS, &mut conrod_ui);
 
+    // println!("{:?}", button_pressed);
     draw_header(conrod_ui, ui, app_theme.clone());
 
     let chasers_usable_width = window_width-editor_width-2.0*app_theme.ui_padding;
-    draw_chasers(conrod_ui, ui, app_theme.clone(), chasers_usable_width);
+    draw_chasers(conrod_ui, ui, app_theme.clone(), chasers_usable_width, button_pressed);
 
     if ui.edit_state {
-        draw_editor(conrod_ui, ui, app_theme.clone(), editor_width);
+        draw_editor(conrod_ui, ui, app_theme.clone(), editor_width, button_pressed);
     }
 }
 
@@ -244,7 +252,7 @@ fn draw_header(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme) {
     }
 }
 
-fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable_width: f64) {
+fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable_width: f64, button_pressed: bool) {
     let tx = ui.tx.clone();
 
     let chasers = {
@@ -291,8 +299,8 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usabl
         let x_pos = x_offset + column*button_width;
         let current_edited_chaser_names = ui.current_edited_chaser_names.clone();
         if ui.edit_state {
-            // let tmp_name = {current_edited_chaser_names.lock().unwrap()[id].clone()};
             let ref mut current_chaser_name = current_edited_chaser_names.lock().unwrap()[id];
+            // let t: u8 = current_chaser_name;
 
             // let ref mut switch_name = switch_name.lock().unwrap()[0];
             TextBox::new(current_chaser_name)
@@ -303,15 +311,24 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usabl
                 .frame(2.0)
                 .frame_color(app_theme.bg_control.plain_contrast())
                 .color(app_theme.bg_control.invert().plain_contrast())
-                .react(|new_name: &mut String| {
-                    let old_name = ui.chasers[id].clone();
-                    ui.frontend_data.rename_chaser(old_name.clone(), new_name.clone());
-                    ui.chasers = ui.chasers.iter().map(|x| if *x == old_name {new_name.clone()} else {x.clone()}).collect();
-                    ui.save_chaser_config();
-                    ui.send_data();
-                })
+                .react(|_: &mut String| {})
+                // .react(|new_name: &mut String| {
+                //     let old_name = ui.chasers[id].clone();
+                //     ui.frontend_data.rename_chaser(old_name.clone(), new_name.clone());
+                //     ui.chasers = ui.chasers.iter().map(|x| if *x == old_name {new_name.clone()} else {x.clone()}).collect();
+                //     ui.save_chaser_config();
+                //     ui.send_data();
+                // })
                 .enabled(true)
                 .set(EDITOR_CHASER_TITLE + id, conrod_ui);
+
+            if button_pressed {
+                let old_name = ui.chasers[id].clone();
+                ui.frontend_data.rename_chaser(old_name.clone(), current_chaser_name.clone());
+                ui.chasers = ui.chasers.iter().map(|x| if *x == old_name {current_chaser_name.clone()} else {x.clone()}).collect();
+                ui.save_chaser_config();
+                ui.send_data();
+            }
         }
         else {
             Text::new(name)
@@ -496,7 +513,7 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usabl
     }
 }
 
-fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable_width: f64) {
+fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable_width: f64, button_pressed: bool) {
     Text::new("Editor")
         .top_left_of(EDITOR_COLUMN)
         .font_size((22.0 * app_theme.ui_scale) as u32)
@@ -529,12 +546,17 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                 .frame(2.0)
                 .frame_color(app_theme.bg_editor.plain_contrast())
                 .color(app_theme.bg_editor.invert().plain_contrast())
-                .react(|new_name: &mut String| {
-                    ui.frontend_data.switches[switch_id].name = new_name.clone();
-                    ui.send_data();
-                })
+                .react(|_: &mut String| {})
+                // .react(|new_name: &mut String| {
+                //     ui.frontend_data.switches[switch_id].name = new_name.clone();
+                //     ui.send_data();
+                // })
                 .enabled(true)
                 .set(EDITOR_CONTENT, conrod_ui);
+            if button_pressed {
+                ui.frontend_data.switches[switch_id].name = switch_name.clone();
+                ui.send_data();
+            }
 
             NumberDialer::new(time as f32, 0.0, 99999.0, 0)
                 .w_h(item_width, item_height)
@@ -733,12 +755,18 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                                 .frame(2.0)
                                 .frame_color(app_theme.bg_editor.plain_contrast())
                                 .color(app_theme.bg_editor.invert().plain_contrast())
-                                .react(|new_name: &mut String| {
-                                    ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().curve_in = FadeCurve::Custom(new_name.clone());
-                                    ui.send_data();
-                                })
+                                .react(|_: &mut String| {})
+                                // .react(|new_name: &mut String| {
+                                //     ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().curve_in = FadeCurve::Custom(new_name.clone());
+                                //     ui.send_data();
+                                // })
                                 .enabled(true)
                                 .set(EDITOR_CURVE_STRING1, conrod_ui);
+
+                            if button_pressed {
+                                ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().curve_in = FadeCurve::Custom(curve_string.clone());
+                                ui.send_data();
+                            }
                         }
 
                         NumberDialer::new(data.time_in as f32, 0.0, 99999.0, 0)
@@ -784,12 +812,17 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                                 .frame(2.0)
                                 .frame_color(app_theme.bg_editor.plain_contrast())
                                 .color(app_theme.bg_editor.invert().plain_contrast())
-                                .react(|new_name: &mut String| {
-                                    ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().curve_out = FadeCurve::Custom(new_name.clone());
-                                    ui.send_data();
-                                })
+                                .react(|_: &mut String| {})
+                                // .react(|new_name: &mut String| {
+                                //     ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().curve_out = FadeCurve::Custom(new_name.clone());
+                                //     ui.send_data();
+                                // })
                                 .enabled(true)
                                 .set(EDITOR_CURVE_STRING2, conrod_ui);
+                            if button_pressed {
+                                ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().curve_out = FadeCurve::Custom(curve_string.clone());
+                                ui.send_data();
+                            }
                         }
 
                         NumberDialer::new(data.time_out as f32, 0.0, 99999.0, 0)
