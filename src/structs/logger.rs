@@ -1,4 +1,4 @@
-use log::{LogRecord, LogLevel, LogMetadata, SetLoggerError, set_logger, self};
+use log::{LogRecord, LogLevel, LogLocation, LogMetadata, SetLoggerError, set_logger, self};
 use std::env;
 use std::str::FromStr;
 pub use ansi_term::*;
@@ -8,7 +8,14 @@ use DmxValue;
 
 struct SimpleLogger {
     level: LogLevel,
+    show_gfx_log: bool,
     show_paths: bool
+}
+
+impl SimpleLogger {
+    fn is_gfx_log(&self, location: &LogLocation) -> bool {
+        location.module_path().find("gfx_device_gl").is_some()
+    }
 }
 
 impl log::Log for SimpleLogger {
@@ -17,8 +24,7 @@ impl log::Log for SimpleLogger {
     }
 
     fn log(&self, record: &LogRecord) {
-        if self.enabled(record.metadata()) {
-            // I can probably change colors here
+        if self.enabled(record.metadata()) && (!self.is_gfx_log(record.location()) || record.level() <= LogLevel::Warn || self.show_gfx_log) {
             let path = match self.level {
                 LogLevel::Trace => {
                     let loc = record.location();
@@ -62,9 +68,14 @@ pub fn init_logger() -> Result<(), SetLoggerError> {
             Ok(val) => val == String::from("true"),
             Err(_) => false
         };
+        let show_gfx_log = match env::var("GFX_LOG") {
+            Ok(val) => val == String::from("true"),
+            Err(_) => false
+        };
         max_log_level.set(level.to_log_level_filter());
         Box::new(SimpleLogger {
             level: level,
+            show_gfx_log: show_gfx_log,
             show_paths: show_paths
         })
     })
@@ -74,10 +85,3 @@ pub fn fake_if_print(channel: DmxAddress, value: DmxValue) {
     let prefix = Colour::Fixed(14).bold().paint("   Interface");
     println!("{} C{} -> V{}", prefix, channel, value);
 }
-
-// #[macro_export]
-// macro_rules! fake_if {
-//     ($channel:expr, $value:expr) => {
-//         fake_if_print($channel, $value);
-//     };
-// }
