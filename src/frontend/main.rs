@@ -27,6 +27,8 @@ use conrod::{
 };
 use piston_window::{ UpdateEvent, PressEvent, ReleaseEvent, Window };
 
+mod colors;
+
 mod ui;
 use ui::UI;
 
@@ -72,7 +74,7 @@ widget_ids! {
 fn create_output_window(ui: Arc<Mutex<UI>>) {
     let (mut window, mut conrod_ui) = create_window("Sushi Reloaded!".to_string(), (1100, 560), 30, false);
 
-    let application_theme = Theme::default();
+    let app_theme = Theme::default();
 
     // Poll events from the window.
     while let Some(event) = window.next() {
@@ -131,13 +133,13 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
 
         //Drawing
         conrod_ui.handle_event(&event);
-        event.update(|_| conrod_ui.set_widgets(|mut conrod_ui| set_widgets(&mut conrod_ui, &mut ui_locked, application_theme.clone(), window.size().width as f64)));
+        event.update(|_| conrod_ui.set_widgets(|mut conrod_ui| set_widgets(&mut conrod_ui, &mut ui_locked, app_theme.clone(), window.size().width as f64)));
         window.draw_2d(&event, |c, g| conrod_ui.draw_if_changed(c, g));
     }
 }
 
 
-fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme, window_width: f64) {
+fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, window_width: f64) {
 
     let editor_width = if ui.edit_state {
         (window_width/3.0).min(350.0)
@@ -146,13 +148,13 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
         0.0
     };
 
-    let header = Canvas::new().color(color::BLUE).pad(application_theme.ui_padding).length(100.0 * application_theme.ui_scale);
-    let control_column = Canvas::new().color(color::LIGHT_ORANGE).scroll_kids().pad(application_theme.ui_padding);
-    let editor_column = Canvas::new().color(color::ORANGE).scroll_kids().pad(application_theme.ui_padding).length(editor_width);
+    let header = Canvas::new().color(app_theme.bg_header).pad(app_theme.ui_padding).length(100.0 * app_theme.ui_scale);
+    let control_column = Canvas::new().color(app_theme.bg_control).scroll_kids().pad(app_theme.ui_padding);
+    let editor_column = Canvas::new().color(app_theme.bg_editor).scroll_kids().pad(app_theme.ui_padding).length(editor_width);
 
     Canvas::new()
         .frame(1.0)
-        .color(application_theme.bg_color)
+        .color(app_theme.bg_header)
         .flow_down(&[
              (HEADER, header),
              (BODY, Canvas::new().flow_right(&[
@@ -162,52 +164,52 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
           ])
         .set(CANVAS, &mut conrod_ui);
 
-    draw_header(conrod_ui, ui, application_theme.clone());
+    draw_header(conrod_ui, ui, app_theme.clone());
 
-    let chasers_usable_width = window_width-editor_width-2.0*application_theme.ui_padding;
-    draw_chasers(conrod_ui, ui, application_theme.clone(), chasers_usable_width);
+    let chasers_usable_width = window_width-editor_width-2.0*app_theme.ui_padding;
+    draw_chasers(conrod_ui, ui, app_theme.clone(), chasers_usable_width);
 
     if ui.edit_state {
-        draw_editor(conrod_ui, ui, application_theme.clone(), editor_width);
+        draw_editor(conrod_ui, ui, app_theme.clone(), editor_width);
     }
 }
 
-fn draw_header(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme) {
+fn draw_header(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme) {
     Text::new("Moonshadow 2016!")
         .top_left_of(HEADER)
-        .font_size((32.0 * application_theme.ui_scale) as u32)
-        .color(application_theme.bg_color.plain_contrast())
+        .font_size((32.0 * app_theme.ui_scale) as u32)
+        .color(app_theme.bg_header.plain_contrast())
         .set(TITLE, conrod_ui);
 
     let connected = ui.watchdog.is_alive();
     let label = if connected { "Connected".to_string() } else { "Disconnected".to_string() };
     Button::new()
-        .w_h(140.0 * application_theme.ui_scale, 35.0 * application_theme.ui_scale)
-        .down_from(TITLE, 7.0 * application_theme.ui_scale)
+        .w_h(140.0 * app_theme.ui_scale, 35.0 * app_theme.ui_scale)
+        .down_from(TITLE, 7.0 * app_theme.ui_scale)
         .frame(1.0)
         .label(&label)
-        .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
+        .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
         .and(|b| {
             if connected {
-                b.rgb(0.1, 0.9, 0.1)
+                b.color(app_theme.switch_on_color)
             } else {
-                b.rgb(0.9, 0.1, 0.1)
+                b.color(app_theme.switch_off_color)
             }
         })
         .react(|| {})
         .set(CONNECTED_BUTTON, conrod_ui);
 
     Button::new()
-        .w_h(140.0 * application_theme.ui_scale, 35.0 * application_theme.ui_scale)
-        .right_from(CONNECTED_BUTTON, 5.0 * application_theme.ui_scale)
+        .w_h(140.0 * app_theme.ui_scale, 35.0 * app_theme.ui_scale)
+        .right_from(CONNECTED_BUTTON, 5.0 * app_theme.ui_scale)
         .frame(1.0)
         .label(&"Edit Mode".to_string())
-        .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
+        .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
         .and(|b| {
             if ui.edit_state {
-                b.rgb(0.1, 0.9, 0.1)
+                b.color(app_theme.switch_on_color)
             } else {
-                b.rgb(0.9, 0.1, 0.1)
+                b.color(app_theme.switch_off_color)
             }
         })
         .react(|| {
@@ -225,18 +227,12 @@ fn draw_header(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
 
     if ui.edit_state {
         Button::new()
-            .w_h(140.0 * application_theme.ui_scale, 35.0 * application_theme.ui_scale)
-            .right_from(EDITOR_BUTTON, 5.0 * application_theme.ui_scale)
+            .w_h(140.0 * app_theme.ui_scale, 35.0 * app_theme.ui_scale)
+            .right_from(EDITOR_BUTTON, 5.0 * app_theme.ui_scale)
             .frame(1.0)
             .label(&"Add Chaser".to_string())
-            .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
-            .and(|b| {
-                if ui.edit_state {
-                    b.rgb(0.1, 0.9, 0.1)
-                } else {
-                    b.rgb(0.9, 0.1, 0.1)
-                }
-            })
+            .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
+            .color(app_theme.switch_on_color)
             .react(|| {
                 let name = ui.frontend_data.add_chaser();
                 ui.chasers.push(name);
@@ -248,7 +244,7 @@ fn draw_header(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
     }
 }
 
-fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme, usable_width: f64) {
+fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable_width: f64) {
     let tx = ui.tx.clone();
 
     let chasers = {
@@ -266,20 +262,20 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Them
         .w_h(TEXT_BLOCK_WIDTH, 20.0)
         .align_text_left()
         .top_left_of(CHASER_COLUMN)
-        .font_size((22.0 * application_theme.ui_scale) as u32)
-        .color(application_theme.bg_color.plain_contrast())
+        .font_size((22.0 * app_theme.ui_scale) as u32)
+        .color(app_theme.bg_control.plain_contrast())
         .set(CHASER_TITLE, conrod_ui);
 
-    let original_button_width = 200.0 * application_theme.ui_scale;
+    let original_button_width = 200.0 * app_theme.ui_scale;
     let chasers_per_row = max((usable_width/original_button_width) as u8, 1);
     let button_width = usable_width/chasers_per_row as f64;
-    let button_height = 50.0 * application_theme.ui_scale;
+    let button_height = 50.0 * app_theme.ui_scale;
     let mut current_button_id = BUTTON;
 
     let mut next_y_offset = 0f64;
     let x_offset = button_width/2.0 - TEXT_BLOCK_WIDTH/2.0;
     let mut column = 0.0;
-    let mut y_offset = -50.0 * application_theme.ui_scale;
+    let mut y_offset = -50.0 * app_theme.ui_scale;
 
     let cloned_ui = ui.clone();
 
@@ -300,13 +296,13 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Them
 
             // let ref mut switch_name = switch_name.lock().unwrap()[0];
             TextBox::new(current_chaser_name)
-                .font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
+                .font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                 .xy_relative_to(CHASER_TITLE, [x_pos, y_offset])
                 // .xy([0.0, 0.0])
                 .w_h(button_width, button_height)
                 .frame(2.0)
-                .frame_color(application_theme.bg_color.invert().plain_contrast())
-                .color(application_theme.bg_color.plain_contrast())
+                .frame_color(app_theme.bg_control.plain_contrast())
+                .color(app_theme.bg_control.invert().plain_contrast())
                 .react(|new_name: &mut String| {
                     let old_name = ui.chasers[id].clone();
                     ui.frontend_data.rename_chaser(old_name.clone(), new_name.clone());
@@ -320,13 +316,13 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Them
         else {
             Text::new(name)
                 .xy_relative_to(CHASER_TITLE, [x_pos, y_offset])
-                .font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
-                .color(application_theme.bg_color.plain_contrast())
+                .font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
+                .color(app_theme.bg_control.plain_contrast())
                 .set(CONTROL_CHASER_TITLE + id, conrod_ui);
         }
 
         for (switch_id_in_chaser, (switch_id, switch)) in chaser.switches.iter().map(|&switch_id| (switch_id, &ui.frontend_data.switches[switch_id])).enumerate() {
-            let y_pos = y_offset - 50.0 * application_theme.ui_scale - switch_id_in_chaser as f64*button_height;
+            let y_pos = y_offset - 50.0 * app_theme.ui_scale - switch_id_in_chaser as f64*button_height;
             let current_edited_switch = ui.current_edited_switch_id.clone();
 
             let label = match switch.get_keybinding_as_text() {
@@ -339,14 +335,14 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Them
                 .and(|b| {
                     if switch.dimmer_value != 0.0 {
                         last_active_switch_id = Some(switch_id_in_chaser);
-                        b.rgb(0.1, 0.9, 0.1)
+                        b.color(app_theme.switch_on_color)
                     } else {
-                        b.rgb(0.9, 0.1, 0.1)
+                        b.color(app_theme.switch_off_color)
                     }
                 })
                 .frame(1.0)
                 .label(&label)
-                .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
+                .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                 .react(|| {
                     if ui.edit_state {
                         current_edited_switch.lock().unwrap()[0] = Some(switch_id);
@@ -363,7 +359,7 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Them
                 .set(current_button_id, conrod_ui);
                 current_button_id = current_button_id + 1;
         }
-        let mut y_pos = y_offset - 50.0 * application_theme.ui_scale - (chaser.switches.len() as f64 - 0.25)*button_height;
+        let mut y_pos = y_offset - 50.0 * app_theme.ui_scale - (chaser.switches.len() as f64 - 0.25)*button_height;
         if !ui.edit_state {
             {
                 let tx = tx.clone();
@@ -371,10 +367,10 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Them
                 Button::new()
                     .w_h(button_width/3.0, button_height/2.0)
                     .xy_relative_to(CHASER_TITLE, [x_pos - button_width/3.0, y_pos])
-                    .rgb(0.9, 0.9, 0.1)
+                    .color(app_theme.chaser_control_color)
                     .frame(1.0)
                     .label(&"<<".to_string())
-                    .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
+                    .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                     .react(|| {
                         let next_switch_id = {
                             match last_active_switch_id {
@@ -403,10 +399,10 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Them
                 Button::new()
                     .w_h(button_width/3.0, button_height/2.0)
                     .xy_relative_to(CHASER_TITLE, [x_pos, y_pos])
-                    .rgb(r, 0.9, 0.1)
+                    .color(app_theme.chaser_control_color)
                     .frame(1.0)
                     .label(&label)
-                    .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
+                    .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                     .react(|| {
                         let next_switch_id = {
                             match last_active_switch_id {
@@ -430,10 +426,10 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Them
                 Button::new()
                     .w_h(button_width/3.0, button_height/2.0)
                     .xy_relative_to(CHASER_TITLE, [x_pos + button_width/3.0, y_pos])
-                    .rgb(0.9, 0.9, 0.1)
+                    .color(app_theme.chaser_control_color)
                     .frame(1.0)
                     .label(&">>".to_string())
-                    .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
+                    .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                     .react(|| {
                         let next_switch_id = {
                             match last_active_switch_id {
@@ -454,10 +450,10 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Them
             Button::new()
                 .w_h(button_width, button_height/2.0)
                 .xy_relative_to(CHASER_TITLE, [x_pos, y_pos])
-                .rgb(0.9, 0.9, 0.1)
+                .color(app_theme.add_button_color)
                 .frame(1.0)
                 .label(&"Add".to_string())
-                .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
+                .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                 .react(|| {
                     let switch_id = ui.frontend_data.add_switch(JsonSwitch::new("Untitled".to_string(), name.clone()));
                     ui.current_edited_switch_id.lock().unwrap()[0] = Some(switch_id);
@@ -472,10 +468,10 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Them
             Button::new()
                     .w_h(button_width, button_height/2.0)
                     .xy_relative_to(CHASER_TITLE, [x_pos, y_pos - button_height/2.0])
-                    .rgb(0.9, 0.1, 0.1)
+                    .color(app_theme.remove_button_color)
                     .frame(1.0)
                     .label(&"Delete".to_string())
-                    .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
+                    .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                     .react(|| {
                         ui.frontend_data.delete_chaser(name.clone());
                         ui.chasers.retain(|x| x != name);
@@ -500,11 +496,11 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Them
     }
 }
 
-fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme, usable_width: f64) {
+fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable_width: f64) {
     Text::new("Editor")
         .top_left_of(EDITOR_COLUMN)
-        .font_size((22.0 * application_theme.ui_scale) as u32)
-        .color(application_theme.bg_color.plain_contrast())
+        .font_size((22.0 * app_theme.ui_scale) as u32)
+        .color(app_theme.bg_editor.plain_contrast())
         .set(EDITOR_TITLE, conrod_ui);
 
 
@@ -518,21 +514,21 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
         Some(switch_id) => {
 
             let time = ui.frontend_data.switches[switch_id].before_chaser;
-            let item_width = usable_width * application_theme.ui_scale;
-            let item_height = usable_width/8.0 * application_theme.ui_scale;//40.0
-            let item_x_offset = 20.0 * application_theme.ui_scale;
+            let item_width = usable_width * app_theme.ui_scale;
+            let item_height = usable_width/8.0 * app_theme.ui_scale;//40.0
+            let item_x_offset = 20.0 * app_theme.ui_scale;
             let line = "-----------------------------------------";
             let ref mut switch_name = switch_name.lock().unwrap()[0];
 
 
             TextBox::new(switch_name)
-                .font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
-                .down(20.0 * application_theme.ui_scale)
+                .font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
+                .down(20.0 * app_theme.ui_scale)
                 .align_left_of(EDITOR_TITLE)
                 .w_h(item_width, item_height)
                 .frame(2.0)
-                .frame_color(application_theme.bg_color.invert().plain_contrast())
-                .color(application_theme.bg_color.plain_contrast())
+                .frame_color(app_theme.bg_editor.plain_contrast())
+                .color(app_theme.bg_editor.invert().plain_contrast())
                 .react(|new_name: &mut String| {
                     ui.frontend_data.switches[switch_id].name = new_name.clone();
                     ui.send_data();
@@ -542,13 +538,13 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
 
             NumberDialer::new(time as f32, 0.0, 99999.0, 0)
                 .w_h(item_width, item_height)
-                .down(20.0 * application_theme.ui_scale)
+                .down(20.0 * app_theme.ui_scale)
                 .align_left_of(EDITOR_TITLE)
-                .rgb(0.5, 0.3, 0.6)
+                .color(app_theme.number_dialer_color)
                 .frame(2.0)
                 .label(&"Chaser time (ms)".to_string())
-                .label_color(color::WHITE)
-                .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
+                .label_color(app_theme.font_color)
+                .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                 .react(|new_time: f32| {
                     ui.frontend_data.switches[switch_id].before_chaser = new_time as FadeTime;
                     ui.send_data();
@@ -573,24 +569,24 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
 
 
             Button::new()
-            .w_h(item_width, item_height)
-            .down(20.0 * application_theme.ui_scale)
-            .align_left_of(EDITOR_TITLE)
-            .rgb(0.9, 0.9, 0.1)
-            .frame(1.0)
-            .label(&label)
-            .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
-            .react(|| {
-                ui.waiting_for_keybinding = true;
-            })
-            .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
-            editor_switch_button_count += 1;
+                .w_h(item_width, item_height)
+                .down(20.0 * app_theme.ui_scale)
+                .align_left_of(EDITOR_TITLE)
+                .color(app_theme.chaser_control_color)
+                .frame(1.0)
+                .label(&label)
+                .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
+                .react(|| {
+                    ui.waiting_for_keybinding = true;
+                })
+                .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
+                editor_switch_button_count += 1;
 
             Text::new(line)
-            .down(20.0 * application_theme.ui_scale)
+            .down(20.0 * app_theme.ui_scale)
             .align_left_of(EDITOR_TITLE)
-                .font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
-                .color(application_theme.bg_color.plain_contrast())
+                .font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
+                .color(app_theme.bg_editor.plain_contrast())
                 .set(EDITOR_SWITCH_TEXT + editor_switch_text_count, conrod_ui);
             editor_switch_text_count += 1;
 
@@ -635,13 +631,13 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
 
                 DropDownList::new(&mut dropdown_list, &mut Some(dropdown_index))
                     .w_h(item_width-item_height, item_height)
-                    .down(20.0 * application_theme.ui_scale)
+                    .down(20.0 * app_theme.ui_scale)
                     .align_left_of(EDITOR_TITLE)
-                    .rgb(0.5, 0.3, 0.6)
+                    .color(app_theme.drop_down_list_color)
                     .frame(2.0)
                     .label(&cloned_ui.frontend_data.fixtures[fixture_id].name.clone())
-                    .label_color(color::WHITE)
-                    .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
+                    .label_color(app_theme.font_color)
+                    .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                     .react(|_: &mut Option<usize>, new_idx, _: &str| {
                         if ui.frontend_data.change_channel_group(switch_id, id_string.clone(), dropdown_background_list_fixture[new_idx], dropdown_background_list_channel_groups[new_idx]) {
                             ui.current_edited_channel_group_id = new_idx as i64;
@@ -661,10 +657,10 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
                 Button::new()
                     .w_h(item_height, item_height)
                     .right(0.0)
-                    .rgb(0.9, 0.9, 0.1)
+                    .color(app_theme.chaser_control_color)
                     .frame(1.0)
                     .label(&label)
-                    .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
+                    .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                     .react(|| {
                         if dropdown_index as i64 == ui.current_edited_channel_group_id {
                             ui.current_edited_channel_group_id = -1;
@@ -689,13 +685,13 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
                         };
                         Slider::new(value as f32, 0.0, 255.0)
                             .w_h(item_width - item_x_offset, item_height)
-                            .down(20.0 * application_theme.ui_scale)
+                            .down(20.0 * app_theme.ui_scale)
                             .align_right_of(EDITOR_CONTENT)
-                            .rgb(0.5, 0.3, 0.6)
+                            .color(app_theme.slider_color)
                             .frame(2.0)
                             .label(&label)
-                            .label_color(color::WHITE)
-                            .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
+                            .label_color(app_theme.font_color)
+                            .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                             .react(|new_value: f32| {
                                 ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().values[index] = new_value as u8;
                                 ui.send_data();
@@ -712,13 +708,13 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
                         let fade_curve_id = data.curve_in.get_id();
                         DropDownList::new(&mut fade_curve_list, &mut Some(fade_curve_id))
                             .w_h(item_width - item_x_offset, item_height)
-                            .down(20.0 * application_theme.ui_scale)
+                            .down(20.0 * app_theme.ui_scale)
                             .align_right_of(EDITOR_CONTENT)
-                            .rgb(0.5, 0.3, 0.6)
+                            .color(app_theme.drop_down_list_color)
                             .frame(2.0)
                             .label(&cloned_ui.frontend_data.fixtures[fixture_id].name.clone())
-                            .label_color(color::WHITE)
-                            .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
+                            .label_color(app_theme.font_color)
+                            .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                             .react(|_: &mut Option<usize>, new_idx, _: &str| {
                                 ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().curve_in = FadeCurve::get_by_id(new_idx, "x".to_string());
                                 ui.send_data();
@@ -731,12 +727,12 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
 
                             TextBox::new(curve_string)
                                 .w_h(item_width - item_x_offset, item_height)
-                                .down(20.0 * application_theme.ui_scale)
+                                .down(20.0 * app_theme.ui_scale)
                                 .align_right_of(EDITOR_CONTENT)
-                                .font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
+                                .font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                                 .frame(2.0)
-                                .frame_color(application_theme.bg_color.invert().plain_contrast())
-                                .color(application_theme.bg_color.plain_contrast())
+                                .frame_color(app_theme.bg_editor.plain_contrast())
+                                .color(app_theme.bg_editor.invert().plain_contrast())
                                 .react(|new_name: &mut String| {
                                     ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().curve_in = FadeCurve::Custom(new_name.clone());
                                     ui.send_data();
@@ -747,13 +743,13 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
 
                         NumberDialer::new(data.time_in as f32, 0.0, 99999.0, 0)
                             .w_h(item_width - item_x_offset, item_height)
-                            .down(20.0 * application_theme.ui_scale)
+                            .down(20.0 * app_theme.ui_scale)
                             .align_right_of(EDITOR_CONTENT)
-                            .rgb(0.5, 0.3, 0.6)
+                            .color(app_theme.number_dialer_color)
                             .frame(2.0)
                             .label(&"Time in".to_string())
-                            .label_color(color::WHITE)
-                            .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
+                            .label_color(app_theme.font_color)
+                            .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                             .react(|new_value: f32| {
                                 ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().time_in = new_value as FadeTime;
                                 ui.send_data();
@@ -764,13 +760,13 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
                         let fade_curve_id = data.curve_out.get_id();
                         DropDownList::new(&mut fade_curve_list, &mut Some(fade_curve_id))
                             .w_h(item_width - item_x_offset, item_height)
-                            .down(20.0 * application_theme.ui_scale)
+                            .down(20.0 * app_theme.ui_scale)
                             .align_right_of(EDITOR_CONTENT)
-                            .rgb(0.5, 0.3, 0.6)
+                            .color(app_theme.drop_down_list_color)
                             .frame(2.0)
                             .label(&cloned_ui.frontend_data.fixtures[fixture_id].name.clone())
-                            .label_color(color::WHITE)
-                            .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
+                            .label_color(app_theme.font_color)
+                            .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                             .react(|_: &mut Option<usize>, new_idx, _: &str| {
                                 ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().curve_out = FadeCurve::get_by_id(new_idx, "x".to_string());
                                 ui.send_data();
@@ -783,11 +779,11 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
 
                             TextBox::new(curve_string)
                                 .w_h(item_width - item_x_offset, item_height)
-                                .down(20.0 * application_theme.ui_scale)
+                                .down(20.0 * app_theme.ui_scale)
                                 .align_right_of(EDITOR_CONTENT)
                                 .frame(2.0)
-                                .frame_color(application_theme.bg_color.invert().plain_contrast())
-                                .color(application_theme.bg_color.plain_contrast())
+                                .frame_color(app_theme.bg_editor.plain_contrast())
+                                .color(app_theme.bg_editor.invert().plain_contrast())
                                 .react(|new_name: &mut String| {
                                     ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().curve_out = FadeCurve::Custom(new_name.clone());
                                     ui.send_data();
@@ -798,13 +794,13 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
 
                         NumberDialer::new(data.time_out as f32, 0.0, 99999.0, 0)
                             .w_h(item_width - item_x_offset, item_height)
-                            .down(20.0 * application_theme.ui_scale)
+                            .down(20.0 * app_theme.ui_scale)
                             .align_right_of(EDITOR_CONTENT)
-                            .rgb(0.5, 0.3, 0.6)
+                            .color(app_theme.number_dialer_color)
                             .frame(2.0)
                             .label(&"Time out".to_string())
-                            .label_color(color::WHITE)
-                            .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
+                            .label_color(app_theme.font_color)
+                            .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                             .react(|new_value: f32| {
                                 ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().time_out = new_value as FadeTime;
                                 ui.send_data();
@@ -815,12 +811,12 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
 
                     Button::new()
                         .w_h(item_width - item_x_offset, item_height)
-                        .down(20.0 * application_theme.ui_scale)
-                        .align_left_of(EDITOR_TITLE)
-                        .rgb(0.9, 0.1, 0.1)
+                        .down(20.0 * app_theme.ui_scale)
+                        .align_right_of(EDITOR_CONTENT)
+                        .color(app_theme.remove_button_color)
                         .frame(1.0)
                         .label("Delete")
-                        .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
+                        .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                         .react(|| {
                             ui.frontend_data.remove_channel_group(switch_id, id_string.clone());
                             ui.send_data();
@@ -831,12 +827,12 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
             }
             Button::new()
                 .w_h(item_width, item_height)
-                .down(20.0 * application_theme.ui_scale)
+                .down(20.0 * app_theme.ui_scale)
                 .align_left_of(EDITOR_TITLE)
-                .rgb(0.1, 0.9, 0.1)
+                .color(app_theme.add_button_color)
                 .frame(1.0)
                 .label("Add")
-                .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
+                .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                 .react(|| {
                     ui.frontend_data.add_channel_group(switch_id);
                     ui.send_data();
@@ -846,12 +842,12 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
 
             Button::new()
                 .w_h(item_width, item_height)
-                .down(20.0 * application_theme.ui_scale)
+                .down(20.0 * app_theme.ui_scale)
                 .align_left_of(EDITOR_TITLE)
-                .rgb(0.9, 0.1, 0.1)
+                .color(app_theme.remove_button_color)
                 .frame(1.0)
                 .label("Delete")
-                .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
+                .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                 .react(|| {
                     ui.frontend_data.remove_switch_with_id(switch_id);
                     ui.current_edited_switch_id.lock().unwrap()[0] = None;
@@ -861,10 +857,10 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
         }
         None => {
             Text::new("No switch selected")
-                .down(20.0 * application_theme.ui_scale)
+                .down(20.0 * app_theme.ui_scale)
                 .align_left_of(EDITOR_TITLE)
-                .font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
-                .color(application_theme.bg_color.plain_contrast())
+                .font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
+                .color(app_theme.font_color.plain_contrast())
                 .set(EDITOR_INFO, conrod_ui);
         }
     }
