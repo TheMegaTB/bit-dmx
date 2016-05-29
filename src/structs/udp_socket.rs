@@ -102,8 +102,8 @@ impl UDPSocket {
         thread::Builder::new().name("WatchDog-Server".to_string()).spawn(move|| {
             let payload = VERSION.to_string() + &GIT_HASH.to_string();
             loop {
-                sock.send_to(payload.as_bytes(), target_addr).unwrap();
                 sleep(Duration::from_secs(WATCHDOG_TTL));
+                sock.send_to(payload.as_bytes(), target_addr).unwrap();
             }
         }).unwrap();
     }

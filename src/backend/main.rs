@@ -51,7 +51,7 @@ fn main() {
         }
     }
 
-   let mut socket = UDPSocket::new();
+    let mut socket = UDPSocket::new();
     socket.start_watchdog_server();
     let server = socket.start_backend_server();
 

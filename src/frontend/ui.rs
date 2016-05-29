@@ -44,7 +44,7 @@ impl UI {
                     if watchdog.is_alive() {
                         frontend_client.send(data.as_slice(), SocketAddr::new(watchdog.get_server_addr().unwrap(), 8001));
                     } else {
-                        warn!("Could not send data. No server available");
+                        warn!("Could not send data since no server is available");
                     }
                 }
             });
@@ -115,10 +115,9 @@ impl UI {
                 let buf = socket.receive().0;
                 let mut ui_locked = ui.lock().unwrap();
 
-                if buf == [255, 255, 255, 255] {
-                    ui_locked.fetch_data();
-                }
-                else {
+                // if buf == [255, 255, 255, 255] {
+                //     ui_locked.fetch_data();
+                // } else {
                     let address_type:u8 = buf[0] & 127;
                     let address: u16 = ((buf[1] as u16) << 8) + (buf[2] as u16);
                     let value: u8 = buf[3];
@@ -139,7 +138,7 @@ impl UI {
 
                         chaser.current_thread = value != 0;
                     }
-                }
+                // }
                 trace!("{:?}", buf);
             }
         });
@@ -201,12 +200,12 @@ impl UI {
                     true
                 }
                 Err(_) => {
-                    warn!("Error while connecting");
+                    warn!("Error while connecting to TCP socket.");
                     false
                 }
             }
         } else {
-            warn!("No server ip");
+            warn!("No server ip available. Even though we received a watchdog signal.");
             false
         }
     }
@@ -226,7 +225,7 @@ impl UI {
             }
         }
         else {
-            warn!("No server ip");
+            warn!("No server available to send data to.");
             false
         }
     }
