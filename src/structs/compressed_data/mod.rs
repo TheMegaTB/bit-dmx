@@ -7,7 +7,7 @@ use std::fs::{File, self};
 use std::path::PathBuf;
 use std::error::Error;
 
-pub fn decompress_assets() -> PathBuf {
+fn decompress_assets() -> PathBuf {
     let mut binary_data: Vec<u8> = Vec::new(); binary_data.extend_from_slice(include_bytes!("assets.bin"));
     let mut binary_data_slice = binary_data.as_slice();
     let mut d = ZlibDecoder::new(&mut binary_data_slice);
@@ -31,4 +31,11 @@ pub fn decompress_assets() -> PathBuf {
         }
     }
     tmp.join("assets/")
+}
+
+pub fn get_assets_path() -> PathBuf {
+    let mut tmp = env::temp_dir();
+    tmp.push("BitDMX/assets");
+    if !tmp.is_dir() { decompress_assets(); }
+    tmp
 }

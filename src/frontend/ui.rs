@@ -79,7 +79,7 @@ impl UI {
         ui
     }
 
-    pub fn get_chaser_config_path(&self) -> PathBuf {
+    pub fn get_chaser_config_path(&self) -> PathBuf { //TODO: Change this to a app-specific path (appdata or such)
         let assets = find_folder::Search::KidsThenParents(3, 5)
             .for_folder("assets").unwrap();
         assets.join(self.frontend_data.name.clone()  + ".local_dmx")

@@ -2,6 +2,7 @@ use piston_window::{ EventLoop, OpenGL, Glyphs, PistonWindow, WindowSettings, se
 use find_folder;
 use std::any::Any;
 use conrod::{Theme, self};
+use structures::get_assets_path;
 
 pub type Backend = (<piston_window::G2d<'static> as conrod::Graphics>::Texture, Glyphs);
 pub type Ui = conrod::Ui<Backend>;
@@ -18,8 +19,7 @@ pub fn create_window(title: String, size: (u32, u32), ups: u64, esc: bool) -> (P
                                     .opengl(OPEN_GL).exit_on_esc(esc).vsync(true).build().unwrap();
 
     let conrod_ui = {
-        let assets = find_folder::Search::KidsThenParents(3, 5)
-            .for_folder("assets").unwrap();
+        let assets = get_assets_path();
         let font_path = assets.join("fonts/NotoSans/NotoSans-Regular.ttf");
         let theme = Theme::default();
         let glyph_cache = Glyphs::new(&font_path, window.factory.clone());

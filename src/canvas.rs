@@ -27,8 +27,7 @@ fn main() {
 
     // construct our `Ui`.
     let mut ui = {
-        let assets = find_folder::Search::ParentsThenKids(3, 3)
-            .for_folder("assets").unwrap();
+        let assets = get_assets_path();
         let font_path = assets.join("fonts/NotoSans/NotoSans-Regular.ttf");
         let theme = Theme::default();
         let glyph_cache = Glyphs::new(&font_path, window.factory.clone());

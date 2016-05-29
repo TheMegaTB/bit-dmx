@@ -166,7 +166,7 @@ impl Parser {
         let stage_tag = "Stage".to_string();
 
         let assets = find_folder::Search::KidsThenParents(3, 5)
-            .for_folder("assets").unwrap();
+            .for_folder("assets").unwrap(); //TODO: Change this to a application specific path (e.g. appdata)
         let path = assets.join("fixtures.dmx");
         let mut f = File::open(path).unwrap();
         let mut s = String::new();
