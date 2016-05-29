@@ -48,7 +48,7 @@ impl Channel {
     pub fn stop_fade(&mut self) {
         match self.current_thread {
             Some(ref tx) => {
-                if tx.send(()).is_ok() {trace!("fade killed")}
+                if tx.send(()).is_ok() {trace!("Killed ongoing fade on channel {}", self.address)}
             },
             None => {}
         }

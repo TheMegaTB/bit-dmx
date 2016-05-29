@@ -20,7 +20,7 @@ impl FrontendChaser {
         }
     }
     pub fn remove_switch_with_id(&mut self, switch_id: usize) {
-        debug!("remove {:?}", switch_id);
+        debug!("Removed switch {:?}", switch_id);
         trace!("{:?}", self.switches);
         self.switches.retain(|&id| id != switch_id);
         self.switches = self.switches.iter().map(|x| if *x < switch_id {*x} else {x - 1}).collect();
@@ -44,7 +44,7 @@ impl Chaser {
     pub fn stop_chaser(&mut self) {
         match self.current_thread {
             Some(ref tx) => {
-                if tx.send(()).is_ok() {debug!("chaser killed")}
+                if tx.send(()).is_ok() {debug!("Killed chaser")}
             },
             None => {}
         }

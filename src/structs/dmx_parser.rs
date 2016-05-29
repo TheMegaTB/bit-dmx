@@ -65,7 +65,7 @@ impl Parser {
             let fixture_type_str = vec_as_str(fixture_type);
             let name_str = vec_as_str(name);
             if !fixtures.contains_key(&fixture_type_str) { panic!("Fixture '{}' is not defined.", fixture_type_str) }
-            trace!("{:?} | {:?} | {:?}", target_channel, fixture_type_str, name_str);
+            //trace!("{:?} | {:?} | {:?}", target_channel, fixture_type_str, name_str);
             self.parse_fixture(fixtures.get(&fixture_type_str).unwrap().clone(), target_channel as u16, name_str);
         }).collect::<Vec<_>>();
     }
@@ -96,10 +96,10 @@ impl Parser {
                         command_type.pop();
                         let command_type_str = vec_as_str(command_type.clone());
                         let command_content_str = vec_as_str(command_chars.clone());
-                        trace!("Got new command of type {} with content {}", command_type_str, command_content_str);
+                        //trace!("Got new command of type {} with content {}", command_type_str, command_content_str);
 
                         if command_type_str == "preheat".to_string() {
-                            trace!("PREHEAT WOHOOOO");
+                            //trace!("PREHEAT WOHOOOO");
                             let cg = channel_groups.pop().expect(&format!("No channel group defined for preheat. ({})", command));
 
                             channel_groups.push(match cg {
@@ -155,7 +155,7 @@ impl Parser {
                     } else if command_open == 0 { panic!("Unclosed delimiter. Figure out where it is.") }
                 }
             }).collect::<Vec<_>>();
-            trace!("COMMAND DONE");
+            //trace!("COMMAND DONE");
         }).collect::<Vec<_>>();
 
         self.stage.add_fixture(Fixture::new(name, channel_groups));

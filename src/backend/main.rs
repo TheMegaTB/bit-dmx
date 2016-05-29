@@ -102,7 +102,7 @@ fn main() {
             use std::net::TcpListener;
 
             let listener = TcpListener::bind("0.0.0.0:8000").unwrap();
-            debug!("listening (send) started, ready to accept");
+            debug!("TCP Server A (send) started");
             for stream in listener.incoming() {
                 let stage = stage.clone();
                 thread::spawn(move || {
@@ -120,7 +120,7 @@ fn main() {
             use std::net::TcpListener;
 
             let listener = TcpListener::bind("0.0.0.0:8001").unwrap();
-            debug!("listening (receive) started, ready to accept");
+            debug!("TCP Server B (recv) started");
             for stream in listener.incoming() {
                 let stage = stage.clone();
                 thread::spawn(move || {

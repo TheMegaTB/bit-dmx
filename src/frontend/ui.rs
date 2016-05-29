@@ -165,6 +165,7 @@ impl UI {
                                     let mut s_addr_locked = s_addr.lock().unwrap();
                                     if s_addr_locked[0] != Some(addr.ip()) {
                                         s_addr_locked[0] = Some(addr.ip());
+                                        info!("Discovered new server @ {:?}", addr.ip());
                                         true
                                     } else {false}
                                 };
@@ -195,7 +196,7 @@ impl UI {
                     let mut buffer = String::new();
                     let _ = stream.read_to_string(&mut buffer);
                     self.frontend_data = json::decode(&buffer).unwrap();
-                    debug!("TCP update from \"{}\"", self.frontend_data.name);
+                    debug!("Received TCP update from \"{}\"", self.frontend_data.name);
                     self.load_chaser_config();
                     true
                 }

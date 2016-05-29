@@ -194,7 +194,7 @@ impl Stage {
     pub fn get_channel_object(&mut self, channel: DmxAddress) -> Arc<Mutex<Channel>> {
         for i in self.channels.len() as u16..channel as u16 {
             self.channels.push(Arc::new(Mutex::new(Channel::new(i + 1, 0, 0, self.dmx_tx.clone()))));
-            trace!("Create channel {}", i + 1);
+            trace!("Created channel {}", i + 1);
         }
         self.channels[channel as usize - 1].clone()
     }

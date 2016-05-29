@@ -121,7 +121,7 @@ impl UDPSocket {
 
 impl UDPSocketHandle {
     pub fn send(&self, data: &[u8], target: SocketAddr) -> usize {
-        trace!("SEND {:?} -> {:?}", data, target);
+        trace!("UDP SEND {:?} -> {:?}", data, target);
         self.socket.send_to(data, target).ok().expect("Failed to send transmission")
     }
 
@@ -132,7 +132,7 @@ impl UDPSocketHandle {
     pub fn receive(&self) -> ([u8; INPUT_BUFFER], SocketAddr) {
         let mut buf = [0; INPUT_BUFFER];
         let src = self.socket.recv_from(&mut buf).ok().expect("Failed to receive package.").1;
-        trace!("RECV {:?} <- {:?}", buf, src);
+        trace!("UDP RECV {:?} <- {:?}", buf, src);
         (buf, src)
     }
 }
