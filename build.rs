@@ -20,34 +20,8 @@ fn recursive_ls(dir: &Path) -> Vec<PathBuf> {
     }).collect::<Vec<_>>()
 }
 
-// fn compress_file(file: &Path) -> Vec<u8> {
-//     let mut f = File::open(file).unwrap();
-//     let mut e = ZlibEncoder::new(Vec::new(), Compression::Default);
-//     let mut buf = Vec::new();
-//
-//     f.read_to_end(&mut buf).unwrap();
-//     e.write_all(&mut buf).unwrap();
-//
-//     e.finish().unwrap()
-// }
-//
-// fn compress_folder_old(folder: &'static str) -> HashMap<String, String> {
-//     let assets = find_folder::Search::KidsThenParents(3, 5)
-//         .for_folder(folder).unwrap();
-//     let paths = recursive_ls(&assets);
-//
-//     let mut compressed_files = HashMap::new();
-//     for path in paths {
-//         let rel_path = format!("{:?}", Path::new(folder).join(path.as_path().strip_prefix(&assets).unwrap())).replace("\"", "");
-//         let data = json::encode(&compress_file(path.as_path())).unwrap();//format!("{:?}", compress_file(path.as_path()));
-//         compressed_files.insert(rel_path, data);
-//     }
-//     compressed_files
-// }
-
 fn compress_folder(folder: &'static str) -> Vec<u8> {
-    let assets = find_folder::Search::KidsThenParents(3, 5)
-        .for_folder(folder).unwrap();
+    let assets = find_folder::Search::KidsThenParents(3, 5).for_folder(folder).unwrap();
     let paths = recursive_ls(&assets);
     let mut files = HashMap::new();
     for path in paths {
@@ -64,12 +38,14 @@ fn compress_folder(folder: &'static str) -> Vec<u8> {
     e.finish().unwrap()
 }
 
+fn compress_and_save_folder(folder: &'static str) {
+    let data = compress_folder("assets");
+    File::create("src/structs/compressed_data/".to_string() + &folder.to_string() + &".bin".to_string()).unwrap().write_all(&data).unwrap();
+}
+
 fn main() {
-    // Read and compress the assets folder into a constant
-    let assets = compress_folder("assets");
-    let mut f = File::create("src/structs/compressed_data/assets.bin").unwrap();
-    f.write_all(&assets).unwrap();
-    // std::process::exit(1);
+    // Read and compress the assets folder into a binary blob included in the binary
+    compress_and_save_folder("assets");
 
     // Add the git hash as constant
     let mut hash = if cfg!( any(unix) ) {
