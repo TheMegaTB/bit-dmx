@@ -8,6 +8,15 @@ use FadeTime;
 use FADE_TICKS;
 
 #[macro_export]
+macro_rules! hashmap {
+    ($( $key: expr => $val: expr ),*) => {{
+         let mut map = ::std::collections::HashMap::new();
+         $( map.insert($key, $val); )*
+         map
+    }}
+}
+
+#[macro_export]
 macro_rules! exit {
     ($code:expr) => {
         // TODO Save all that important work

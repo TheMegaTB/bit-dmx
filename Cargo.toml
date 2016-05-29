@@ -25,15 +25,18 @@ path = "src/structs/structs.rs"
 default = []
 
 [dependencies]
-conrod = "0.35.0"
-piston_window = "0.47.0"
-find_folder = "0.3.0"
-net2 = "0.2.23"
-log = "0.3.6"
-env_logger = "0.3.3"
+conrod = "0.35.0"  # UI Framework
+piston_window = "0.47.0"  # Backend for UI
+find_folder = "0.3.0"  # Finding the assets folder
+net2 = "0.2.23"  # Multicast support for UDP communication
+log = "0.3.6"  # Base for custom logger
 meval = { git = "https://github.com/rekka/meval-rs" }
-rustc-serialize = "0.3.19"
-ansi_term = "0.7"
+rustc-serialize = "0.3.19"  # Storing and transmitting of encoded values
+ansi_term = "0.7"  # Logger
+flate2 = "0.2"  # Compression of assets
 
 [build-dependencies]
-gcc = "0.3"
+gcc = "0.3"  # Compilation of C code for interface communication
+find_folder = "0.3.0"
+flate2 = "0.2"
+rustc-serialize = "0.3.19"
