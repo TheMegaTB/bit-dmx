@@ -95,7 +95,7 @@ impl Parser {
 
                         command_type.pop();
                         let command_type_str = vec_as_str(command_type.clone());
-                        let command_content_str = vec_as_str(command_chars.clone());
+                        // let command_content_str = vec_as_str(command_chars.clone());
                         //trace!("Got new command of type {} with content {}", command_type_str, command_content_str);
 
                         if command_type_str == "preheat".to_string() {
