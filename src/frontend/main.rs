@@ -41,15 +41,6 @@ use theme::*;
 mod frontend_helpers;
 use frontend_helpers::*;
 
-// mod header;
-// use header::*;
-//
-// mod chasers;
-// use chasers::*;
-//
-// mod editor;
-// use editor::*;
-
 widget_ids! {
     CANVAS,
     HEADER,
@@ -425,7 +416,6 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Them
                     current_button_id = current_button_id + 1;
             }
             {
-                //let x_pos = (id as f64 - 1f64/6f64) * button_width;
                 Button::new()
                     .w_h(button_width/3.0, button_height/2.0)
                     .xy_relative_to(CHASER_TITLE, [x_pos + button_width/3.0, y_pos])

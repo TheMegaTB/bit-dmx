@@ -1,7 +1,7 @@
 use conrod::color;
 
 #[derive(Debug, Clone)]
-pub struct Theme {
+pub struct Theme { //TODO add colors
      pub ui_scale: f64,
      pub base_font_size: f64,
      pub ui_padding: f64,
