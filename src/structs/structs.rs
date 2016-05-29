@@ -16,14 +16,15 @@ pub type DmxValue = u8;
 pub type ChannelGroupValueTuple = (Vec<DmxValue>, (FadeCurve, FadeTime), (FadeCurve, FadeTime));
 pub const FADE_TICKS: FadeTime = 30;
 
+#[macro_use]
+pub mod helpers;
+pub use helpers::*;
+
 pub mod compressed_data;
 pub use compressed_data::*;
 
 pub mod git_hash;
 pub use git_hash::*;
-
-pub mod helpers;
-pub use helpers::*;
 
 pub mod logger;
 pub use logger::*;

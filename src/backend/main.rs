@@ -20,6 +20,8 @@ fn main() {
     init_logger().unwrap();
     info!("BitDMX backend v{}-{}", VERSION, GIT_HASH);
 
+    // exit!(2, "Hi");
+
     let args: Vec<_> = env::args().collect();
     let instance_name = if args.len() > 1 {
         args[1].clone()

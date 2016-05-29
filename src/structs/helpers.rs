@@ -8,25 +8,28 @@ use FadeTime;
 use FADE_TICKS;
 
 #[macro_export]
+macro_rules! exit {
+    () => {exit!(1)};
+    ($code:expr) => {
+        // TODO Save all that important work
+        ::std::process::exit($code);
+    };
+    ($code:expr, $res:expr) => {
+        error!("{}", $res);
+        exit!($code);
+    };
+    ($code:expr, $res:expr, $($arg:tt)*) => {
+        exit!($code, format!($res, $($arg)*));
+    };
+}
+
+#[macro_export]
 macro_rules! hashmap {
     ($( $key: expr => $val: expr ),*) => {{
          let mut map = ::std::collections::HashMap::new();
          $( map.insert($key, $val); )*
          map
     }}
-}
-
-#[macro_export]
-macro_rules! exit {
-    ($code:expr) => {
-        // TODO Save all that important work
-        std::process::exit($code);
-    };
-    ($code:expr, $res:expr) => {
-        error!("{}", $res);
-        exit!($code);
-    };
-    ($code:expr, $res:expr, $($arg:tt)*) => {exit!($code, format!($res, $($arg)*))};
 }
 
 fn max3(a: f64, b: f64, c: f64) -> f64 {

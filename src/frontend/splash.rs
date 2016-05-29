@@ -18,7 +18,14 @@ impl SplashWindow {
     pub fn new(ui: Arc<Mutex<UI>>) -> SplashWindow {
         SplashWindow {
             thread: thread::spawn(move || {
-                let (mut window, mut conrod_ui) = create_window("BitDMX Splashscreen".to_string(), (500, 300), 1, true);
+                let (mut window, mut conrod_ui) = match create_window("BitDMX Splashscreen".to_string(), (500, 300), 1, true) {
+                    Ok(res) => res,
+                    Err(e) => {
+                        exit!(3, e);
+                        panic!()
+                    }
+                };
+
                 while let Some(event) = window.next() {
                     conrod_ui.handle_event(&event);
                     window.draw_2d(&event, |c, g| conrod_ui.draw(c, g));

@@ -2,7 +2,7 @@
 #[macro_use] extern crate conrod;
 extern crate piston_window;
 extern crate find_folder;
-extern crate structures;
+#[macro_use] extern crate structures;
 extern crate rustc_serialize;
 use structures::*;
 
@@ -71,7 +71,12 @@ widget_ids! {
 }
 
 fn create_output_window(ui: Arc<Mutex<UI>>) {
-    let (mut window, mut conrod_ui) = create_window("Sushi Reloaded!".to_string(), (1100, 560), 30, false);
+    let (mut window, mut conrod_ui) = match create_window("Sushi Reloaded!".to_string(), (1100, 560), 30, false) {
+        Ok(res) => res,
+        Err(e) => {
+            exit!(3, e);
+        }
+    };
 
     let app_theme = Theme::default();
 
