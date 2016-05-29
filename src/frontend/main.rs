@@ -7,6 +7,7 @@ extern crate structures;
 extern crate rustc_serialize;
 use structures::*;
 
+use std::cmp::max;
 use std::sync::{Arc, Mutex};
 use conrod::{
     color,
@@ -251,10 +252,6 @@ fn draw_header(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
 fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme, usable_width: f64) {
     let tx = ui.tx.clone();
 
-    let button_width = 200.0 * application_theme.ui_scale;
-    let button_height = 50.0 * application_theme.ui_scale;
-    let mut current_button_id = BUTTON;
-
     let chasers = {
         let mut tmp_chasers = Vec::new();
         for chaser_name in ui.chasers.iter() {
@@ -274,6 +271,11 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Them
         .color(application_theme.bg_color.plain_contrast())
         .set(CHASER_TITLE, conrod_ui);
 
+    let original_button_width = 200.0 * application_theme.ui_scale;
+    let chasers_per_row = max((usable_width/original_button_width) as u8, 1);
+    let button_width = usable_width/chasers_per_row as f64;
+    let button_height = 50.0 * application_theme.ui_scale;
+    let mut current_button_id = BUTTON;
 
     let mut next_y_offset = 0f64;
     let x_offset = button_width/2.0 - TEXT_BLOCK_WIDTH/2.0;
@@ -283,9 +285,11 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Them
     let cloned_ui = ui.clone();
 
 
+
+
     for (id, (name, chaser)) in chasers.iter().map(|x| (x, cloned_ui.frontend_data.chasers.get(x).unwrap())).enumerate() {
         let mut last_active_switch_id = None;
-        if (column + 1.0)*button_width >= usable_width {
+        if column*button_width >= usable_width {
              column = 0.0;
              y_offset = next_y_offset;
         }
