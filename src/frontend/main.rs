@@ -21,6 +21,7 @@ use conrod::{
     DropDownList,
     Labelable,
     Sizeable,
+    Slider,
     NumberDialer,
     TextBox
 };
@@ -59,6 +60,7 @@ widget_ids! {
     EDITOR_CONTENT with 4000,
     BUTTON with 4000,
     CONTROL_CHASER_TITLE with 4000,
+    EDITOR_SWITCH_SLIDER with 4000,
     EDITOR_SWITCH_NUMBER_DIALER with 4000,
     EDITOR_SWITCH_BUTTON with 4000,
     EDITOR_SWITCH_TEXT with 4000,
@@ -80,6 +82,9 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
         if let Some(button) = event.press_args() {
             if button == piston_window::Button::Keyboard(piston_window::Key::LShift) {
                 ui_locked.shift_state = true;
+            }
+            else if button == piston_window::Button::Keyboard(piston_window::Key::LCtrl) {
+                ui_locked.control_state = true;
             }
             if ui_locked.waiting_for_keybinding {
                 let switch_id = ui_locked.current_edited_switch_id.lock().unwrap()[0];
@@ -118,6 +123,9 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
         else if let Some(button) = event.release_args() {
             if button == piston_window::Button::Keyboard(piston_window::Key::LShift) {
                 ui_locked.shift_state = false;
+            }
+            else if button == piston_window::Button::Keyboard(piston_window::Key::LCtrl) {
+                ui_locked.control_state = false;
             }
         }
 
@@ -343,6 +351,9 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Them
                     if ui.edit_state {
                         current_edited_switch.lock().unwrap()[0] = Some(switch_id);
                         ui.current_edited_switch_name.lock().unwrap()[0] = switch.name.clone();
+                        if ui.control_state {
+                            // ui.waiting_for_keybinding = true; //TODO make this working
+                        }
                     }
                     else {
                         let new_value = if switch.dimmer_value == 0.0 {255} else {0};
@@ -535,7 +546,7 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
                 .align_left_of(EDITOR_TITLE)
                 .rgb(0.5, 0.3, 0.6)
                 .frame(2.0)
-                .label(&"Chaser time".to_string())
+                .label(&"Chaser time (ms)".to_string())
                 .label_color(color::WHITE)
                 .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
                 .react(|new_time: f32| {
@@ -554,6 +565,7 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
                 }
             };
 
+            let mut editor_switch_slider_count = 0;
             let mut editor_switch_number_dialer_count = 0;
             let mut editor_switch_button_count = 0;
             let mut editor_switch_text_count = 0;
@@ -669,15 +681,19 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: Theme
 
 
                 if dropdown_index as i64 == ui.current_edited_channel_group_id {
-
                     for (index, &value) in data.values.iter().enumerate() {
-                        NumberDialer::new(value as f32, 0.0, 255.0, 0)
+                        let label = {
+                            let mut text = "Value: ".to_string();
+                            text.push_str(&value.to_string());
+                            text
+                        };
+                        Slider::new(value as f32, 0.0, 255.0)
                             .w_h(item_width - item_x_offset, item_height)
                             .down(20.0 * application_theme.ui_scale)
                             .align_right_of(EDITOR_CONTENT)
                             .rgb(0.5, 0.3, 0.6)
                             .frame(2.0)
-                            .label(&"Value".to_string())
+                            .label(&label)
                             .label_color(color::WHITE)
                             .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
                             .react(|new_value: f32| {
