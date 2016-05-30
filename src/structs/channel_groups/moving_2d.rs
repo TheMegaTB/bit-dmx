@@ -40,13 +40,13 @@ impl Moving2D {
         stop_fade(channel_y.clone(), tx.clone());
 
         thread::spawn(move || {
-            let start_x = {channel_x.lock().unwrap().get()};
-            let start_y = {channel_y.lock().unwrap().get()};
+            let start_x = {channel_x.lock().expect("Failed to lock Arc!").get()};
+            let start_y = {channel_y.lock().expect("Failed to lock Arc!").get()};
             for (&x, &y) in get_fade_steps_int(start_x, end_x, steps, curve.clone()).iter().zip(get_fade_steps_int(start_y, end_y, steps, curve.clone()).iter()) {
                 {
                     if rx.try_recv().is_ok() { return }
-                    channel_x.lock().unwrap().set(x);
-                    channel_y.lock().unwrap().set(y);
+                    channel_x.lock().expect("Failed to lock Arc!").set(x);
+                    channel_y.lock().expect("Failed to lock Arc!").set(y);
                 }
                 sleep(Duration::from_millis((time/steps) as u64));
             }
@@ -55,8 +55,8 @@ impl Moving2D {
 
     pub fn get_addresses(&self) -> Vec<DmxAddress> {
         vec![
-            self.channel_x.lock().unwrap().address,
-            self.channel_y.lock().unwrap().address
+            self.channel_x.lock().expect("Failed to lock Arc!").address,
+            self.channel_y.lock().expect("Failed to lock Arc!").address
         ]
     }
 }

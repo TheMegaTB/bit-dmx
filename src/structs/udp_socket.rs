@@ -139,12 +139,12 @@ impl UDPSocketHandle {
 
 impl WatchDogClient {
     pub fn is_alive(&self) -> bool {
-        let state = self.state.lock().unwrap();
+        let state = self.state.lock().expect("Failed to lock Arc!");
         state[0]
     }
 
     pub fn get_server_addr(&self) -> Option<IpAddr> {
-        let server_addr = self.server_addr.lock().unwrap();
+        let server_addr = self.server_addr.lock().expect("Failed to lock Arc!");
         server_addr[0]
     }
 }

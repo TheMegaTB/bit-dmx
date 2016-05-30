@@ -89,10 +89,10 @@ pub fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: 
         let x_pos = x_offset + column*button_width;
         let current_edited_chaser_names = ui.current_edited_chaser_names.clone();
         if ui.edit_state {
-            // let tmp_name = {current_edited_chaser_names.lock().unwrap()[id].clone()};
-            let ref mut current_chaser_name = current_edited_chaser_names.lock().unwrap()[id];
+            // let tmp_name = {current_edited_chaser_names.lock().expect("Failed to lock Arc!")[id].clone()};
+            let ref mut current_chaser_name = current_edited_chaser_names.lock().expect("Failed to lock Arc!")[id];
 
-            // let ref mut switch_name = switch_name.lock().unwrap()[0];
+            // let ref mut switch_name = switch_name.lock().expect("Failed to lock Arc!")[0];
             TextBox::new(current_chaser_name)
                 .font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
                 .xy_relative_to(CHASER_TITLE, [x_pos, y_offset])
@@ -143,8 +143,8 @@ pub fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: 
                 .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
                 .react(|| {
                     if ui.edit_state {
-                        current_edited_switch.lock().unwrap()[0] = Some(switch_id);
-                        ui.current_edited_switch_name.lock().unwrap()[0] = switch.name.clone();
+                        current_edited_switch.lock().expect("Failed to lock Arc!")[0] = Some(switch_id);
+                        ui.current_edited_switch_name.lock().expect("Failed to lock Arc!")[0] = switch.name.clone();
                     }
                     else {
                         let new_value = if switch.dimmer_value == 0.0 {255} else {0};
@@ -252,8 +252,8 @@ pub fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: 
                 .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
                 .react(|| {
                     let switch_id = ui.frontend_data.add_switch(JsonSwitch::new("Untitled".to_string(), name.clone()));
-                    ui.current_edited_switch_id.lock().unwrap()[0] = Some(switch_id);
-                    ui.current_edited_switch_name.lock().unwrap()[0] = "Untitled".to_string();
+                    ui.current_edited_switch_id.lock().expect("Failed to lock Arc!")[0] = Some(switch_id);
+                    ui.current_edited_switch_name.lock().expect("Failed to lock Arc!")[0] = "Untitled".to_string();
 
                     ui.send_data();
                     test = true;

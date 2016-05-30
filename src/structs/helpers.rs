@@ -124,7 +124,7 @@ pub fn get_fade_steps(start_value: f64, target_value: f64, steps: usize, curve: 
 }
 
 pub fn stop_fade(channel: Arc<Mutex<Channel>>, tx: mpsc::Sender<()>) {
-    let mut channel_locked = channel.lock().unwrap();
+    let mut channel_locked = channel.lock().expect("Failed to lock Arc!");
     channel_locked.stop_fade();
     channel_locked.current_thread = Some(tx);
 }

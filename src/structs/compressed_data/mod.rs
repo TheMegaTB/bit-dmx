@@ -43,7 +43,14 @@ fn decompress_assets() -> PathBuf {
             }
         }
         match fs::remove_file(tmp_path.clone()) {
-            Ok(_) => {}, Err(e) => { exit!(2, "Couldn't overwrite assets file {}: {:?}", tmp_path.display(), e.description()); }
+            Ok(_) => {}, Err(e) => {
+                let desc = e.description();
+                if desc.find("not found").is_some() {
+                    debug!("Couldn't delete old asset {}: {:?}", tmp_path.display(), desc)
+                } else {
+                    exit!(2, "Couldn't overwrite assets file {}: {:?}", tmp_path.display(), desc);
+                }
+            }
         }
         match File::create(tmp_path.clone()) {
             Ok(mut f) => match f.write_all(&mut data) {

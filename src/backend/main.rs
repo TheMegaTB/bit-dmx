@@ -17,10 +17,8 @@ use rustc_serialize::json;
 use structures::*;
 
 fn main() {
-    init_logger().unwrap();
+    init_logger();
     info!("BitDMX backend v{}-{}", VERSION, GIT_HASH);
-
-    // exit!(2, "Hi");
 
     let args: Vec<_> = env::args().collect();
     let instance_name = if args.len() > 1 {
@@ -37,9 +35,13 @@ fn main() {
 
     info!("Server started as \"{}\"", instance_name);
 
-    let interface = Interface::new().port(interface_port).connect();
-    if interface.is_err() { panic!(interface) }
-    let (tx, _interrupt_tx) = interface.unwrap().to_thread();
+    let (tx, _interrupt_tx) = match Interface::new().port(interface_port).connect() {
+        Ok(interface) => interface.to_thread(),
+        Err(interface) => {
+            warn!("Enabled fake interface since no hardware interface is detected.");
+            interface.to_thread()
+        }
+    };
 
     let mut stage = Parser::new(Stage::new(instance_name, tx)).parse();
     stage.load_config();
@@ -74,14 +76,14 @@ fn main() {
 
                 if address_type == 0 {
                     // Channel
-                    let stage_locked = stage.lock().unwrap();
-                    let mut channel_locked = stage_locked.channels[address as usize].lock().unwrap();
+                    let stage_locked = stage.lock().expect("Failed to lock Arc!");
+                    let mut channel_locked = stage_locked.channels[address as usize].lock().expect("Failed to lock Arc!");
                     channel_locked.stop_fade();
                     channel_locked.set(value);
                 }
                 else if address_type == 1 {
                     // Switch
-                    let mut stage_locked = stage.lock().unwrap();
+                    let mut stage_locked = stage.lock().expect("Failed to lock Arc!");
                     debug!("Set switch with address {:?} to {:?} (shifted: {:?})", address, value, shift);
                     if shift {
                         stage_locked.deactivate_group_of_switch(address as usize)
@@ -108,7 +110,7 @@ fn main() {
             for stream in listener.incoming() {
                 let stage = stage.clone();
                 thread::spawn(move || {
-                    let stage_locked = stage.lock().unwrap();
+                    let stage_locked = stage.lock().expect("Failed to lock Arc!");
                     let mut stream = stream.unwrap();
                     stream.write(stage_locked.get_frontend_data().get_json_string().as_bytes()).unwrap();
                 });
@@ -131,7 +133,7 @@ fn main() {
                     let _ = stream.read_to_string(&mut buffer);
                     let frontend_data: FrontendData = json::decode(&buffer).unwrap();
                     {
-                        let mut stage_locked = stage.lock().unwrap();
+                        let mut stage_locked = stage.lock().expect("Failed to lock Arc!");
                         stage_locked.from_frontend_data(frontend_data);
                         stage_locked.save_config();
                     }

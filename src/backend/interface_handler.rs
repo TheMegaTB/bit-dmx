@@ -8,6 +8,8 @@ use structures::DmxAddress;
 use structures::DmxValue;
 use structures::fake_if_print;
 
+use std::error::Error;
+
 #[allow(dead_code)]
 extern {
     fn open_port(baudrate: usize, port: *const c_char) -> bool;
@@ -19,7 +21,10 @@ extern {
 
 fn connect(baudrate: usize, port: String) -> bool {
     unsafe {
-        open_port(baudrate, CString::new(port).unwrap().as_ptr())
+        match CString::new(port) {
+            Ok(port) => open_port(baudrate, port.as_ptr()),
+            Err(e) => {exit!(4, "Invalid port string. (Can't convert to CString: {})", e.description());}
+        }
     }
 }
 
@@ -61,13 +66,13 @@ impl Interface {
         self
     }
 
-    pub fn connect(self) -> Result<InterfaceHandle, &'static str> {
+    pub fn connect(self) -> Result<InterfaceHandle, InterfaceHandle> {
         match connect(self.baudrate, self.port.clone()) {
             true => Ok(InterfaceHandle {interface: self, fake: false}),
             false => {
                 unsafe { set_fake_interface_mode(true); }
-                warn!("Enabled fake interface since no hardware interface is detected.");
-                Ok(InterfaceHandle {interface: self, fake: true})
+                //warn!("Enabled fake interface since no hardware interface is detected.");
+                Err(InterfaceHandle {interface: self, fake: true})
             }
         }
     }
@@ -85,7 +90,7 @@ impl InterfaceHandle {
     pub fn to_thread(self) -> (mpsc::Sender<(DmxAddress, DmxValue)>, mpsc::Sender<bool>) {
         let (tx, rx) = mpsc::channel();
         let (interrupt_tx, interrupt_rx) = mpsc::channel();
-        thread::Builder::new().name("DMX-IF".to_string()).spawn(move|| {
+        match thread::Builder::new().name("DMX-IF".to_string()).spawn(move|| {
 
             let mut cache: Vec<DmxTouple> = Vec::with_capacity(16);
 
@@ -121,10 +126,12 @@ impl InterfaceHandle {
                         trace!("Setting channel {:?} to value {:?}", elem.0, elem.1);
                         self.write_to_dmx(elem.0, elem.1);
                     },
-                    None => {} //This shouldn't happen regardless.
+                    None => { unreachable!() }
                 }
             }
-        }).unwrap();
+        }) {
+            Ok(_) => {}, Err(e) => {exit!(5, "Error whilst spawning DMX Interface thread: {}", e.description());}
+        };
         (tx, interrupt_tx)
     }
 

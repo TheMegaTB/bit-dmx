@@ -61,7 +61,7 @@ pub fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: T
     y_pos = y_pos - 40.0 * application_theme.ui_scale;
 
     let current_edited_switch = {
-        ui.current_edited_switch_id.lock().unwrap()[0].clone()
+        ui.current_edited_switch_id.lock().expect("Failed to lock Arc!")[0].clone()
     };
 
     let switch_name = ui.current_edited_switch_name.clone();
@@ -84,7 +84,7 @@ pub fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: T
             let item_height = 40.0 * application_theme.ui_scale;
             let item_x_offset = 20.0 * application_theme.ui_scale;
             let line = "-----------------------------------------";
-            let ref mut switch_name = switch_name.lock().unwrap()[0];
+            let ref mut switch_name = switch_name.lock().expect("Failed to lock Arc!")[0];
 
 
             TextBox::new(switch_name)
@@ -239,7 +239,7 @@ pub fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: T
                         }
                         else {
                             ui.current_edited_channel_group_id = dropdown_index as i64;
-                            let mut current_edited_curve_strings_locked = ui.current_edited_curve_strings.lock().unwrap();
+                            let mut current_edited_curve_strings_locked = ui.current_edited_curve_strings.lock().expect("Failed to lock Arc!");
                             current_edited_curve_strings_locked[0] = data.curve_in.get_string();
                             current_edited_curve_strings_locked[1] = data.curve_out.get_string();
                         };
@@ -296,7 +296,7 @@ pub fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: T
                         y_pos = y_pos - 60.0 * application_theme.ui_scale;
 
                         if fade_curve_id == 3 {
-                            let ref mut curve_string = {ui.current_edited_curve_strings.lock().unwrap()[0].clone()};
+                            let ref mut curve_string = {ui.current_edited_curve_strings.lock().expect("Failed to lock Arc!")[0].clone()};
 
                             TextBox::new(curve_string)
                                 .w_h(item_width - item_x_offset, item_height)
@@ -352,7 +352,7 @@ pub fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: T
                         y_pos = y_pos - 60.0 * application_theme.ui_scale;
 
                         if fade_curve_id == 3 {
-                            let ref mut curve_string = {ui.current_edited_curve_strings.lock().unwrap()[1].clone()};
+                            let ref mut curve_string = {ui.current_edited_curve_strings.lock().expect("Failed to lock Arc!")[1].clone()};
 
                             TextBox::new(curve_string)
                                 .w_h(item_width - item_x_offset, item_height)
@@ -431,7 +431,7 @@ pub fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: T
                 .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
                 .react(|| {
                     ui.frontend_data.remove_switch_with_id(switch_id);
-                    ui.current_edited_switch_id.lock().unwrap()[0] = None;
+                    ui.current_edited_switch_id.lock().expect("Failed to lock Arc!")[0] = None;
                     ui.send_data();
                 })
                 .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);

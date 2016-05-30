@@ -22,7 +22,6 @@ impl SplashWindow {
                     Ok(res) => res,
                     Err(e) => {
                         exit!(3, e);
-                        panic!()
                     }
                 };
 
@@ -38,7 +37,7 @@ impl SplashWindow {
                             .set(CANVAS, &mut conrod_ui);
                     }));
 
-                    if ui.lock().unwrap().watchdog.is_alive() { break };
+                    if ui.lock().expect("Failed to lock Arc!").watchdog.is_alive() { break };
                 };
             })
         }

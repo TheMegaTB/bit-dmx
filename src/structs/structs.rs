@@ -4,8 +4,8 @@ extern crate net2;
 extern crate piston_window;
 extern crate ansi_term;
 extern crate flate2;
-
 extern crate meval;
+
 pub use meval::*;
 
 pub const VERSION: &'static str = env!("CARGO_PKG_VERSION");

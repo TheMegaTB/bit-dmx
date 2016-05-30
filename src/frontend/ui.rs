@@ -113,7 +113,7 @@ impl UI {
             let socket = socket.start_frontend_server();
             loop {
                 let buf = socket.receive().0;
-                let mut ui_locked = ui.lock().unwrap();
+                let mut ui_locked = ui.lock().expect("Failed to lock Arc!");
 
                 // if buf == [255, 255, 255, 255] {
                 //     ui_locked.fetch_data();
@@ -148,7 +148,7 @@ impl UI {
         let sock = socket.assemble_socket(Some(2));
         {
             let (s, s_addr) = {
-                let ui_locked = ui.lock().unwrap();
+                let ui_locked = ui.lock().expect("Failed to lock Arc!");
                 (ui_locked.watchdog.state.clone(), ui_locked.watchdog.server_addr.clone())
             };
             thread::Builder::new().name("WatchDog-Client".to_string()).spawn(move || {
@@ -160,28 +160,28 @@ impl UI {
                         Ok((_, addr)) => {
                             if buf == payload.as_bytes() {
                                 trace!("received valid watchdog data");
-                                s.lock().unwrap()[0] = true;
+                                s.lock().expect("Failed to lock Arc!")[0] = true;
                                 let ip_changed = {
-                                    let mut s_addr_locked = s_addr.lock().unwrap();
+                                    let mut s_addr_locked = s_addr.lock().expect("Failed to lock Arc!");
                                     if s_addr_locked[0] != Some(addr.ip()) {
                                         s_addr_locked[0] = Some(addr.ip());
                                         info!("Discovered new server @ {:?}", addr.ip());
                                         true
                                     } else {false}
                                 };
-                                if ip_changed && !ui.lock().unwrap().fetch_data() {
-                                    s_addr.lock().unwrap()[0] = None;
+                                if ip_changed && !ui.lock().expect("Failed to lock Arc!").fetch_data() {
+                                    s_addr.lock().expect("Failed to lock Arc!")[0] = None;
                                 }
                             } else {
                                 trace!("received invalid watchdog data");
-                                s.lock().unwrap()[0] = false;
-                                s_addr.lock().unwrap()[0] = None;
+                                s.lock().expect("Failed to lock Arc!")[0] = false;
+                                s_addr.lock().expect("Failed to lock Arc!")[0] = None;
                             }
                         },
                         Err(_) => {
                             trace!("watchdog timeout");
-                            s.lock().unwrap()[0] = false;
-                            s_addr.lock().unwrap()[0] = None;
+                            s.lock().expect("Failed to lock Arc!")[0] = false;
+                            s_addr.lock().expect("Failed to lock Arc!")[0] = None;
                         }
                     }
                 }

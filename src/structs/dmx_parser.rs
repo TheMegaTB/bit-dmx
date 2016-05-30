@@ -104,7 +104,7 @@ impl Parser {
 
                             channel_groups.push(match cg {
                                 ChannelGroup::Single(group) => {
-                                    group.channel1.lock().unwrap().max_preheat_value = command_args[0].parse::<DmxValue>().unwrap();
+                                    group.channel1.lock().expect("Failed to lock Arc!").max_preheat_value = command_args[0].parse::<DmxValue>().unwrap();
                                     ChannelGroup::Single(group)
                                 },
                                 _ => {

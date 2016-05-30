@@ -3,6 +3,8 @@ use std::env;
 use std::str::FromStr;
 pub use ansi_term::*;
 
+use std::error::Error;
+
 use DmxAddress;
 use DmxValue;
 
@@ -53,8 +55,8 @@ impl log::Log for SimpleLogger {
 
 const DEFAULT_LOGLEVEL: LogLevel = LogLevel::Info;
 
-pub fn init_logger() -> Result<(), SetLoggerError> {
-    set_logger(|max_log_level| {
+pub fn init_logger() {//-> Result<(), SetLoggerError> {
+    match set_logger(|max_log_level| {
         let level = match env::var("LOG") {
             Ok(level) => {
                 match LogLevel::from_str(&level) {
@@ -78,7 +80,13 @@ pub fn init_logger() -> Result<(), SetLoggerError> {
             show_gfx_log: show_gfx_log,
             show_paths: show_paths
         })
-    })
+    }) {
+        Ok(_) => {},
+        Err(e) => {
+            println!("{} Failed to set logger: {}", Colour::Fixed(160).bold().paint("       Error"), e.description());
+            ::std::process::exit(6);
+        }
+    }
 }
 
 pub fn fake_if_print(channel: DmxAddress, value: DmxValue) {

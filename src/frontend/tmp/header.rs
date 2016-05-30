@@ -80,8 +80,8 @@ pub fn draw_header(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: T
             }
         })
         .react(|| {
-            ui.current_edited_switch_id.lock().unwrap()[0] = None;
-            ui.current_edited_switch_name.lock().unwrap()[0] = "".to_string();
+            ui.current_edited_switch_id.lock().expect("Failed to lock Arc!")[0] = None;
+            ui.current_edited_switch_name.lock().expect("Failed to lock Arc!")[0] = "".to_string();
             if ui.edit_state {
                 ui.send_data();
             }

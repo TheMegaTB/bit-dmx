@@ -23,7 +23,7 @@ pub fn create_window(title: String, size: (u32, u32), ups: u64, esc: bool) -> Re
         let theme = Theme::default();
         let glyph_cache = match Glyphs::new(&font_path, window.factory.clone()) {
             Ok(cache) => cache,
-            Err(e) => return Err("Unable to load font cache.")
+            Err(_) => return Err("Unable to load font cache.")
         };
         Ui::new(glyph_cache, theme)
     };
