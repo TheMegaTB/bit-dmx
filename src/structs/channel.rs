@@ -1,6 +1,8 @@
 use std::sync::mpsc;
 use std::cmp;
 
+use std::error::Error;
+
 use DmxValue;
 use DmxAddress;
 
@@ -42,8 +44,13 @@ impl Channel {
         self.update();
     }
     fn update(&mut self) {
-        self.current_value = cmp::max(self.preheat_value, self.value);
-        self.dmx_tx.send((self.address, self.current_value)).unwrap();
+        let new_value = cmp::max(self.preheat_value, self.value);
+        if self.current_value != new_value {
+            self.current_value = new_value;
+            match self.dmx_tx.send((self.address, self.current_value)) {
+                Ok(_) => {}, Err(e) => {exit!(7, "Failed to send value to dmx interface handler: {}", e.description());}
+            };
+        }
     }
     pub fn stop_fade(&mut self) {
         match self.current_thread {
