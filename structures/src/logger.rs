@@ -1,4 +1,4 @@
-use log::{LogRecord, LogLevel, LogLocation, LogMetadata, SetLoggerError, set_logger, self};
+use log::{LogRecord, LogLevel, LogLocation, LogMetadata, set_logger, self};
 use std::env;
 use std::str::FromStr;
 pub use ansi_term::*;
