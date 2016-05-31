@@ -17,11 +17,6 @@ path = "src/backend/main.rs"
 name = "test_frontend"
 path = "src/test_frontend/main.rs"
 
-# [lib]
-# name = "structures"
-# path = "src/structs/structs.rs"
-# crate-type = ["rlib", "dylib"]
-
 [features]
 default = []
 
