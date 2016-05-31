@@ -6,15 +6,13 @@ extern crate ansi_term;
 extern crate flate2;
 extern crate meval;
 
-pub use meval::*;
-
 pub const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
 pub type FadeTime = usize;
 pub type DmxAddress = u16;
 pub type DmxValue = u8;
 pub type ChannelGroupValueTuple = (Vec<DmxValue>, (FadeCurve, FadeTime), (FadeCurve, FadeTime));
-pub const FADE_TICKS: FadeTime = 30;
+const FADE_TICKS: FadeTime = 30;
 
 #[macro_use]
 pub mod helpers;
