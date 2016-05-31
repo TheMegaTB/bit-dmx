@@ -31,6 +31,9 @@ impl FrontendData {
             chasers: HashMap::new()
         }
     }
+    pub fn from_json(json: String) -> Result<FrontendData, json::DecoderError> {
+        json::decode(&json)
+    }
     pub fn get_json_string(&self) -> String {
         json::encode(self).unwrap()
     }

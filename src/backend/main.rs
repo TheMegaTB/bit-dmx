@@ -1,10 +1,11 @@
 #[macro_use] extern crate log;
 #[macro_use] extern crate structures;
-extern crate net2;
-extern crate rustc_serialize;
+// extern crate net2;
+// extern crate rustc_serialize;
 
 use std::thread;
 use std::sync::{Arc, Mutex};
+use std::error::Error;
 
 use std::io::prelude::*;
 use std::env;
@@ -12,7 +13,7 @@ use std::env;
 mod interface_handler;
 use interface_handler::*;
 
-use rustc_serialize::json;
+// use rustc_serialize::json;
 
 use structures::*;
 
@@ -130,14 +131,15 @@ fn main() {
                 thread::spawn(move || {
                     let mut stream = stream.unwrap();
                     let mut buffer = String::new();
-                    let _ = stream.read_to_string(&mut buffer);
-                    let frontend_data: FrontendData = json::decode(&buffer).unwrap();
-                    {
-                        let mut stage_locked = stage.lock().expect("Failed to lock Arc!");
-                        stage_locked.from_frontend_data(frontend_data);
-                        stage_locked.save_config();
+                    stream.read_to_string(&mut buffer).unwrap();
+                    match FrontendData::from_json(buffer) {
+                        Ok(data) => {
+                            let mut stage_locked = stage.lock().expect("Failed to lock Arc!");
+                            stage_locked.from_frontend_data(data);
+                            stage_locked.save_config();
+                            UDPSocket::new().start_frontend_client().send_to_multicast(&[255, 255, 255, 255]);
+                        }, Err(e) => {error!("Failed to decode JSON received from client: {}", e.description());}
                     }
-                    UDPSocket::new().start_frontend_client().send_to_multicast(&[255, 255, 255, 255]);
                 });
             }
         }).join().unwrap();
