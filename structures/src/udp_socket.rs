@@ -4,6 +4,7 @@ use std::time::Duration;
 use std::thread::sleep;
 use std::str::FromStr;
 use std::thread;
+use std::error::Error;
 
 use net2::UdpSocketExt;
 
@@ -39,7 +40,7 @@ impl UDPSocket {
     pub fn new() -> UDPSocket {
         UDPSocket {
             local_addr: Ipv4Addr::new(0, 0, 0, 0),
-            multicast_addr: Ipv4Addr::from_str(MULTICAST).unwrap(),
+            multicast_addr: Ipv4Addr::from_str(MULTICAST).expect("Failed to convert MULTICAST const to IP."),
             port: BASE_PORT
         }
     }
@@ -64,7 +65,9 @@ impl UDPSocket {
             Some(delta) => self.port+delta,
             None => 0
         };
-        let sock = UdpSocket::bind(SocketAddrV4::new(self.local_addr, port)).unwrap();
+        let sock = match UdpSocket::bind(SocketAddrV4::new(self.local_addr, port)) {
+            Ok(s) => s, Err(e) => {exit!(8, "Error binding UDP socket: {}", e.description());}
+        };
         match sock.join_multicast_v4(&self.multicast_addr, &self.local_addr) {
             Ok(_) => sock,
             Err(_) => {
@@ -103,7 +106,11 @@ impl UDPSocket {
             let payload = VERSION.to_string() + &GIT_HASH.to_string();
             loop {
                 sleep(Duration::from_secs(WATCHDOG_TTL));
-                sock.send_to(payload.as_bytes(), target_addr).unwrap();
+                match sock.send_to(payload.as_bytes(), target_addr) {
+                    Ok(_) => {}, Err(e) => {
+                        exit!(6, "Error whilst sending beacon signal: {}", e.description());
+                    }
+                };
             }
         }).unwrap();
     }
