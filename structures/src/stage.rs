@@ -11,6 +11,8 @@ use std::io::{BufReader, BufWriter};
 use std::fs::File;
 use std::path::PathBuf;
 
+use get_config_path;
+
 use DmxAddress;
 use DmxValue;
 use FadeTime;

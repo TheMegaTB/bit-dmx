@@ -5,6 +5,8 @@ use std::fs::File;
 
 use std::collections::HashMap;
 
+use get_config_path;
+
 use ChannelGroup;
 use DmxAddress;
 use DmxValue;

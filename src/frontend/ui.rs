@@ -1,4 +1,3 @@
-use find_folder;
 use std::sync::{Arc, Mutex, mpsc};
 use structures::*;
 use std::net::{TcpStream, SocketAddr};
