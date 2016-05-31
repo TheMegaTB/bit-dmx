@@ -17,9 +17,6 @@ path = "src/backend/main.rs"
 name = "test_frontend"
 path = "src/test_frontend/main.rs"
 
-[features]
-default = []
-
 [dependencies]
 conrod = "0.35.0"  # UI Framework
 piston_window = "0.47.0"  # Backend for UI
