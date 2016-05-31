@@ -165,9 +165,8 @@ impl Parser {
         let fixture_tag = "Fixture".to_string();
         let stage_tag = "Stage".to_string();
 
-        let assets = find_folder::Search::KidsThenParents(3, 5)
-            .for_folder("assets").unwrap(); //TODO: Change this to a application specific path (e.g. appdata)
-        let path = assets.join("fixtures.dmx");
+        //TODO: Change this to a application specific path (e.g. appdata)
+        let path = get_config_path().join("fixtures.dmx");
         let mut f = File::open(path).unwrap();
         let mut s = String::new();
         f.read_to_string(&mut s).unwrap();

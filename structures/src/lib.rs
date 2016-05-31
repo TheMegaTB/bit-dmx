@@ -2,6 +2,7 @@
 extern crate rustc_serialize;
 extern crate net2;
 extern crate piston_window;
+extern crate find_folder;
 extern crate ansi_term;
 extern crate flate2;
 extern crate meval;
@@ -17,6 +18,9 @@ const FADE_TICKS: FadeTime = 30;
 #[macro_use]
 pub mod helpers;
 pub use helpers::*;
+
+pub mod config;
+pub use config::*;
 
 pub mod compressed_data;
 pub use compressed_data::*;
