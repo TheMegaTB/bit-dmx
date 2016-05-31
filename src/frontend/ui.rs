@@ -78,7 +78,7 @@ impl UI {
         ui
     }
 
-    pub fn get_chaser_config_path(&self) -> PathBuf { //TODO: Change this to a app-specific path (appdata or such)
+    pub fn get_chaser_config_path(&self) -> PathBuf {
         get_config_path().join(self.frontend_data.name.clone()  + ".local.dmx")
     }
 

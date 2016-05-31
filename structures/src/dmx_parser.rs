@@ -167,7 +167,6 @@ impl Parser {
         let fixture_tag = "Fixture".to_string();
         let stage_tag = "Stage".to_string();
 
-        //TODO: Change this to a application specific path (e.g. appdata)
         let path = get_config_path().join("fixtures.dmx");
         let mut f = File::open(path).unwrap();
         let mut s = String::new();

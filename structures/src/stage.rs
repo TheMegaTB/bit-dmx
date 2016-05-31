@@ -63,7 +63,6 @@ impl Stage {
     }
 
     fn get_config_filename(&self) -> PathBuf {
-        //TODO: Change this to a application specific path (e.g. appdata)
         get_config_path().join(self.name.clone()  + ".server.dmx")
     }
 
