@@ -731,8 +731,8 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                                 ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().values[index] = new_value as u8;
                                 ui.send_data();
                             })
-                            .set(EDITOR_SWITCH_NUMBER_DIALER + editor_switch_number_dialer_count, conrod_ui);
-                        editor_switch_number_dialer_count += 1;
+                            .set(EDITOR_SWITCH_NUMBER_DIALER + editor_switch_slider_count, conrod_ui);
+                        editor_switch_slider_count += 1;
                     }
 
                     let mut fade_curve_list = vec!("Linear".to_string(), "Squared".to_string(), "Square root".to_string(), "Custom".to_string());
