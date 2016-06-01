@@ -126,7 +126,12 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
                 }
             }
             else {
-                button_pressed = true;
+                if button == piston_window::Button::Keyboard(piston_window::Key::Escape) {
+                    ui_locked.edit_state = false;
+                }
+                else {
+                    button_pressed = true;
+                }
             }
         }
         else if let Some(button) = event.release_args() {
