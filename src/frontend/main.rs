@@ -8,7 +8,6 @@ use structures::*;
 use std::cmp::max;
 use std::sync::{Arc, Mutex};
 use conrod::{
-    color,
     Canvas,
     Colorable,
     Frameable,
