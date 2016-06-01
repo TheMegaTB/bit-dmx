@@ -393,15 +393,17 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usabl
                     .label(&"<<".to_string())
                     .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                     .react(|| {
-                        let next_switch_id = {
-                            match last_active_switch_id {
-                                Some(last_active_switch_id) => {
-                                    if last_active_switch_id == 0 {chaser.switches.len() - 1} else {last_active_switch_id - 1}
-                                },
-                                None => 0
-                            }
-                        };
-                        tx.send(get_switch_update(!ui.shift_state, chaser.switches[next_switch_id] as u16, 255)).unwrap();
+                        if chaser.switches.len() > 0 {
+                            let next_switch_id = {
+                                match last_active_switch_id {
+                                    Some(last_active_switch_id) => {
+                                        if last_active_switch_id == 0 {chaser.switches.len() - 1} else {last_active_switch_id - 1}
+                                    },
+                                    None => 0
+                                }
+                            };
+                            tx.send(get_switch_update(!ui.shift_state, chaser.switches[next_switch_id] as u16, 255)).unwrap();
+                        }
                     })
                     .set(current_button_id, conrod_ui);
                     current_button_id = current_button_id + 1;
@@ -409,12 +411,12 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usabl
             {
                 let tx = tx.clone();
                 //let x_pos = (id as f64 - 0.5) * button_width;
-                let (label, r) = {
+                let label = {
                     if chaser.current_thread {
-                        ("||".to_string(), 0.1)
+                        "||".to_string()
                     }
                     else {
-                        (">".to_string(), 0.9)
+                        ">".to_string()
                     }
                 };
                 Button::new()
@@ -425,19 +427,21 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usabl
                     .label(&label)
                     .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                     .react(|| {
-                        let next_switch_id = {
-                            match last_active_switch_id {
-                                Some(last_active_switch_id) => {
-                                    if last_active_switch_id == 0 {chaser.switches.len() - 1} else {last_active_switch_id - 1}
-                                },
-                                None => 0
+                        if chaser.switches.len() > 0 {
+                            let next_switch_id = {
+                                match last_active_switch_id {
+                                    Some(last_active_switch_id) => {
+                                        if last_active_switch_id == 0 {chaser.switches.len() - 1} else {last_active_switch_id - 1}
+                                    },
+                                    None => 0
+                                }
+                            };
+                            if chaser.current_thread {
+                                tx.send(get_start_chaser(!ui.shift_state, chaser.switches[next_switch_id] as u16, 0)).unwrap();
                             }
-                        };
-                        if chaser.current_thread {
-                            tx.send(get_start_chaser(!ui.shift_state, chaser.switches[next_switch_id] as u16, 0)).unwrap();
-                        }
-                        else {
-                            tx.send(get_start_chaser(!ui.shift_state, chaser.switches[next_switch_id] as u16, 255)).unwrap();
+                            else {
+                                tx.send(get_start_chaser(!ui.shift_state, chaser.switches[next_switch_id] as u16, 255)).unwrap();
+                            }
                         }
                     })
                     .set(current_button_id, conrod_ui);
@@ -452,15 +456,17 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usabl
                     .label(&">>".to_string())
                     .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                     .react(|| {
-                        let next_switch_id = {
-                            match last_active_switch_id {
-                                Some(last_active_switch_id) => {
-                                    if last_active_switch_id + 1 == chaser.switches.len() {0} else {last_active_switch_id + 1}
-                                },
-                                None => 0
-                            }
-                        };
-                        tx.send(get_switch_update(!ui.shift_state, chaser.switches[next_switch_id] as u16, 255)).unwrap();
+                        if chaser.switches.len() > 0 {
+                            let next_switch_id = {
+                                match last_active_switch_id {
+                                    Some(last_active_switch_id) => {
+                                        if last_active_switch_id + 1 == chaser.switches.len() {0} else {last_active_switch_id + 1}
+                                    },
+                                    None => 0
+                                }
+                            };
+                            tx.send(get_switch_update(!ui.shift_state, chaser.switches[next_switch_id] as u16, 255)).unwrap();
+                        }
                     })
                     .set(current_button_id, conrod_ui);
                     current_button_id = current_button_id + 1;
