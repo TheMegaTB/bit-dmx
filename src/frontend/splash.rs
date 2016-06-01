@@ -1,13 +1,18 @@
 use std::thread::{self, JoinHandle};
 use ui::UI;
-use conrod::{color, Canvas, Frameable, Colorable, Widget};
+use conrod::{color, Canvas, Text, Frameable, Colorable, Sizeable, Positionable, Widget};
 use std::sync::{Arc, Mutex};
 use window::*;
 use piston_window::UpdateEvent;
 use std::any::Any;
 
+use colors::*;
+
 widget_ids! {
     CANVAS,
+    SPLASH_TEXT_BIT,
+    SPLASH_TEXT_DMX,
+    SPLASH_SEARCHING_FOR_SERVER
 }
 
 pub struct SplashWindow {
@@ -18,13 +23,14 @@ impl SplashWindow {
     pub fn new(ui: Arc<Mutex<UI>>) -> SplashWindow {
         SplashWindow {
             thread: thread::spawn(move || {
-                let (mut window, mut conrod_ui) = match create_window("BitDMX Splashscreen".to_string(), (500, 300), 1, true) {
+                let (mut window, mut conrod_ui) = match create_window("BitDMX Splashscreen".to_string(), (500, 300), 3, true) {
                     Ok(res) => res,
                     Err(e) => {
                         exit!(3, e);
                     }
                 };
 
+                let mut i = 0;
                 while let Some(event) = window.next() {
                     conrod_ui.handle_event(&event);
                     window.draw_2d(&event, |c, g| conrod_ui.draw(c, g));
@@ -32,9 +38,35 @@ impl SplashWindow {
                     event.update(|_| conrod_ui.set_widgets(|mut conrod_ui| {
                         Canvas::new()
                             .frame(1.0)
-                            .pad(30.0)
-                            .color(color::rgb(0.236, 0.239, 0.900))
+                            .pad(5.0)
+                            .color(midnight_blue())
                             .set(CANVAS, &mut conrod_ui);
+
+                        Text::new("Bit")
+                            .w_h(200.0, 100.0)
+                            .middle_of(CANVAS)
+                            .font_size(100)
+                            .color(clouds())
+                            .set(SPLASH_TEXT_BIT, &mut conrod_ui);
+
+                        Text::new("DMX")
+                            .w_h(50.0, 20.0)
+                            .bottom_right_of(SPLASH_TEXT_BIT)
+                            .font_size(20)
+                            .color(clouds())
+                            .set(SPLASH_TEXT_DMX, &mut conrod_ui);
+
+                        let label = "Searching for server";
+                        let dots = (0..i).map(|_| " .").collect::<String>();
+                        Text::new(&format!("{}{}", label, dots))
+                            .w_h(150.0, 20.0)
+                            // .x_y(290.0, 270.0)
+                            .bottom_right_with_margin_on(CANVAS, 5.0)
+                            .font_size(12)
+                            .color(clouds())
+                            .set(SPLASH_SEARCHING_FOR_SERVER, &mut conrod_ui);
+
+                        i = if i > 2 { 0 } else { i+1 };
                     }));
 
                     if ui.lock().expect("Failed to lock Arc!").watchdog.is_alive() { break };

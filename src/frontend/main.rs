@@ -1,7 +1,6 @@
 #[macro_use] extern crate log;
 #[macro_use] extern crate conrod;
 extern crate piston_window;
-extern crate find_folder;
 #[macro_use] extern crate structures;
 extern crate rustc_serialize;
 use structures::*;

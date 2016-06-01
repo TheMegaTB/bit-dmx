@@ -13,8 +13,6 @@ use std::env;
 mod interface_handler;
 use interface_handler::*;
 
-// use rustc_serialize::json;
-
 use structures::*;
 
 fn main() {

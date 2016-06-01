@@ -11,6 +11,8 @@ use std::io::{BufReader, BufWriter};
 use std::fs::File;
 use std::path::PathBuf;
 
+use get_config_path;
+
 use DmxAddress;
 use DmxValue;
 use FadeTime;
@@ -61,9 +63,7 @@ impl Stage {
     }
 
     fn get_config_filename(&self) -> PathBuf {
-        let assets = find_folder::Search::KidsThenParents(3, 5)
-            .for_folder("assets").unwrap(); //TODO: Change this to a application specific path (e.g. appdata)
-        assets.join(self.name.clone()  + ".server_dmx")
+        get_config_path().join(self.name.clone()  + ".server.dmx")
     }
 
     pub fn load_config(&mut self) {
