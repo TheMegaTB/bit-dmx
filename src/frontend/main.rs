@@ -145,7 +145,7 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
         //Drawing
         conrod_ui.handle_event(&event);
         event.update(|_| {
-            conrod_ui.set_widgets(|mut conrod_ui| set_widgets(&mut conrod_ui, &mut ui_locked, app_theme.clone(), window.size().width as f64, button_pressed));
+            conrod_ui.set_widgets(|mut conrod_ui| set_widgets(&mut conrod_ui, &mut ui_locked, app_theme.clone(), window.size().width as f64, window.size().height as f64, button_pressed));
             button_pressed = false;
         });
         window.draw_2d(&event, |c, g| conrod_ui.draw_if_changed(c, g));
@@ -153,7 +153,7 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
 }
 
 
-fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, window_width: f64, button_pressed: bool) {
+fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, window_width: f64, window_height:f64, button_pressed: bool) {
 
     let editor_width = if ui.edit_state {
         (window_width/3.0).min(350.0)
@@ -161,6 +161,9 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, window
     else {
         0.0
     };
+
+    let header_height = 100.0 * app_theme.ui_scale;
+    let editor_height = window_height - header_height;
 
     let header = Canvas::new().color(app_theme.bg_header).pad(app_theme.ui_padding).length(100.0 * app_theme.ui_scale);
     let control_column = Canvas::new().color(app_theme.bg_control).scroll_kids().pad(app_theme.ui_padding);
@@ -185,7 +188,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, window
     draw_chasers(conrod_ui, ui, app_theme.clone(), chasers_usable_width, button_pressed);
 
     if ui.edit_state {
-        draw_editor(conrod_ui, ui, app_theme.clone(), editor_width, button_pressed);
+        draw_editor(conrod_ui, ui, app_theme.clone(), editor_width, editor_height, button_pressed);
     }
 }
 
@@ -307,25 +310,15 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usabl
         let current_edited_chaser_names = ui.current_edited_chaser_names.clone();
         if ui.edit_state {
             let ref mut current_chaser_name = current_edited_chaser_names.lock().expect("Failed to lock Arc!")[id];
-            // let t: u8 = current_chaser_name;
 
-            // let ref mut switch_name = switch_name.lock().expect("Failed to lock Arc!")[0];
             TextBox::new(current_chaser_name)
                 .font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                 .xy_relative_to(CHASER_TITLE, [x_pos, y_offset])
-                // .xy([0.0, 0.0])
                 .w_h(button_width, button_height)
                 .frame(2.0)
                 .frame_color(app_theme.bg_control.plain_contrast())
                 .color(app_theme.bg_control.invert().plain_contrast())
                 .react(|_: &mut String| {})
-                // .react(|new_name: &mut String| {
-                //     let old_name = ui.chasers[id].clone();
-                //     ui.frontend_data.rename_chaser(old_name.clone(), new_name.clone());
-                //     ui.chasers = ui.chasers.iter().map(|x| if *x == old_name {new_name.clone()} else {x.clone()}).collect();
-                //     ui.save_chaser_config();
-                //     ui.send_data();
-                // })
                 .enabled(true)
                 .set(EDITOR_CHASER_TITLE + id, conrod_ui);
 
@@ -349,10 +342,6 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usabl
             let y_pos = y_offset - 50.0 * app_theme.ui_scale - switch_id_in_chaser as f64*button_height;
             let current_edited_switch = ui.current_edited_switch_id.clone();
 
-            let label = match switch.get_keybinding_as_text() {
-                Some(keybinding) => switch.name.clone() + ": " + &keybinding,
-                None => switch.name.clone()
-            };
             Button::new()
                 .w_h(button_width, button_height)
                 .xy_relative_to(CHASER_TITLE, [x_pos, y_pos])
@@ -365,7 +354,7 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usabl
                     }
                 })
                 .frame(1.0)
-                .label(&label)
+                .label(&switch.name)
                 .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                 .react(|| {
                     if ui.edit_state {
@@ -381,7 +370,19 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usabl
                     }
                 })
                 .set(current_button_id, conrod_ui);
-                current_button_id = current_button_id + 1;
+
+            match switch.get_keybinding_as_text() {
+                Some(keybinding) => {
+                    Text::new(&keybinding)
+                        .bottom_right_with_margins_on(current_button_id, 10.0 * app_theme.ui_scale, 10.0 * app_theme.ui_scale)
+                        .font_size((app_theme.keybindings_font_size * app_theme.ui_scale) as u32)
+                        .color(app_theme.bg_control.plain_contrast())
+                        .set(CONTROL_CHASER_TITLE + switch_id + 50, conrod_ui); //TODO ID Range for Keybindings
+                },
+                None => {}
+            }
+            current_button_id = current_button_id + 1;
+
         }
         let mut y_pos = y_offset - 50.0 * app_theme.ui_scale - (chaser.switches.len() as f64 - 0.25)*button_height;
         if !ui.edit_state {
@@ -526,7 +527,7 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usabl
     }
 }
 
-fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable_width: f64, button_pressed: bool) {
+fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable_width: f64, usable_height: f64, button_pressed: bool) {
     Text::new("Editor")
         .top_left_of(EDITOR_COLUMN)
         .font_size((22.0 * app_theme.ui_scale) as u32)
@@ -667,6 +668,7 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                 DropDownList::new(&mut dropdown_list, &mut Some(dropdown_index))
                     .w_h(item_width-item_height, item_height)
                     .down(20.0 * app_theme.ui_scale)
+                    .max_visible_height(usable_height/2.0)
                     .align_left_of(EDITOR_TITLE)
                     .color(app_theme.drop_down_list_color)
                     .frame(2.0)
@@ -744,6 +746,7 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                         DropDownList::new(&mut fade_curve_list, &mut Some(fade_curve_id))
                             .w_h(item_width - item_x_offset, item_height)
                             .down(20.0 * app_theme.ui_scale)
+                            .max_visible_height(usable_height/2.0)
                             .align_right_of(EDITOR_CONTENT)
                             .color(app_theme.drop_down_list_color)
                             .frame(2.0)
@@ -803,6 +806,7 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                             .w_h(item_width - item_x_offset, item_height)
                             .down(20.0 * app_theme.ui_scale)
                             .align_right_of(EDITOR_CONTENT)
+                            .max_visible_height(usable_height/2.0)
                             .color(app_theme.drop_down_list_color)
                             .frame(2.0)
                             .label(&cloned_ui.frontend_data.fixtures[fixture_id].name.clone())
