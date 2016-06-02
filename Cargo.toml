@@ -13,6 +13,10 @@ path = "src/frontend/main.rs"
 name = "backend"
 path = "src/backend/main.rs"
 
+[[bin]]
+name = "fixture_editor"
+path = "src/fixture_editor/main.rs"
+
 [dependencies]
 conrod = "0.35.0"  # UI Framework
 piston_window = "0.47.0"  # Backend for UI
