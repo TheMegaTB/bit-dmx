@@ -182,7 +182,6 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, window
           ])
         .set(CANVAS, &mut conrod_ui);
 
-    // println!("{:?}", button_pressed);
     draw_header(conrod_ui, ui, app_theme.clone());
 
     let chasers_usable_width = window_width-editor_width-2.0*app_theme.ui_padding;
@@ -389,7 +388,6 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usabl
         if !ui.edit_state {
             {
                 let tx = tx.clone();
-                //let x_pos = (id as f64 - 5f64/6f64) * button_width;
                 Button::new()
                     .w_h(button_width/3.0, button_height/2.0)
                     .xy_relative_to(CHASER_TITLE, [x_pos - button_width/3.0, y_pos])
@@ -415,7 +413,6 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usabl
             }
             {
                 let tx = tx.clone();
-                //let x_pos = (id as f64 - 0.5) * button_width;
                 let label = {
                     if chaser.current_thread {
                         "||".to_string()
@@ -547,7 +544,7 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
 
             let time = ui.frontend_data.switches[switch_id].before_chaser;
             let item_width = usable_width * app_theme.ui_scale;
-            let item_height = usable_width/8.0 * app_theme.ui_scale;//40.0
+            let item_height = usable_width/8.0 * app_theme.ui_scale;
             let item_x_offset = 20.0 * app_theme.ui_scale;
             let line = "-----------------------------------------";
             let ref mut switch_name = switch_name.lock().expect("Failed to lock Arc!")[0];
@@ -562,10 +559,6 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                 .frame_color(app_theme.bg_editor.plain_contrast())
                 .color(app_theme.bg_editor.invert().plain_contrast())
                 .react(|_: &mut String| {})
-                // .react(|new_name: &mut String| {
-                //     ui.frontend_data.switches[switch_id].name = new_name.clone();
-                //     ui.send_data();
-                // })
                 .enabled(true)
                 .set(EDITOR_CONTENT, conrod_ui);
             if button_pressed {
@@ -773,10 +766,6 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                                 .frame_color(app_theme.bg_editor.plain_contrast())
                                 .color(app_theme.bg_editor.invert().plain_contrast())
                                 .react(|_: &mut String| {})
-                                // .react(|new_name: &mut String| {
-                                //     ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().curve_in = FadeCurve::Custom(new_name.clone());
-                                //     ui.send_data();
-                                // })
                                 .enabled(true)
                                 .set(EDITOR_CURVE_STRING1, conrod_ui);
 
@@ -831,10 +820,6 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                                 .frame_color(app_theme.bg_editor.plain_contrast())
                                 .color(app_theme.bg_editor.invert().plain_contrast())
                                 .react(|_: &mut String| {})
-                                // .react(|new_name: &mut String| {
-                                //     ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().curve_out = FadeCurve::Custom(new_name.clone());
-                                //     ui.send_data();
-                                // })
                                 .enabled(true)
                                 .set(EDITOR_CURVE_STRING2, conrod_ui);
                             if button_pressed {
