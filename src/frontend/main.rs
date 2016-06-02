@@ -3,7 +3,7 @@
 extern crate piston_window;
 #[macro_use] extern crate structures;
 extern crate rustc_serialize;
-use structures::*;
+pub use structures::*;
 
 use std::cmp::max;
 use std::sync::{Arc, Mutex};
@@ -24,16 +24,13 @@ use conrod::{
 };
 use piston_window::{ UpdateEvent, PressEvent, ReleaseEvent, Window };
 
-mod colors;
+// mod colors;
 
 mod ui;
 use ui::UI;
 
 mod splash;
 use splash::*;
-
-mod theme;
-use theme::*;
 
 mod frontend_helpers;
 use frontend_helpers::*;

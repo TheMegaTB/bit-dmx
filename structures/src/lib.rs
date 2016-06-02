@@ -35,6 +35,9 @@ pub use logger::*;
 pub mod colors;
 pub use colors::*;
 
+pub mod theme;
+pub use theme::*;
+
 pub mod window;
 pub use window::*;
 
