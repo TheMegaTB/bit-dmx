@@ -2,11 +2,11 @@ use std::thread::{self, JoinHandle};
 use ui::UI;
 use conrod::{Canvas, Text, Frameable, Colorable, Sizeable, Positionable, Widget};
 use std::sync::{Arc, Mutex};
-use window::*;
 use piston_window::UpdateEvent;
 use std::any::Any;
 
 use colors::*;
+use structures::{create_window, DMXWindow};
 
 widget_ids! {
     CANVAS,
@@ -39,21 +39,21 @@ impl SplashWindow {
                         Canvas::new()
                             .frame(1.0)
                             .pad(5.0)
-                            .color(midnight_blue())
+                            .color(FlatColor::midnight_blue())
                             .set(CANVAS, &mut conrod_ui);
 
                         Text::new("Bit")
                             .w_h(200.0, 100.0)
                             .middle_of(CANVAS)
                             .font_size(100)
-                            .color(clouds())
+                            .color(FlatColor::clouds())
                             .set(SPLASH_TEXT_BIT, &mut conrod_ui);
 
                         Text::new("DMX")
                             .w_h(50.0, 20.0)
                             .bottom_right_of(SPLASH_TEXT_BIT)
                             .font_size(20)
-                            .color(clouds())
+                            .color(FlatColor::clouds())
                             .set(SPLASH_TEXT_DMX, &mut conrod_ui);
 
                         let label = "Searching for server";
@@ -63,7 +63,7 @@ impl SplashWindow {
                             // .x_y(290.0, 270.0)
                             .bottom_right_with_margin_on(CANVAS, 5.0)
                             .font_size(12)
-                            .color(clouds())
+                            .color(FlatColor::clouds())
                             .set(SPLASH_SEARCHING_FOR_SERVER, &mut conrod_ui);
 
                         i = if i > 2 { 0 } else { i+1 };

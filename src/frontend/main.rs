@@ -29,9 +29,6 @@ mod colors;
 mod ui;
 use ui::UI;
 
-mod window;
-use window::*;
-
 mod splash;
 use splash::*;
 

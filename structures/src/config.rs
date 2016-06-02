@@ -7,6 +7,7 @@ pub enum Config {
 }
 
 pub fn get_config_path(conf: Config, name: &String) -> PathBuf {
+    // TODO: Move to .config / %AppData% and create if it doesn't exist
     let mut config_path = find_folder::Search::KidsThenParents(3, 5)
         .for_folder("config").unwrap();
     config_path = match conf {

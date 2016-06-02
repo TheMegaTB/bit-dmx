@@ -1,6 +1,8 @@
 use conrod::color;
 use colors::*;
 
+// TODO: If the theme struct and default settings are somewhat ok this file is subject to be moved into structures crate
+
 #[derive(Debug, Clone)]
 pub struct Theme { //TODO add colors
      pub ui_scale: f64,
@@ -28,18 +30,18 @@ impl Theme {
             base_font_size: 20.0,
             keybindings_font_size: 15.0,
             ui_padding: 10.0,
-            bg_header: midnight_blue(),
-            bg_control: concrete(),
-            bg_editor: concrete(),
-            add_button_color: emerald(),
-            remove_button_color: alizarin(),
-            switch_on_color: nephritis(),
-            switch_off_color: pomegranate(),
-            chaser_control_color: pumpkin(),
+            bg_header: FlatColor::midnight_blue(),
+            bg_control: FlatColor::concrete(),
+            bg_editor: FlatColor::concrete(),
+            add_button_color: FlatColor::emerald(),
+            remove_button_color: FlatColor::alizarin(),
+            switch_on_color: FlatColor::nephritis(),
+            switch_off_color: FlatColor::pomegranate(),
+            chaser_control_color: FlatColor::pumpkin(),
             font_color: color::rgb(0.0, 0.0, 0.0),
-            slider_color: emerald(),
-            number_dialer_color: turquoise(),
-            drop_down_list_color: wisteria()
+            slider_color: FlatColor::emerald(),
+            number_dialer_color: FlatColor::turquoise(),
+            drop_down_list_color: FlatColor::wisteria()
         }
     }
 }
