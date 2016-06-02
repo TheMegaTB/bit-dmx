@@ -5,6 +5,7 @@ use std::thread::sleep;
 use std::str::FromStr;
 use std::thread;
 use std::error::Error;
+use std::sync::{Once, ONCE_INIT};
 
 use net2::UdpSocketExt;
 
@@ -16,6 +17,8 @@ pub const WATCHDOG_TTL: u64 = 1;
 
 const MULTICAST: &'static str = "228.228.228.228";
 const BASE_PORT: u16 = 8000;
+
+static PRINT_LOCAL_WARNING: Once = ONCE_INIT;
 
 #[derive(Debug)]
 pub struct UDPSocket {
@@ -71,7 +74,9 @@ impl UDPSocket {
         match sock.join_multicast_v4(&self.multicast_addr, &self.local_addr) {
             Ok(_) => sock,
             Err(_) => {
-                warn!("Falling back to local mode since multicast is not available.");
+                PRINT_LOCAL_WARNING.call_once(|| {
+                    warn!("Multicast support not available. (NET_ERR)"); //Falling back to local mode since multicast is not available.
+                });
                 self.multicast_addr = Ipv4Addr::new(127, 0, 0, 1);
                 sock
             }
