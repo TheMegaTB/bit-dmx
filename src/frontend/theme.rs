@@ -5,6 +5,7 @@ use colors::*;
 pub struct Theme { //TODO add colors
      pub ui_scale: f64,
      pub base_font_size: f64,
+     pub keybindings_font_size: f64,
      pub ui_padding: f64,
      pub bg_header: color::Color,
      pub bg_control: color::Color,
@@ -25,6 +26,7 @@ impl Theme {
         Theme {
             ui_scale: 0.8,
             base_font_size: 20.0,
+            keybindings_font_size: 15.0,
             ui_padding: 10.0,
             bg_header: midnight_blue(),
             bg_control: concrete(),

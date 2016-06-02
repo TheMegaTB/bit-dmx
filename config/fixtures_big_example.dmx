@@ -1,0 +1,39 @@
+Fixture {
+    name("DPAR");
+    single(0);
+}
+
+Fixture {
+    name("PAR");
+    rgb(0, 1, 2);
+}
+
+
+Stage {
+    1 -> PAR("RGBPar1");
+    4 -> PAR("RGBPar1");
+    7 -> PAR("RGBPar1");
+    10 -> PAR("RGBPar1");
+    13 -> PAR("RGBPar1");
+    16 -> PAR("RGBPar1");
+    19 -> PAR("RGBPar1");
+    22 -> PAR("RGBPar1");
+    25 -> PAR("RGBPar1");
+    28 -> PAR("RGBPar1");
+    31 -> PAR("RGBPar1");
+    34 -> PAR("RGBPar1");
+    37 -> PAR("RGBPar1");
+    40 -> PAR("RGBPar1");
+    43 -> PAR("RGBPar1");
+    46 -> PAR("RGBPar1");
+    49 -> PAR("RGBPar1");
+    52 -> PAR("RGBPar1");
+    55 -> PAR("RGBPar1");
+    58 -> PAR("RGBPar1");
+    61 -> PAR("RGBPar1");
+    64 -> PAR("RGBPar1");
+    67 -> PAR("RGBPar1");
+    70 -> PAR("RGBPar1");
+    73 -> PAR("RGBPar1");
+    76 -> PAR("RGBPar1");
+}
