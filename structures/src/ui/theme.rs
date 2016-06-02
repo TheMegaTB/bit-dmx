@@ -1,5 +1,5 @@
 use conrod::color;
-use structures::ui::colors::FlatColor;
+use super::colors::FlatColor;
 
 // TODO: If the theme struct and default settings are somewhat ok this file is subject to be moved into structures crate
 
@@ -16,6 +16,7 @@ pub struct Theme { //TODO add colors
      pub remove_button_color: color::Color,
      pub switch_on_color: color::Color,
      pub switch_off_color: color::Color,
+     pub selected_switch_color: color::Color,
      pub chaser_control_color: color::Color,
      pub font_color: color::Color,
      pub slider_color: color::Color,
@@ -37,6 +38,7 @@ impl Theme {
             remove_button_color: FlatColor::alizarin(),
             switch_on_color: FlatColor::nephritis(),
             switch_off_color: FlatColor::pomegranate(),
+            selected_switch_color: FlatColor::belize_hole(),
             chaser_control_color: FlatColor::pumpkin(),
             font_color: color::rgb(0.0, 0.0, 0.0),
             slider_color: FlatColor::emerald(),
