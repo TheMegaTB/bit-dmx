@@ -82,7 +82,7 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
     // Poll events from the window.
     let mut button_pressed = false;
     while let Some(event) = window.next() {
-        let mut ui_locked = ui.lock().expect("Failed to lock Arc!");
+        let mut ui_locked = &mut *ui.lock().expect("Failed to lock Arc!");
 
         // Button/Mouse events
         if let Some(button) = event.press_args() {
@@ -91,6 +91,9 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
             }
             else if button == piston_window::Button::Keyboard(piston_window::Key::LCtrl) {
                 ui_locked.control_state = true;
+            }
+            else if button == piston_window::Button::Keyboard(piston_window::Key::LAlt) {
+                ui_locked.alt_state = true;
             }
             if ui_locked.waiting_for_keybinding {
                 let switch_id = ui_locked.current_edited_switch_id.lock().expect("Failed to lock Arc!")[0];
@@ -129,6 +132,130 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
                 if button == piston_window::Button::Keyboard(piston_window::Key::Escape) {
                     ui_locked.edit_state = false;
                 }
+                else if ui_locked.control_state || ui_locked.alt_state {
+                    let switch_id = ui_locked.current_edited_switch_id.lock().unwrap()[0];
+                    match switch_id {
+                        Some(switch_id) => {
+                            if ui_locked.control_state {
+                                {
+                                    let mut switch = ui_locked.frontend_data.switches[switch_id].clone();
+                                    let mut frontend_data = &mut ui_locked.frontend_data;
+                                    if button == piston_window::Button::Keyboard(piston_window::Key::Up) {
+                                        let chaser = frontend_data.chasers.get_mut(&switch.chaser_id).unwrap();
+                                        let index = chaser.switches.iter().position(|&r| r == switch_id).unwrap();
+                                        if ui_locked.shift_state {
+                                            switch.name = switch.name + " Cloned";
+                                            ui_locked.current_edited_switch_name = Arc::new(Mutex::new([switch.name.clone()]));
+                                            frontend_data.switches.push(switch);
+                                            let new_switch_id = frontend_data.switches.len() - 1;
+                                            chaser.switches.insert(index, new_switch_id);
+                                            ui_locked.current_edited_switch_id = Arc::new(Mutex::new([Some(new_switch_id)]));
+                                        }
+                                        else if index > 0 {
+                                            let tmp = chaser.switches[index - 1];
+                                            chaser.switches[index - 1] = chaser.switches[index];
+                                            chaser.switches[index] = tmp;
+                                        }
+                                    }
+                                    else if button == piston_window::Button::Keyboard(piston_window::Key::Down) {
+                                        let chaser = frontend_data.chasers.get_mut(&switch.chaser_id).unwrap();
+                                        let index = chaser.switches.iter().position(|&r| r == switch_id).unwrap();
+                                        if ui_locked.shift_state {
+                                            switch.name = switch.name + " Cloned";
+                                            ui_locked.current_edited_switch_name = Arc::new(Mutex::new([switch.name.clone()]));
+                                            frontend_data.switches.push(switch);
+                                            let new_switch_id = frontend_data.switches.len() - 1;
+                                            chaser.switches.insert(index + 1, new_switch_id);
+                                            ui_locked.current_edited_switch_id = Arc::new(Mutex::new([Some(new_switch_id)]));
+                                        }
+                                        else if index < chaser.switches.len() - 1 {
+                                            let tmp = chaser.switches[index + 1];
+                                            chaser.switches[index + 1] = chaser.switches[index];
+                                            chaser.switches[index] = tmp;
+                                        }
+                                    }
+                                    else if button == piston_window::Button::Keyboard(piston_window::Key::Left) {
+                                        let chaser_index = ui_locked.chasers.iter().position(|r| r == &switch.chaser_id).unwrap();
+                                        if chaser_index > 0 {
+                                            let new_chaser_id = &mut ui_locked.chasers[chaser_index - 1];
+                                            let new_switch_id = {
+                                                let chaser = frontend_data.chasers.get_mut(&switch.chaser_id).unwrap();
+                                                let index = chaser.switches.iter().position(|&r| r == switch_id).unwrap();
+                                                if ui_locked.shift_state {
+                                                    switch.name = switch.name + " Cloned";
+                                                    ui_locked.current_edited_switch_name = Arc::new(Mutex::new([switch.name.clone()]));
+                                                    switch.chaser_id = new_chaser_id.clone();
+                                                    frontend_data.switches.push(switch);
+                                                    let new_switch_id = frontend_data.switches.len() - 1;
+                                                    ui_locked.current_edited_switch_id = Arc::new(Mutex::new([Some(new_switch_id)]));
+                                                    new_switch_id
+                                                }
+                                                else {
+                                                    frontend_data.switches[switch_id].chaser_id = new_chaser_id.clone();
+                                                    chaser.switches.remove(index)
+                                                }
+                                            };
+                                            let new_chaser = frontend_data.chasers.get_mut(new_chaser_id).unwrap();
+                                            new_chaser.switches.push(new_switch_id);
+                                        }
+                                    }
+                                    else if button == piston_window::Button::Keyboard(piston_window::Key::Right) {
+                                        let chaser_index = ui_locked.chasers.iter().position(|r| r == &switch.chaser_id).unwrap();
+                                        if chaser_index < ui_locked.chasers.len() - 1 {
+                                            let new_chaser_id = &mut ui_locked.chasers[chaser_index + 1];
+                                            let new_switch_id = {
+                                                let chaser = frontend_data.chasers.get_mut(&switch.chaser_id).unwrap();
+                                                let index = chaser.switches.iter().position(|&r| r == switch_id).unwrap();
+                                                if ui_locked.shift_state {
+                                                    switch.name = switch.name + " Cloned";
+                                                    ui_locked.current_edited_switch_name = Arc::new(Mutex::new([switch.name.clone()]));
+                                                    switch.chaser_id = new_chaser_id.clone();
+                                                    frontend_data.switches.push(switch);
+                                                    let new_switch_id = frontend_data.switches.len() - 1;
+                                                    ui_locked.current_edited_switch_id = Arc::new(Mutex::new([Some(new_switch_id)]));
+                                                    new_switch_id
+                                                }
+                                                else {
+                                                    frontend_data.switches[switch_id].chaser_id = new_chaser_id.clone();
+                                                    chaser.switches.remove(index)
+                                                }
+                                            };
+                                            let new_chaser = frontend_data.chasers.get_mut(new_chaser_id).unwrap();
+                                            new_chaser.switches.push(new_switch_id);
+                                        }
+                                    }
+                                }
+                                ui_locked.send_data();
+                            }
+                            else if ui_locked.alt_state {
+                                if button == piston_window::Button::Keyboard(piston_window::Key::Right) {
+                                    let switch = ui_locked.frontend_data.switches[switch_id].clone(); //TODO borrow multiple struct parts
+                                    let index = ui_locked.chasers.iter().position(|r| r == &switch.chaser_id).unwrap();
+                                    if index < ui_locked.chasers.len() - 1 {
+                                        let tmp = ui_locked.chasers[index + 1].clone();
+                                        ui_locked.chasers[index + 1] = ui_locked.chasers[index].clone();
+                                        ui_locked.chasers[index] = tmp;
+                                    }
+                                    ui_locked.current_edited_chaser_names = Arc::new(Mutex::new(ui_locked.chasers.clone()));
+                                    ui_locked.save_chaser_config();
+
+                                }
+                                else if button == piston_window::Button::Keyboard(piston_window::Key::Left) {
+                                    let switch = ui_locked.frontend_data.switches[switch_id].clone(); //TODO borrow multiple struct parts
+                                    let index = ui_locked.chasers.iter().position(|r| r == &switch.chaser_id).unwrap();
+                                    if index > 0 {
+                                        let tmp = ui_locked.chasers[index - 1].clone();
+                                        ui_locked.chasers[index - 1] = ui_locked.chasers[index].clone();
+                                        ui_locked.chasers[index] = tmp;
+                                    }
+                                    ui_locked.current_edited_chaser_names = Arc::new(Mutex::new(ui_locked.chasers.clone()));
+                                    ui_locked.save_chaser_config();
+                                }
+                            }
+                        },
+                        None => {}
+                    }
+                }
                 else {
                     button_pressed = true;
                 }
@@ -140,6 +267,9 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
             }
             else if button == piston_window::Button::Keyboard(piston_window::Key::LCtrl) {
                 ui_locked.control_state = false;
+            }
+            else if button == piston_window::Button::Keyboard(piston_window::Key::LAlt) {
+                ui_locked.alt_state = false;
             }
         }
 
@@ -346,7 +476,11 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usabl
                 .w_h(button_width, button_height)
                 .xy_relative_to(CHASER_TITLE, [x_pos, y_pos])
                 .and(|b| {
-                    if switch.dimmer_value != 0.0 {
+                    let edited_switch_id = current_edited_switch.lock().unwrap();
+                    if ui.edit_state && edited_switch_id[0].is_some() && switch_id == edited_switch_id[0].unwrap() {
+                        b.color(app_theme.selected_switch_color)
+                    }
+                    else if switch.dimmer_value != 0.0 {
                         last_active_switch_id = Some(switch_id_in_chaser);
                         b.color(app_theme.switch_on_color)
                     } else {

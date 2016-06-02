@@ -129,6 +129,9 @@ impl FrontendData {
     pub fn rename_chaser(&mut self, old_name: String, new_name: String) -> bool {
         if !self.chasers.contains_key(&new_name) {
             let data = self.chasers.get(&old_name).unwrap().clone();
+            for &index in data.switches.iter() {
+                self.switches[index].chaser_id = new_name.clone();
+            }
             self.chasers.insert(new_name, data);
             self.chasers.remove(&old_name);
             true
