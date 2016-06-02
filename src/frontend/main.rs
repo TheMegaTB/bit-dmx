@@ -55,6 +55,7 @@ widget_ids! {
     EDITOR_TITLE,
     EDITOR_INFO,
     EDITOR_TIME_NUMBER_DIALER,
+    KEYBINDING_LABEL with 4000,
     EDITOR_CHASER_TITLE with 4000,
     EDITOR_CONTENT with 4000,
     BUTTON with 4000,
@@ -377,7 +378,7 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usabl
                         .bottom_right_with_margins_on(current_button_id, 10.0 * app_theme.ui_scale, 10.0 * app_theme.ui_scale)
                         .font_size((app_theme.keybindings_font_size * app_theme.ui_scale) as u32)
                         .color(app_theme.bg_control.plain_contrast())
-                        .set(CONTROL_CHASER_TITLE + switch_id + 50, conrod_ui); //TODO ID Range for Keybindings
+                        .set(KEYBINDING_LABEL + switch_id, conrod_ui);
                 },
                 None => {}
             }
