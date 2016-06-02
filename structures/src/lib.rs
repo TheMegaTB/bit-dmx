@@ -18,6 +18,8 @@ pub type DmxValue = u8;
 pub type ChannelGroupValueTuple = (Vec<DmxValue>, (FadeCurve, FadeTime), (FadeCurve, FadeTime));
 const FADE_TICKS: FadeTime = 30;
 
+const FIXTURE_DEF: &'static str = "fixtures.dmx";
+
 // Various helper functions
 #[macro_use]
 pub mod helpers;
