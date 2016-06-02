@@ -1,8 +1,6 @@
 use conrod::color;
 use super::colors::FlatColor;
 
-// TODO: If the theme struct and default settings are somewhat ok this file is subject to be moved into structures crate
-
 #[derive(Debug, Clone)]
 pub struct Theme { //TODO add colors
      pub ui_scale: f64,
