@@ -3,6 +3,8 @@ extern crate find_folder;
 use std::io::prelude::*;
 use std::fs::File;
 
+use std::error::Error;
+
 use std::collections::HashMap;
 
 use super::config::{get_config_path, Config};
@@ -19,7 +21,7 @@ use RGBA;
 use Single;
 use Moving2D;
 
-// use Config;
+use FIXTURE_DEF;
 
 pub struct Parser {
     stage: Stage
@@ -61,14 +63,14 @@ impl Parser {
             let target_channel;
             match vec_as_str(target_channel_char.clone()).parse::<DmxAddress>() {
                 Ok(v) => target_channel = v,
-                Err(_) => panic!("Invalid channel ID: {:?}", target_channel_char)
+                Err(_) => {exit!(10, "Invalid channel ID: {:?}", target_channel_char);}
             }
             strip_parentheses(&mut fixture_type);
             strip_parentheses(&mut name);
             name.pop();
             let fixture_type_str = vec_as_str(fixture_type);
             let name_str = vec_as_str(name);
-            if !fixtures.contains_key(&fixture_type_str) { panic!("Fixture '{}' is not defined.", fixture_type_str) }
+            if !fixtures.contains_key(&fixture_type_str) { exit!(10, "Fixture '{}' is not defined.", fixture_type_str); }
             //trace!("{:?} | {:?} | {:?}", target_channel, fixture_type_str, name_str);
             self.parse_fixture(fixtures.get(&fixture_type_str).unwrap().clone(), target_channel as u16, name_str);
         }).collect::<Vec<_>>();
@@ -112,7 +114,7 @@ impl Parser {
                                     ChannelGroup::Single(group)
                                 },
                                 _ => {
-                                    panic!("Preheat is not available for fixture type {:?}", cg);
+                                    exit!(10, "Preheat is not available for fixture type {:?}", cg);
                                 }
                             });
                         } else {
@@ -156,7 +158,7 @@ impl Parser {
                         }
                         command_type.clear();
                         command_chars.clear();
-                    } else if command_open == 0 { panic!("Unclosed delimiter. Figure out where it is.") }
+                    } else if command_open == 0 { exit!(10, "Unclosed delimiter. Figure out where it is."); }
                 }
             }).collect::<Vec<_>>();
             //trace!("COMMAND DONE");
@@ -169,8 +171,12 @@ impl Parser {
         let fixture_tag = "Fixture".to_string();
         let stage_tag = "Stage".to_string();
 
-        let path = get_config_path(Config::Server, &self.stage.name).join("fixtures.dmx");
-        let mut f = File::open(path).unwrap();
+        let path = get_config_path(Config::Server, &self.stage.name).join(FIXTURE_DEF);
+        let mut f = match File::open(path) {
+            Ok(f) => f, Err(e) => {
+                exit!(9, "Unable to read fixture definitions: {}", e.description());
+            }
+        };
         let mut s = String::new();
         f.read_to_string(&mut s).unwrap();
 
@@ -202,13 +208,13 @@ impl Parser {
                         fixtures.insert(name, commands);
                     } else if block_type_str == stage_tag {
                         self.parse_scene(block, &fixtures);
-                    } else { panic!("Unknown tag {:?}", block_type_str) }
+                    } else { exit!(10, "Unknown tag {:?}", block_type_str); }
                     block_type = Vec::new();
                     block = Vec::new();
-                } else if blocks_open == 0 { panic!("Syntax error: Unexpected closing bracket @ {}", index) }
+                } else if blocks_open == 0 { exit!(10, "Syntax error: Unexpected closing bracket @ {}", index); }
             }
         }
-        if blocks_open > 0 { panic!("Syntax error: Unclosed block.") }
+        if blocks_open > 0 { exit!(10, "Syntax error: Unclosed block."); }
 
         // for block in fixtures.iter() {trace!("{:?}", block);}
         // for block in stages.iter() {trace!("{:?}", block);}
