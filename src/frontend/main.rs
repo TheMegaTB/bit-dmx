@@ -731,7 +731,7 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                                 ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().values[index] = new_value as u8;
                                 ui.send_data();
                             })
-                            .set(EDITOR_SWITCH_NUMBER_DIALER + editor_switch_slider_count, conrod_ui);
+                            .set(EDITOR_SWITCH_SLIDER + editor_switch_slider_count, conrod_ui);
                         editor_switch_slider_count += 1;
                     }
 
