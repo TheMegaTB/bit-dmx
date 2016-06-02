@@ -1,9 +1,8 @@
-#[macro_use] extern crate log;
-#[macro_use] extern crate conrod;
-extern crate piston_window;
 #[macro_use] extern crate structures;
+#[macro_use] extern crate conrod;
+#[macro_use] extern crate log;
 extern crate rustc_serialize;
-use structures::*;
+extern crate piston_window;
 
 use std::cmp::max;
 use std::sync::{Arc, Mutex};
@@ -24,10 +23,14 @@ use conrod::{
 };
 use piston_window::{ UpdateEvent, PressEvent, ReleaseEvent, Window };
 
-mod colors;
-
-mod ui;
-use ui::UI;
+use structures::ui::window::{create_window, UiCell, DMXWindow};
+use structures::ui::ui::UI;
+use structures::FadeTime;
+use structures::JsonSwitch;
+use structures::FadeCurve;
+use structures::io::logger::Logger;
+use structures::GIT_HASH;
+use structures::VERSION;
 
 mod splash;
 use splash::*;
@@ -900,7 +903,7 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
 }
 
 fn main() {
-    init_logger();
+    Logger::init();
     info!("BitDMX frontend v{}-{}", VERSION, GIT_HASH);
 
     let ui = UI::new();

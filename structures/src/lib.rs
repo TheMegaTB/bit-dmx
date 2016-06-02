@@ -20,26 +20,26 @@ const FADE_TICKS: FadeTime = 30;
 pub mod helpers;
 pub use helpers::*;
 
-pub mod config;
-pub use config::*;
+pub mod io;
+// pub mod config;
+// pub use config::*;
 
-pub mod compressed_data;
-pub use compressed_data::*;
+pub mod res;
+pub use res::git_hash::*;
+pub use res::compressed_data::get_assets_path;
+// pub mod compressed_data;
+// pub use compressed_data::*;
 
-pub mod git_hash;
-pub use git_hash::*;
+// pub mod git_hash;
+// pub use git_hash::*;
 
-pub mod logger;
-pub use logger::*;
+// pub mod logger;
 
-pub mod colors;
-pub use colors::*;
+pub mod ui;
+// pub use ui::frontend_data::*; // TODO: Remove this pub visibility quantifier 'somehow'
 
-pub mod window;
-pub use window::*;
-
-pub mod udp_socket;
-pub use udp_socket::*;
+pub mod networking;
+// pub use udp_socket::*;
 
 pub mod channel;
 pub use channel::*;
@@ -47,8 +47,8 @@ pub use channel::*;
 pub mod channel_group_value;
 pub use channel_group_value::*;
 
-pub mod dmx_parser;
-pub use dmx_parser::*;
+// pub mod dmx_parser;
+// pub use dmx_parser::*;
 
 pub mod fixture;
 pub use fixture::*;
@@ -58,9 +58,6 @@ pub use switch::*;
 
 pub mod chaser;
 pub use chaser::*;
-
-pub mod frontend_data;
-pub use frontend_data::*;
 
 pub mod stage;
 pub use stage::*;

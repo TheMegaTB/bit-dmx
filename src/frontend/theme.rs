@@ -1,5 +1,5 @@
 use conrod::color;
-use colors::*;
+use structures::ui::colors::FlatColor;
 
 // TODO: If the theme struct and default settings are somewhat ok this file is subject to be moved into structures crate
 

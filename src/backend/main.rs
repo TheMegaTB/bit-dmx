@@ -1,7 +1,5 @@
-#[macro_use] extern crate log;
 #[macro_use] extern crate structures;
-// extern crate net2;
-// extern crate rustc_serialize;
+#[macro_use] extern crate log;
 
 use std::thread;
 use std::sync::{Arc, Mutex};
@@ -13,10 +11,19 @@ use std::env;
 mod interface_handler;
 use interface_handler::*;
 
-use structures::*;
+use structures::io::logger::Logger;
+use structures::GIT_HASH;
+use structures::VERSION;
+use structures::io::dmx_parser::Parser;
+use structures::Stage;
+use structures::FadeCurve;
+use structures::ChannelGroup;
+use structures::networking::UDPSocket;
+use structures::start_chaser_of_switch;
+use structures::ui::frontend_data::FrontendData;
 
 fn main() {
-    init_logger();
+    Logger::init();
     info!("BitDMX backend v{}-{}", VERSION, GIT_HASH);
 
     let args: Vec<_> = env::args().collect();
@@ -37,7 +44,7 @@ fn main() {
     let (tx, _interrupt_tx) = match Interface::new().port(interface_port).connect() {
         Ok(interface) => interface.to_thread(),
         Err(interface) => {
-            warn!("No hardware interface detected."); //Enabled fake interface since 
+            warn!("No hardware interface detected."); //Enabled fake interface since
             interface.to_thread()
         }
     };

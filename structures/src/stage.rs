@@ -11,7 +11,7 @@ use std::io::{BufReader, BufWriter};
 use std::fs::File;
 use std::path::PathBuf;
 
-use get_config_path;
+use super::io::config::{get_config_path, Config};
 
 use DmxAddress;
 use DmxValue;
@@ -25,12 +25,10 @@ use ChannelGroupValue;
 use Switch;
 use FadeCurve;
 
-use UDPSocket;
+use networking::UDPSocket;
 
 use Chaser;
-use FrontendData;
-
-use Config;
+use super::ui::frontend_data::FrontendData;
 
 #[derive(Debug)]
 pub struct Stage {

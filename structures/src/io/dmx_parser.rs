@@ -5,7 +5,7 @@ use std::fs::File;
 
 use std::collections::HashMap;
 
-use get_config_path;
+use super::config::{get_config_path, Config};
 
 use ChannelGroup;
 use DmxAddress;
@@ -19,7 +19,7 @@ use RGBA;
 use Single;
 use Moving2D;
 
-use Config;
+// use Config;
 
 pub struct Parser {
     stage: Stage

@@ -42,7 +42,7 @@ fn compress_folder(folder: &'static str) -> Vec<u8> {
 
 fn compress_and_save_folder(folder: &'static str) {
     let data = compress_folder("assets");
-    File::create("src/compressed_data/".to_string() + &folder.to_string() + &".bin".to_string()).unwrap().write_all(&data).unwrap();
+    File::create("src/res/compressed_data/".to_string() + &folder.to_string() + &".bin".to_string()).unwrap().write_all(&data).unwrap();
 }
 
 fn main() {
@@ -67,7 +67,7 @@ fn main() {
     hash.pop();
 
     // Write the constant to a file that is compiled into the project
-    let mut f = File::create("src/git_hash.rs").unwrap();
+    let mut f = File::create("src/res/git_hash.rs").unwrap();
     f.write_all("pub const GIT_HASH: &'static str = \"".to_string().as_bytes()).unwrap();
     f.write_all(hash.as_slice()).unwrap();
     f.write_all("\";".to_string().as_bytes()).unwrap();
