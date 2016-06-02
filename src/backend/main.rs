@@ -37,7 +37,7 @@ fn main() {
     let (tx, _interrupt_tx) = match Interface::new().port(interface_port).connect() {
         Ok(interface) => interface.to_thread(),
         Err(interface) => {
-            warn!("Enabled fake interface since no hardware interface is detected.");
+            warn!("No hardware interface detected."); //Enabled fake interface since 
             interface.to_thread()
         }
     };

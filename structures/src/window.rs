@@ -1,7 +1,8 @@
 use piston_window::{ EventLoop, OpenGL, Glyphs, PistonWindow, WindowSettings, self };
 use std::any::Any;
 use conrod::{Theme, self};
-use structures::*;
+
+use get_assets_path;
 
 pub type Backend = (<piston_window::G2d<'static> as conrod::Graphics>::Texture, Glyphs);
 pub type Ui = conrod::Ui<Backend>;
