@@ -1,6 +1,6 @@
 [package]
 name = "structures"
-version = "0.1.2"
+version = "0.2.0"
 authors = ["Til Blechschmidt <til@blechschmidt.de>", "Noah Peeters <noah.peeters99@gmail.com>"]
 build = "build.rs"
 
