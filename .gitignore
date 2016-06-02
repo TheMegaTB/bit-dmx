@@ -26,3 +26,7 @@ Cargo.lock
 git_hash.rs
 *.local.dmx
 *.server.dmx
+
+# Config directories
+/config/server/*
+/config/client/*
