@@ -30,9 +30,11 @@ use UDPSocket;
 use Chaser;
 use FrontendData;
 
+use Config;
+
 #[derive(Debug)]
 pub struct Stage {
-    name: String,
+    pub name: String,
     pub channels: Vec<Arc<Mutex<Channel>>>,
     pub fixtures: Vec<Fixture>,
     switches: Vec<Switch>,
@@ -63,7 +65,7 @@ impl Stage {
     }
 
     fn get_config_filename(&self) -> PathBuf {
-        get_config_path().join(self.name.clone()  + ".server.dmx")
+        get_config_path(Config::Server, &self.name).join(self.name.clone()  + ".server.dmx")
     }
 
     pub fn load_config(&mut self) {

@@ -19,6 +19,8 @@ use RGBA;
 use Single;
 use Moving2D;
 
+use Config;
+
 pub struct Parser {
     stage: Stage
 }
@@ -167,7 +169,7 @@ impl Parser {
         let fixture_tag = "Fixture".to_string();
         let stage_tag = "Stage".to_string();
 
-        let path = get_config_path().join("fixtures.dmx");
+        let path = get_config_path(Config::Server, &self.stage.name).join("fixtures.dmx");
         let mut f = File::open(path).unwrap();
         let mut s = String::new();
         f.read_to_string(&mut s).unwrap();
