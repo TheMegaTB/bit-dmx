@@ -84,4 +84,12 @@ impl FlatColor {
     pub fn asbestos() -> Color {
         rgb(0.498, 0.549, 0.553)
     }
+    #[allow(dead_code)]
+    pub fn ebony_clay() -> Color {
+        rgb(0.133, 0.191, 0.246)
+    }
+    #[allow(dead_code)]
+    pub fn pickled_bluewood() -> Color {
+        rgb(0.203, 0.285, 0.367)
+    }
 }
