@@ -23,7 +23,8 @@ use conrod::{
 };
 use piston_window::{ UpdateEvent, PressEvent, ReleaseEvent, Window };
 
-use structures::ui::window::{create_window, UiCell, DMXWindow};
+// use structures::ui::window::{create_window, UiCell, DMXWindow};
+use structures::ui::window::{create_window, UiCell};
 use structures::ui::ui::UI;
 use structures::ui::theme::Theme;
 use structures::FadeTime;
