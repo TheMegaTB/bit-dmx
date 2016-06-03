@@ -1,12 +1,13 @@
-use std::thread::{self, JoinHandle};
+// use std::thread::{self, JoinHandle};
 use structures::ui::ui::UI;
 use conrod::{Canvas, Text, Frameable, Colorable, Sizeable, Positionable, Widget};
 use std::sync::{Arc, Mutex};
 use piston_window::UpdateEvent;
-use std::any::Any;
+// use std::any::Any;
 
 use structures::ui::colors::FlatColor;
-use structures::ui::window::{create_window, DMXWindow};
+// use structures::ui::window::{create_window, DMXWindow};
+use structures::ui::window::{create_window};
 
 widget_ids! {
     CANVAS,
