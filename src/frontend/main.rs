@@ -1039,6 +1039,7 @@ fn main() {
     info!("BitDMX frontend v{}-{}", VERSION, GIT_HASH);
 
     let ui = UI::new();
-    SplashWindow::new(ui.clone()).join().unwrap();
+    // SplashWindow::new(ui.clone()).join().unwrap();
+    SplashWindow::start(ui.clone());
     if {ui.lock().expect("Failed to lock Arc!").watchdog.is_alive()} { create_output_window(ui.clone()); }
 }
