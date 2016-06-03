@@ -122,9 +122,9 @@ impl UI {
                 let buf = socket.receive().0;
                 let mut ui_locked = ui.lock().expect("Failed to lock Arc!");
 
-                // if buf == [255, 255, 255, 255] {
-                //     ui_locked.fetch_data();
-                // } else {
+                if buf == [255, 255, 255, 255] {
+                    ui_locked.fetch_data();
+                } else {
                     let address_type:u8 = buf[0] & 127;
                     let address: u16 = ((buf[1] as u16) << 8) + (buf[2] as u16);
                     let value: u8 = buf[3];
@@ -145,7 +145,7 @@ impl UI {
 
                         chaser.current_thread = value != 0;
                     }
-                // }
+                }
                 trace!("{:?}", buf);
             }
         });

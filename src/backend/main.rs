@@ -143,7 +143,8 @@ fn main() {
                             stage_locked.from_frontend_data(data);
                             stage_locked.save_config();
                             UDPSocket::new().start_frontend_client().send_to_multicast(&[255, 255, 255, 255]);
-                        }, Err(e) => {error!("Failed to decode JSON received from client: {}", e.description());}
+                        },
+                        Err(e) => {error!("Failed to decode JSON received from client: {}", e.description());}
                     }
                 });
             }
