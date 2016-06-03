@@ -92,9 +92,9 @@ fn main() {
                     let mut stage_locked = stage.lock().expect("Failed to lock Arc!");
                     debug!("Set switch with address {:?} to {:?} (shifted: {:?})", address, value, shift);
                     if shift {
-                        stage_locked.deactivate_group_of_switch(address as usize)
+                        stage_locked.deactivate_group_of_switch(address as usize, true)
                     }
-                    stage_locked.set_switch(address as usize, value as f64);
+                    stage_locked.set_switch(address as usize, value as f64, true);
                 }
                 else if address_type == 2 {
                     // Chaser

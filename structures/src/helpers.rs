@@ -123,8 +123,26 @@ pub fn get_fade_steps(start_value: f64, target_value: f64, steps: usize, curve: 
     }
 }
 
-pub fn stop_fade(channel: Arc<Mutex<Channel>>, tx: mpsc::Sender<()>) {
+pub fn stop_fade(channel: &Arc<Mutex<Channel>>, tx: mpsc::Sender<()>) {
     let mut channel_locked = channel.lock().expect("Failed to lock Arc!");
     channel_locked.stop_fade();
     channel_locked.current_thread = Some(tx);
+}
+
+pub fn try_stop_fades(channels: Vec<&Arc<Mutex<Channel>>>, tx: mpsc::Sender<()>, kill_others: bool) -> bool {
+    let mut channel_blocked = false;
+    for channel in channels.iter() {
+        let channel_locked = channel.lock().expect("Failed to lock Arc!");
+        if channel_locked.current_thread.is_some() {
+            channel_blocked = true;
+        }
+    }
+    if !channel_blocked || (channel_blocked && kill_others) {
+        for channel in channels.iter() {
+            stop_fade(channel, tx.clone())
+        }
+        true
+    }
+    else {false}
+
 }

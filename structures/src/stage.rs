@@ -118,18 +118,18 @@ impl Stage {
         id
     }
 
-    pub fn deactivate_group_of_switch(&mut self, switch_id: usize) {
+    pub fn deactivate_group_of_switch(&mut self, switch_id: usize, kill_others: bool) {
         let switches = self.chasers.get(&self.switches[switch_id].chaser_id).unwrap().switches.iter().filter(|&x| *x != switch_id).map(|&x| x).collect::<Vec<usize>>();
 
         for switch_id in switches.iter() {
-            self.set_switch(*switch_id, 0.0);
+            self.set_switch(*switch_id, 0.0, kill_others);
         };
     }
 
-    pub fn set_switch(&mut self, switch_id: usize, dimmer_value: f64) {
+    pub fn set_switch(&mut self, switch_id: usize, dimmer_value: f64, kill_others: bool) {
         self.switches[switch_id].dimmer_value = dimmer_value;
         if dimmer_value == 0.0 {
-            self.deactivate_switch(switch_id);
+            self.deactivate_switch(switch_id, kill_others);
         }
         else {
             for (&(fixture_id, channel_group_id), data) in self.switches[switch_id].channel_groups.iter() {
@@ -138,19 +138,19 @@ impl Stage {
                     //TODO Check if there are enough values in new_values
                     ChannelGroup::Single(ref mut group) => {
                         group.active_switches.push((switch_id, ChannelGroupValue::from_tuple((new_values.clone(), (data.curve_in.clone(), data.time_in), (data.curve_out.clone(), data.time_out)))));
-                        group.fade_simple(data.curve_in.clone(), data.time_in, new_values[0]);
+                        group.fade_simple(data.curve_in.clone(), data.time_in, new_values[0], kill_others);
                     },
                     ChannelGroup::RGB(ref mut group) => {
                         group.active_switches.push((switch_id, ChannelGroupValue::from_tuple((new_values.clone(), (data.curve_in.clone(), data.time_in), (data.curve_out.clone(), data.time_out)))));
-                        group.fade_simple(data.curve_in.clone(), data.time_in, new_values[0], new_values[1], new_values[2]);
+                        group.fade_simple(data.curve_in.clone(), data.time_in, new_values[0], new_values[1], new_values[2], kill_others);
                     },
                     ChannelGroup::RGBA(ref mut group) => {
                         group.active_switches.push((switch_id, ChannelGroupValue::from_tuple((new_values.clone(), (data.curve_in.clone(), data.time_in), (data.curve_out.clone(), data.time_out)))));
-                        group.fade_simple(data.curve_in.clone(), data.time_in, new_values[0], new_values[1], new_values[2], new_values[3]);
+                        group.fade_simple(data.curve_in.clone(), data.time_in, new_values[0], new_values[1], new_values[2], new_values[3], kill_others);
                     },
                     ChannelGroup::Moving2D(ref mut group) => {
                         group.active_switches.push((switch_id, ChannelGroupValue::from_tuple((new_values.clone(), (data.curve_in.clone(), data.time_in), (data.curve_out.clone(), data.time_out)))));
-                        group.fade_simple(data.curve_in.clone(), data.time_in, new_values[0], new_values[1]);
+                        group.fade_simple(data.curve_in.clone(), data.time_in, new_values[0], new_values[1], kill_others);
                     }
                 }
             }
@@ -160,31 +160,31 @@ impl Stage {
         UDPSocket::new().start_frontend_client().send_to_multicast(&[1, addr_high, addr_low, dimmer_value as u8]);
     }
 
-    fn deactivate_switch(&mut self, switch_id: usize) {
+    fn deactivate_switch(&mut self, switch_id: usize, kill_others: bool) {
         for (&(fixture_id, channel_group_id), data) in self.switches[switch_id].channel_groups.iter() {
             match self.fixtures[fixture_id].channel_groups[channel_group_id] {
                 ChannelGroup::Single(ref mut group) => {
                     if remove_from_active_switches(&mut group.active_switches, switch_id) {
                         let (new_values, new_curve, new_time) = extract_new_values(&mut group.active_switches, vec![0], data.curve_out.clone(), data.time_out);
-                        group.fade_simple(new_curve, new_time, new_values[0]);
+                        group.fade_simple(new_curve, new_time, new_values[0], kill_others);
                     }
                 },
                 ChannelGroup::RGB(ref mut group) => {
                     if remove_from_active_switches(&mut group.active_switches, switch_id) {
                         let (new_values, new_curve, new_time) = extract_new_values(&mut group.active_switches, vec![0, 0, 0], data.curve_out.clone(), data.time_out);
-                        group.fade_simple(new_curve, new_time, new_values[0], new_values[1], new_values[2]);
+                        group.fade_simple(new_curve, new_time, new_values[0], new_values[1], new_values[2], kill_others);
                     }
                 },
                 ChannelGroup::RGBA(ref mut group) => {
                     if remove_from_active_switches(&mut group.active_switches, switch_id) {
                         let (new_values, new_curve, new_time) = extract_new_values(&mut group.active_switches, vec![0, 0, 0, 0], data.curve_out.clone(), data.time_out);
-                        group.fade_simple(new_curve, new_time, new_values[0], new_values[1], new_values[2], new_values[3]);
+                        group.fade_simple(new_curve, new_time, new_values[0], new_values[1], new_values[2], new_values[3], kill_others);
                     }
                 },
                 ChannelGroup::Moving2D(ref mut group) => {
                     if remove_from_active_switches(&mut group.active_switches, switch_id) {
                         let (new_values, new_curve, new_time) = extract_new_values(&mut group.active_switches, vec![0, 0], data.curve_out.clone(), data.time_out);
-                        group.fade_simple(new_curve, new_time, new_values[0], new_values[1]);
+                        group.fade_simple(new_curve, new_time, new_values[0], new_values[1], kill_others);
                     }
                 }
             }
@@ -221,8 +221,8 @@ pub fn start_chaser_of_switch(stage: Arc<Mutex<Stage>>, switch_id: usize, dimmer
     thread::spawn(move || {
         let mut current_switch_id_in_chaser: usize = 0; //TODO use switch_id
         loop {
-            {stage.lock().expect("Failed to lock Arc!").deactivate_group_of_switch(chaser.switches[current_switch_id_in_chaser]);}
-            {stage.lock().expect("Failed to lock Arc!").set_switch(chaser.switches[current_switch_id_in_chaser], dimmer_value);}
+            {stage.lock().expect("Failed to lock Arc!").deactivate_group_of_switch(chaser.switches[current_switch_id_in_chaser], false);}
+            {stage.lock().expect("Failed to lock Arc!").set_switch(chaser.switches[current_switch_id_in_chaser], dimmer_value, true);}
             let sleep_time = {
                 let stage_locked = stage.lock().expect("Failed to lock Arc!");
                 stage_locked.switches[chaser.switches[current_switch_id_in_chaser]].before_chaser as u64

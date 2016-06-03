@@ -11,13 +11,9 @@ use ChannelGroupValue;
 use Channel;
 use FadeCurve;
 
-// use rgb_to_hsv;
-// use hsv_to_rgb;
-//
-// use get_fade_steps;
 use get_step_number;
 use get_fade_steps_int;
-use stop_fade;
+use try_stop_fades;
 
 #[derive(Debug)]
 pub struct RGB {
@@ -63,31 +59,33 @@ impl RGB {
     //     });
     // }
 
-    pub fn fade_simple(&mut self, curve: FadeCurve, time: FadeTime, end_r: DmxValue, end_g: DmxValue, end_b: DmxValue) {
+    pub fn fade_simple(&mut self, curve: FadeCurve, time: FadeTime, end_r: DmxValue, end_g: DmxValue, end_b: DmxValue, kill_others: bool) {
         let steps = get_step_number(time);
         let (tx, rx) = mpsc::channel();
-        let channel_r = self.channel_r.clone();
-        let channel_g = self.channel_g.clone();
-        let channel_b = self.channel_b.clone();
-        stop_fade(channel_r.clone(), tx.clone());
-        stop_fade(channel_g.clone(), tx.clone());
-        stop_fade(channel_b.clone(), tx.clone());
 
 
-        thread::spawn(move || {
-            let start_r = channel_r.lock().expect("Failed to lock Arc!").get();
-            let start_g = channel_g.lock().expect("Failed to lock Arc!").get();
-            let start_b = channel_b.lock().expect("Failed to lock Arc!").get();
-            for ((&r, &g), &b) in get_fade_steps_int(start_r, end_r, steps, curve.clone()).iter().zip(get_fade_steps_int(start_g, end_g, steps, curve.clone()).iter()).zip(get_fade_steps_int(start_b, end_b, steps, curve.clone()).iter()) {
-                {
-                    if rx.try_recv().is_ok() { return }
-                    channel_r.lock().expect("Failed to lock Arc!").set(r);
-                    channel_g.lock().expect("Failed to lock Arc!").set(g);
-                    channel_b.lock().expect("Failed to lock Arc!").set(b);
+        if try_stop_fades(vec!(&self.channel_r, &self.channel_g, &self.channel_b), tx, kill_others) {
+
+            let channel_r = self.channel_r.clone();
+            let channel_g = self.channel_g.clone();
+            let channel_b = self.channel_b.clone();
+
+
+            thread::spawn(move || {
+                let start_r = channel_r.lock().expect("Failed to lock Arc!").get();
+                let start_g = channel_g.lock().expect("Failed to lock Arc!").get();
+                let start_b = channel_b.lock().expect("Failed to lock Arc!").get();
+                for ((&r, &g), &b) in get_fade_steps_int(start_r, end_r, steps, curve.clone()).iter().zip(get_fade_steps_int(start_g, end_g, steps, curve.clone()).iter()).zip(get_fade_steps_int(start_b, end_b, steps, curve.clone()).iter()) {
+                    {
+                        if rx.try_recv().is_ok() { return }
+                        channel_r.lock().expect("Failed to lock Arc!").set(r);
+                        channel_g.lock().expect("Failed to lock Arc!").set(g);
+                        channel_b.lock().expect("Failed to lock Arc!").set(b);
+                    }
+                    sleep(Duration::from_millis((time/steps) as u64));
                 }
-                sleep(Duration::from_millis((time/steps) as u64));
-            }
-        });
+            });
+        }
     }
 
     pub fn get_addresses(&self) -> Vec<DmxAddress> {
