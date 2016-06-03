@@ -1,5 +1,5 @@
 use conrod::color;
-use super::colors::FlatColor;
+use ui::colors::FlatColor;
 
 #[derive(Debug, Clone)]
 pub struct Theme { //TODO add colors

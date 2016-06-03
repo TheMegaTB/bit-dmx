@@ -7,7 +7,7 @@ use std::error::Error;
 
 use std::collections::HashMap;
 
-use super::config::{get_config_path, Config};
+use io::config::{get_config_path, Config};
 
 use ChannelGroup;
 use DmxAddress;

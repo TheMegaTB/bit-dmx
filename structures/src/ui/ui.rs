@@ -9,9 +9,9 @@ use rustc_serialize::json;
 use std::path::PathBuf;
 
 
-use super::super::io::config::{get_config_path, Config};
+use io::config::{get_config_path, Config};
 use networking::UDPSocket;
-use super::frontend_data::FrontendData;
+use ui::FrontendData;
 use networking::WatchDogClient;
 use networking::WATCHDOG_TTL;
 use VERSION;

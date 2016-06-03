@@ -24,8 +24,8 @@ use conrod::{
 use piston_window::{ UpdateEvent, PressEvent, ReleaseEvent, Window };
 
 use structures::ui::window::{create_window, UiCell, DMXWindow};
-use structures::ui::ui::UI;
-use structures::ui::theme::Theme;
+use structures::ui::UI;
+use structures::ui::Theme;
 use structures::FadeTime;
 use structures::JsonSwitch;
 use structures::FadeCurve;

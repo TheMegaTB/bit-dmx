@@ -1,5 +1,5 @@
 use std::thread::{self, JoinHandle};
-use structures::ui::ui::UI;
+use structures::ui::UI;
 use conrod::{Canvas, Text, Frameable, Colorable, Sizeable, Positionable, Widget};
 use std::sync::{Arc, Mutex};
 use piston_window::UpdateEvent;
