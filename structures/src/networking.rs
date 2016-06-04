@@ -7,8 +7,6 @@ use std::thread;
 use std::error::Error;
 use std::sync::{Once, ONCE_INIT};
 
-use net2::UdpSocketExt;
-
 use VERSION;
 use GIT_HASH;
 
