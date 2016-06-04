@@ -666,9 +666,6 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
         .color(app_theme.bg_editor.plain_contrast())
         .set(EDITOR_TITLE, conrod_ui);
 
-    error_message("Failed to start Editor");
-
-
     let current_edited_switch = {
         ui.current_edited_switch_id.lock().expect("Failed to lock Arc!")[0].clone()
     };
