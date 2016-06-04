@@ -1,7 +1,6 @@
 pub fn get_path() -> String {
     use std::env;
-
-    env::current_dir().unwrap().display().to_string() + "/config/fixtures.dmx.example"
+    env::current_dir().unwrap().display().to_string() + "/config/server/"
 }
 
 pub fn check_for_file(path: String) -> bool {
@@ -29,4 +28,21 @@ pub fn get_file_content(path: String) -> String {
     f.read_to_string(&mut content);
 
     content.clone().to_string()
+}
+
+pub fn write_file_content(path: String, content: String) {
+    use std::fs::File;
+    use std::io::prelude::*;
+
+    let mut file_to_save: File;
+    match File::create(path) {
+        Ok(file) => file_to_save = file,
+        _ => panic!("Couldn't create file")
+    }
+
+    let to_write: &[u8] = content.as_bytes();
+
+    file_to_save.write_all(to_write);
+
+
 }
