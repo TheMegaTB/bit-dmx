@@ -3,7 +3,7 @@ pub fn get_path() -> String {
     env::current_dir().unwrap().display().to_string() + "/config/server/"
 }
 
-pub fn check_for_file(path: String) -> bool {
+pub fn check_for_file(path: String) -> bool { //TODO return file
     use std::fs::File;
 
     match File::open(path) {

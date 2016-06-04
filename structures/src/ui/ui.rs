@@ -57,12 +57,6 @@ impl UI {
             });
         }
 
-        {
-            thread::spawn(move || {
-
-            });
-        }
-
         let ui = UI {
             watchdog: watchdog,
             tx: tx,
