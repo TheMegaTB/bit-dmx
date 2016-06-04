@@ -22,9 +22,6 @@ use file::*;
 mod parser;
 use parser::*;
 
-mod error;
-use error::*;
-
 widget_ids! {
     BACKGROUND,
     TITLE_BACKGROUND,
@@ -226,7 +223,7 @@ impl FixtureWindow {
                                     if file::check_for_file(path_to_config.clone()) {
                                         match parser::decode_file(file::get_file_content(path_to_config.clone())) {
                                             Some(c) => config = Some(c),
-                                            _ => error::ErrorWindow::start("Error".to_string(), "There has been an error parsing the file.\nTry an other file or create a new one.".to_string())
+                                            _ => println!("There has been an error parsing the file.\nTry an other file or create a new one.")
                                         }
                                     } else {
                                         path_to_config = "".to_string();

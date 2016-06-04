@@ -27,6 +27,7 @@ use piston_window::{ UpdateEvent, PressEvent, ReleaseEvent, Window };
 use structures::ui::window::{create_window, UiCell};
 use structures::ui::ui::UI;
 use structures::ui::theme::Theme;
+use structures::ui::error_window::error_message;
 use structures::FadeTime;
 use structures::JsonSwitch;
 use structures::FadeCurve;
@@ -664,6 +665,8 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
         .font_size((22.0 * app_theme.ui_scale) as u32)
         .color(app_theme.bg_editor.plain_contrast())
         .set(EDITOR_TITLE, conrod_ui);
+
+    error_message("Failed to start Editor");
 
 
     let current_edited_switch = {
