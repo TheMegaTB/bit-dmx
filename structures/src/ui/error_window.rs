@@ -10,7 +10,7 @@ widget_ids! {
     BUTTON,
 }
 
-trait Unwrap2<T> {
+trait Unwrap2<T> { //TODO find better name
     fn unwrap2(self, msg: &'static str) -> T;
 }
 
@@ -26,7 +26,7 @@ impl<T> Unwrap2<T> for Option<T> {
     }
 }
 
-pub fn error_message(msg: &'static str) { //TODO add send report button
+pub fn error_message(msg: &'static str) { //TODO add send report buttonP
     let (mut window, mut conrod_ui) = match create_window("Error".to_string(), (200, 100), 30, true) {
         Ok(res) => res,
         Err(e) => {
