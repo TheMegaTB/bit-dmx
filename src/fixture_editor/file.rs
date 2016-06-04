@@ -6,10 +6,6 @@ pub fn get_path() -> String {
     env::current_dir().unwrap().display().to_string() + "/config/server/"
 }
 
-pub fn path_to_folder_name(path: String) -> String {
-    path.split("/").last().unwrap().to_string()
-}
-
 pub fn check_for_file(path: String) -> bool {
     match File::open(path) {
         Ok(file) => true,

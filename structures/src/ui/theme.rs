@@ -2,7 +2,7 @@ use conrod::color;
 use super::colors::FlatColor;
 
 #[derive(Debug, Clone)]
-pub struct Theme { //TODO add colors
+pub struct Theme {
      pub ui_scale: f64,
      pub base_font_size: f64,
      pub keybindings_font_size: f64,
@@ -44,4 +44,8 @@ impl Theme {
             drop_down_list_color: FlatColor::wisteria()
         }
     }
+}
+
+pub fn get_themes() -> Vec<(String, Theme)> {
+    vec!(("Default".to_string(), Theme::default()))
 }

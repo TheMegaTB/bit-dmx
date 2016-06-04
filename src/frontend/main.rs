@@ -174,9 +174,9 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
                                         }
                                     }
                                     else if button == piston_window::Button::Keyboard(piston_window::Key::Left) {
-                                        let chaser_index = ui_locked.chasers.iter().position(|r| r == &switch.chaser_id).unwrap();
+                                        let chaser_index = ui_locked.config.chasers.iter().position(|r| r == &switch.chaser_id).unwrap();
                                         if chaser_index > 0 {
-                                            let new_chaser_id = &mut ui_locked.chasers[chaser_index - 1];
+                                            let new_chaser_id = &mut ui_locked.config.chasers[chaser_index - 1];
                                             let new_switch_id = {
                                                 let chaser = frontend_data.chasers.get_mut(&switch.chaser_id).unwrap();
                                                 let index = chaser.switches.iter().position(|&r| r == switch_id).unwrap();
@@ -199,9 +199,9 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
                                         }
                                     }
                                     else if button == piston_window::Button::Keyboard(piston_window::Key::Right) {
-                                        let chaser_index = ui_locked.chasers.iter().position(|r| r == &switch.chaser_id).unwrap();
-                                        if chaser_index < ui_locked.chasers.len() - 1 {
-                                            let new_chaser_id = &mut ui_locked.chasers[chaser_index + 1];
+                                        let chaser_index = ui_locked.config.chasers.iter().position(|r| r == &switch.chaser_id).unwrap();
+                                        if chaser_index < ui_locked.config.chasers.len() - 1 {
+                                            let new_chaser_id = &mut ui_locked.config.chasers[chaser_index + 1];
                                             let new_switch_id = {
                                                 let chaser = frontend_data.chasers.get_mut(&switch.chaser_id).unwrap();
                                                 let index = chaser.switches.iter().position(|&r| r == switch_id).unwrap();
@@ -229,25 +229,25 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
                             else if ui_locked.alt_state {
                                 if button == piston_window::Button::Keyboard(piston_window::Key::Right) {
                                     let switch = ui_locked.frontend_data.switches[switch_id].clone(); //TODO borrow multiple struct parts
-                                    let index = ui_locked.chasers.iter().position(|r| r == &switch.chaser_id).unwrap();
-                                    if index < ui_locked.chasers.len() - 1 {
-                                        let tmp = ui_locked.chasers[index + 1].clone();
-                                        ui_locked.chasers[index + 1] = ui_locked.chasers[index].clone();
-                                        ui_locked.chasers[index] = tmp;
+                                    let index = ui_locked.config.chasers.iter().position(|r| r == &switch.chaser_id).unwrap();
+                                    if index < ui_locked.config.chasers.len() - 1 {
+                                        let tmp = ui_locked.config.chasers[index + 1].clone();
+                                        ui_locked.config.chasers[index + 1] = ui_locked.config.chasers[index].clone();
+                                        ui_locked.config.chasers[index] = tmp;
                                     }
-                                    ui_locked.current_edited_chaser_names = Arc::new(Mutex::new(ui_locked.chasers.clone()));
+                                    ui_locked.current_edited_chaser_names = Arc::new(Mutex::new(ui_locked.config.chasers.clone()));
                                     ui_locked.save_chaser_config();
 
                                 }
                                 else if button == piston_window::Button::Keyboard(piston_window::Key::Left) {
                                     let switch = ui_locked.frontend_data.switches[switch_id].clone(); //TODO borrow multiple struct parts
-                                    let index = ui_locked.chasers.iter().position(|r| r == &switch.chaser_id).unwrap();
+                                    let index = ui_locked.config.chasers.iter().position(|r| r == &switch.chaser_id).unwrap();
                                     if index > 0 {
-                                        let tmp = ui_locked.chasers[index - 1].clone();
-                                        ui_locked.chasers[index - 1] = ui_locked.chasers[index].clone();
-                                        ui_locked.chasers[index] = tmp;
+                                        let tmp = ui_locked.config.chasers[index - 1].clone();
+                                        ui_locked.config.chasers[index - 1] = ui_locked.config.chasers[index].clone();
+                                        ui_locked.config.chasers[index] = tmp;
                                     }
-                                    ui_locked.current_edited_chaser_names = Arc::new(Mutex::new(ui_locked.chasers.clone()));
+                                    ui_locked.current_edited_chaser_names = Arc::new(Mutex::new(ui_locked.config.chasers.clone()));
                                     ui_locked.save_chaser_config();
                                 }
                             }
@@ -366,7 +366,7 @@ fn draw_header(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme) {
                 ui.send_data();
             }
             else {
-                ui.current_edited_chaser_names = Arc::new(Mutex::new(ui.chasers.clone()));
+                ui.current_edited_chaser_names = Arc::new(Mutex::new(ui.config.chasers.clone()));
             }
             ui.edit_state = !ui.edit_state;
         })
@@ -382,8 +382,8 @@ fn draw_header(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme) {
             .color(app_theme.switch_on_color)
             .react(|| {
                 let name = ui.frontend_data.add_chaser();
-                ui.chasers.push(name);
-                ui.current_edited_chaser_names = Arc::new(Mutex::new(ui.chasers.clone()));
+                ui.config.chasers.push(name);
+                ui.current_edited_chaser_names = Arc::new(Mutex::new(ui.config.chasers.clone()));
                 ui.save_chaser_config();
                 ui.send_data();
             })
@@ -396,7 +396,7 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usabl
 
     let chasers = {
         let mut tmp_chasers = Vec::new();
-        for chaser_name in ui.chasers.iter() {
+        for chaser_name in ui.config.chasers.iter() {
             if ui.frontend_data.chasers.contains_key(chaser_name) {
                 tmp_chasers.push(chaser_name.clone());
             }
@@ -452,9 +452,9 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usabl
                 .set(EDITOR_CHASER_TITLE + id, conrod_ui);
 
             if button_pressed {
-                let old_name = ui.chasers[id].clone();
+                let old_name = ui.config.chasers[id].clone();
                 ui.frontend_data.rename_chaser(old_name.clone(), current_chaser_name.clone());
-                ui.chasers = ui.chasers.iter().map(|x| if *x == old_name {current_chaser_name.clone()} else {x.clone()}).collect();
+                ui.config.chasers = ui.config.chasers.iter().map(|x| if *x == old_name {current_chaser_name.clone()} else {x.clone()}).collect();
                 ui.save_chaser_config();
                 ui.send_data();
             }
@@ -636,8 +636,8 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usabl
                     .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                     .react(|| {
                         ui.frontend_data.delete_chaser(name.clone());
-                        ui.chasers.retain(|x| x != name);
-                        ui.current_edited_chaser_names = Arc::new(Mutex::new(ui.chasers.clone()));
+                        ui.config.chasers.retain(|x| x != name);
+                        ui.current_edited_chaser_names = Arc::new(Mutex::new(ui.config.chasers.clone()));
                         ui.save_chaser_config();
                         ui.send_data();
                         test = true;

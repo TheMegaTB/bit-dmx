@@ -2,8 +2,6 @@ use std::sync::{Arc, Mutex, mpsc};
 use std::net::{TcpStream, SocketAddr};
 use std::thread;
 use std::io::prelude::*;
-use std::io::{BufReader, BufWriter};
-use std::fs::File;
 use std::time::Duration;
 use rustc_serialize::json;
 use std::path::PathBuf;
@@ -14,6 +12,7 @@ use networking::UDPSocket;
 use super::frontend_data::FrontendData;
 use networking::WatchDogClient;
 use networking::WATCHDOG_TTL;
+use super::frontend_config::FrontendConfig;
 use VERSION;
 use GIT_HASH;
 
@@ -22,11 +21,11 @@ pub struct UI {
     pub watchdog: WatchDogClient,
     pub tx: mpsc::Sender<Vec<u8>>,
     pub frontend_data: FrontendData,
+    pub config: FrontendConfig,
     pub shift_state: bool,
     pub control_state: bool,
     pub alt_state: bool,
     pub edit_state: bool,
-    pub chasers: Vec<String>,
     pub waiting_for_keybinding: bool,
     pub current_edited_switch_id: Arc<Mutex<[Option<usize>; 1]>>,
     pub current_edited_channel_group_id: i64,
@@ -58,21 +57,15 @@ impl UI {
             });
         }
 
-        {
-            thread::spawn(move || {
-
-            });
-        }
-
         let ui = UI {
             watchdog: watchdog,
             tx: tx,
             frontend_data: frontend_data,
+            config: FrontendConfig::empty(),
             shift_state: false,
             control_state: false,
             alt_state: false,
             edit_state: false,
-            chasers: Vec::new(),
             waiting_for_keybinding: false,
             current_edited_switch_id: Arc::new(Mutex::new([None])),
             current_edited_channel_group_id: -1,
@@ -93,26 +86,16 @@ impl UI {
     }
 
     pub fn load_chaser_config(&mut self) {
-        let path = self.get_chaser_config_path();
-        match File::open(path) {
-            Ok(file) => {
-                let buf = BufReader::new(file);
-                self.chasers = buf.lines().map(|l| l.expect("Could not parse line")).collect();
-            },
-            _ => {
-                self.chasers = self.frontend_data.chasers.keys().map(|x| x.clone()).collect();
-                self.save_chaser_config();
+        match FrontendConfig::load(self.get_chaser_config_path()) {
+            Some(config) => self.config = config,
+            None => {
+                self.config.chasers = self.frontend_data.chasers.keys().map(|x| x.clone()).collect();
             }
         }
     }
 
     pub fn save_chaser_config(&self) {
-        let path = self.get_chaser_config_path();
-        let file = File::create(path).expect("no such file");
-        let mut buf = BufWriter::new(file);
-        for line in self.chasers.iter() {
-            buf.write_all((line.clone() + "\n").as_bytes()).unwrap();
-        }
+        self.config.save(self.get_chaser_config_path());
     }
 
     pub fn start_udp_server(ui: Arc<Mutex<UI>>, mut socket: UDPSocket) {
