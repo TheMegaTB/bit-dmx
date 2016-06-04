@@ -2,8 +2,6 @@ use std::sync::{Arc, Mutex, mpsc};
 use std::net::{TcpStream, SocketAddr};
 use std::thread;
 use std::io::prelude::*;
-use std::io::{BufReader, BufWriter};
-use std::fs::File;
 use std::time::Duration;
 use rustc_serialize::json;
 use std::path::PathBuf;
