@@ -92,4 +92,8 @@ impl FlatColor {
     pub fn pickled_bluewood() -> Color {
         rgb(0.203, 0.285, 0.367)
     }
+    #[allow(dead_code)]
+    pub fn gray() -> Color {
+        rgb(0.242, 0.273, 0.316)
+    }
 }

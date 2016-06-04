@@ -1,11 +1,16 @@
+use std::env;
+use std::fs::File;
+use std::io::prelude::*;
+
 pub fn get_path() -> String {
-    use std::env;
     env::current_dir().unwrap().display().to_string() + "/config/server/"
 }
 
-pub fn check_for_file(path: String) -> bool {
-    use std::fs::File;
+pub fn path_to_folder_name(path: String) -> String {
+    path.split("/").last().unwrap().to_string()
+}
 
+pub fn check_for_file(path: String) -> bool {
     match File::open(path) {
         Ok(file) => true,
         _ => false
@@ -13,9 +18,6 @@ pub fn check_for_file(path: String) -> bool {
 }
 
 pub fn get_file_content(path: String) -> String {
-    use std::fs::File;
-    use std::io::prelude::*;
-
     let mut f: File;
 
     match File::open(path) {
@@ -31,9 +33,6 @@ pub fn get_file_content(path: String) -> String {
 }
 
 pub fn write_file_content(path: String, content: String) {
-    use std::fs::File;
-    use std::io::prelude::*;
-
     let mut file_to_save: File;
     match File::create(path) {
         Ok(file) => file_to_save = file,

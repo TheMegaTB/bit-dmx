@@ -11,6 +11,7 @@ use piston_window::Window;
 //use std::any::Any;
 use std::iter::*;
 use std::fs;
+use std::ffi;
 
 use structures::ui::colors::FlatColor;
 use structures::ui::window::{create_window};
@@ -20,6 +21,9 @@ use file::*;
 
 mod parser;
 use parser::*;
+
+mod error;
+use error::*;
 
 widget_ids! {
     BACKGROUND,
@@ -31,6 +35,9 @@ widget_ids! {
     CONFIG_SELECT_BUTTON with 100,
     CREATE_NEW_BUTTON,
     FIXTURE with 1000,
+    ADD_FIXTURE_TEMPLATE_BUTTON,
+    ADD_CHANNEL_GROUP_BUTTON,
+    BACK_TO_FIXTURE_TEMPLATE_LIST_BUTTON,
 }
 
 pub struct FixtureWindow {}
@@ -42,7 +49,9 @@ impl FixtureWindow {
         };
 
         let mut config: Option<parser::Config> = None;
+        let mut path_to_config = "".to_string();
 
+        let mut current_fixture_templat_id: Option<usize> = None;
 
         while let Some(event) = window.next() {
             conrod_ui.handle_event(&event);
@@ -93,21 +102,95 @@ impl FixtureWindow {
 
                 match config {
                     Some(ref mut config) => {
+
+                        ///////////////
+                        // Left Side //
+                        ///////////////
                         Canvas::new()
                             .frame(1.0)
-                            .scroll_kids()
+                            .scroll_kids_vertically() //TODO
                             .pad(5.0)
                             .w_h(window.size().width as f64 / 2.0, window.size().height as f64 - title_size)
                             .top_left_of(BODY)
-                            .color(FlatColor::pickled_bluewood())
+                            .color(FlatColor::peter_river())
                             .set(LEFT, &mut conrod_ui);
 
+                        match current_fixture_templat_id {
+                            Some(id) => {
+                                Button::new()
+                                    .w_h(200.0, 30.0)
+                                    .label("Back")
+                                    .top_left_with_margin_on(LEFT, 10.0)
+                                    .color(FlatColor::alizarin())
+                                    .react(|| current_fixture_templat_id = None)
+                                    .set(BACK_TO_FIXTURE_TEMPLATE_LIST_BUTTON, &mut conrod_ui);
+
+                                Button::new()
+                                    .w_h(200.0, 30.0)
+                                    .label("New Channel-Group")
+                                    .right_from(BACK_TO_FIXTURE_TEMPLATE_LIST_BUTTON, 10.0)
+                                    .color(FlatColor::emerald())
+                                    .react(|| config.fixture_templates[id].channel_groups.push(parser::ChannelGroup::Single(0)))
+                                    .set(ADD_CHANNEL_GROUP_BUTTON, &mut conrod_ui);
+
+                                for (count, channel_group) in config.fixture_templates[id].channel_groups.iter().enumerate() {
+
+                                    let (name, channels) = match channel_group {
+                                        &parser::ChannelGroup::Single(ch1) => ("Single", vec!(ch1)),
+                                        &parser::ChannelGroup::RGB(ch1, ch2, ch3) => ("RGB", vec!(ch1, ch2, ch3)),
+                                        &parser::ChannelGroup::RGBA(ch1, ch2, ch3, ch4) => ("RGBA", vec!(ch1, ch2, ch3, ch4)),
+                                        &parser::ChannelGroup::Moving2D(ch1, ch2) => ("Moving2D", vec!(ch1, ch2)),
+                                    };
+
+                                    Button::new()
+                                        .w_h(200.0, 30.0)
+                                        .label(name)
+                                        .and_if(count > 0, |b| {
+                                            b.down_from(FIXTURE + (count - 1), 10.0)
+                                        })
+                                        .and_if(count == 0, |b| {
+                                            b.down_from(ADD_FIXTURE_TEMPLATE_BUTTON, 10.0)
+                                        })
+                                        .color(FlatColor::clouds())
+                                        .react(|| current_fixture_templat_id = Some(count))
+                                        .set(FIXTURE + count, &mut conrod_ui);
+                                }
+                            }
+                            None => {
+                                Button::new()
+                                    .w_h(200.0, 30.0)
+                                    .label("New Fixture-Template")
+                                    .top_left_with_margin_on(LEFT, 10.0)
+                                    .color(FlatColor::emerald())
+                                    .react(|| config.fixture_templates.push(parser::FixtureTemplate::new_empty()))
+                                    .set(ADD_FIXTURE_TEMPLATE_BUTTON, &mut conrod_ui);
+
+                                for (count, fixture_template) in config.fixture_templates.iter().enumerate() {
+                                    Button::new()
+                                        .w_h(200.0, 30.0)
+                                        .label(&fixture_template.name)
+                                        .and_if(count > 0, |b| {
+                                            b.down_from(FIXTURE + (count - 1), 10.0)
+                                        })
+                                        .and_if(count == 0, |b| {
+                                            b.down_from(ADD_FIXTURE_TEMPLATE_BUTTON, 10.0)
+                                        })
+                                        .color(FlatColor::clouds())
+                                        .react(|| current_fixture_templat_id = Some(count))
+                                        .set(FIXTURE + count, &mut conrod_ui);
+                                }
+                            }
+                        }
+
+                        ////////////////
+                        // Right Side //
+                        ////////////////
                         Canvas::new()
                             .frame(1.0)
                             .scroll_kids()
                             .pad(5.0)
                             .w_h(window.size().width as f64 / 2.0, window.size().height as f64 - title_size)
-                            .right(0.0)
+                            .align_right_of(BODY)
                             .color(FlatColor::pickled_bluewood())
                             .set(RIGHT, &mut conrod_ui)
 
@@ -116,15 +199,17 @@ impl FixtureWindow {
                         Button::new()
                             .w_h(200.0, 30.0)
                             .color(FlatColor::silver())
-                            .align_top_of(BODY)
-                            .align_middle_x_of(BODY)
+                            .mid_top_with_margin_on(BODY, 10.0)
                             .label("Create new config")
+                            .label_font_size(15)
                             .react(|| config = Some(parser::Config::new_empty()))
                             .set(CREATE_NEW_BUTTON, &mut conrod_ui);
 
-                        let paths = fs::read_dir(file::get_path()).unwrap();
+                        let mut paths = fs::read_dir(file::get_path()).unwrap();
 
                         for (pathnumber, path) in paths.enumerate() {
+                            //let p = path.clone();
+
                             Button::new()
                                 .w_h(200.0, 30.0)
                                 .color(FlatColor::silver())
@@ -134,16 +219,26 @@ impl FixtureWindow {
                                 .and_if(pathnumber == 0, |b| {
                                     b.down_from(CREATE_NEW_BUTTON, 10.0)
                                 })
-                                .label(&path.unwrap().path().display().to_string())
-                                .label_font_size(10)
-                                .react(|| config = Some(parser::Config::new_empty()))
+                                .label(&path.unwrap().path().file_name().unwrap().to_str().unwrap().clone())
+                                .label_font_size(15)
+                                .react(|| {
+                                    path_to_config = fs::read_dir(file::get_path()).unwrap().nth(pathnumber).unwrap().unwrap().path().display().to_string().clone() + "/fixtures.dmx";
+                                    if file::check_for_file(path_to_config.clone()) {
+                                        match parser::decode_file(file::get_file_content(path_to_config.clone())) {
+                                            Some(c) => config = Some(c),
+                                            _ => error::ErrorWindow::start("Error".to_string(), "There has been an error parsing the file.\nTry an other file or create a new one.".to_string())
+                                        }
+                                    } else {
+                                        path_to_config = "".to_string();
+                                    }
+                                })
                                 .set(CONFIG_SELECT_BUTTON + pathnumber, &mut conrod_ui);
                         }
 
 
                     },
                 }
-                
+
 /*
                 if file::check_for_file(path.clone()) == false {
                     Text::new(&"Couldn't find fixtures file".to_string())
