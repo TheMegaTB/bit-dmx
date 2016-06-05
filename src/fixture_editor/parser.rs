@@ -1,7 +1,7 @@
 use rustc_serialize::json;
 use structures::DmxAddress;
 
-#[derive(RustcDecodable, RustcEncodable, Debug)]
+#[derive(RustcDecodable, RustcEncodable, Debug, Clone)]
 pub enum ChannelGroup {
     Single(DmxAddress),
     RGB(DmxAddress, DmxAddress, DmxAddress),
@@ -9,7 +9,7 @@ pub enum ChannelGroup {
     Moving2D(DmxAddress, DmxAddress)
 }
 
-#[derive(RustcDecodable, RustcEncodable, Debug)]
+#[derive(RustcDecodable, RustcEncodable, Debug, Clone)]
 pub struct FixtureTemplate {
     pub name: String,
     pub channel_groups: Vec<ChannelGroup>,
@@ -24,7 +24,7 @@ impl FixtureTemplate {
     }
 }
 
-#[derive(RustcDecodable, RustcEncodable, Debug)]
+#[derive(RustcDecodable, RustcEncodable, Debug, Clone)]
 pub struct Fixture {
     pub channel: i32,
     pub template_name: String,
@@ -32,7 +32,8 @@ pub struct Fixture {
 }
 
 impl Fixture {
-    fn new(c: i32, t_n: String, n: String) -> Fixture {
+    //Do not delete
+    /*fn new(c: i32, t_n: String, n: String) -> Fixture {
         Fixture {
             channel: c,
             template_name: t_n,
@@ -45,10 +46,10 @@ impl Fixture {
             template_name: "Empty".to_string(),
             name: "Empty".to_string(),
         }
-    }
+    }*/
 }
 
-#[derive(RustcDecodable, RustcEncodable, Debug)]
+#[derive(RustcDecodable, RustcEncodable, Debug, Clone)]
 pub struct Stage {
     pub name: String,
     pub fixture: Vec<Fixture>,
@@ -63,7 +64,7 @@ impl Stage {
     }
 }
 
-#[derive(RustcDecodable, RustcEncodable, Debug)]
+#[derive(RustcDecodable, RustcEncodable, Debug, Clone)]
 pub struct Config {
     pub fixture_templates: Vec<FixtureTemplate>,
     pub stage: Stage,
