@@ -4,16 +4,33 @@ use logic::Channel;
 use std::sync::mpsc;
 use std::sync::{Arc, Mutex};
 
+/// The default time to save time
 pub type FadeTime = usize;
-const FADE_TICKS: FadeTime = 30;
+
+/// The fade steps per second. In the future this will be replaced by a dynamic number
+const FADE_TICKS: FadeTime = 30; //TODO replace this with a variable
 
 #[derive(Debug, Clone)]
 #[derive(RustcDecodable, RustcEncodable)]
+
+/// An enum to describe all possible fade curves, that are suported by bit dmx
 pub enum FadeCurve { //TODO add fadecurve from pointlist
+    /// A simple linear curve
     Linear,
+    /// A simple squared curve
     Squared,
+    /// A simple square root curve
     SquareRoot,
+    /// A sin curve with n hills
     Sin(u8),
+    /// A custom curve represented by a String
+    ///
+    /// # Examples
+    /// ```
+    /// use structures::logic::fade::FadeCurve;
+
+    /// let curve = FadeCurve::Custom("log(x)".to_string())
+    /// ```
     Custom(String)
 }
 

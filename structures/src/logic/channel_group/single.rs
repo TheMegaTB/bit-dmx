@@ -17,17 +17,21 @@ use logic::fade::try_stop_fades;
 
 #[derive(Debug)]
 pub struct Single {
+    /// The first channel
     pub channel1: Arc<Mutex<Channel>>,
+    /// List of activated switches to activate them again in the reverse order
     pub active_switches: Vec<(usize, ChannelGroupValue)>
 }
 
 impl Single {
+    /// Create an empty channel group with one channel
     pub fn new(channel1: Arc<Mutex<Channel>>) -> Single {
         Single {
             channel1: channel1,
             active_switches: Vec::new()
         }
     }
+
     pub fn fade_simple(&mut self, curve: FadeCurve, time: FadeTime, end_value: DmxValue, kill_others: bool) {
         let start_value = {self.channel1.lock().expect("Failed to lock Arc!").value};
         self.fade(curve, time, start_value, end_value, false, kill_others);
@@ -83,6 +87,7 @@ impl Single {
         }
     }
 
+    /// A function to get a vector of the DMX addresses used by this channel group
     pub fn get_addresses(&self) -> Vec<DmxAddress> {
         vec![
             self.channel1.lock().expect("Failed to lock Arc!").address

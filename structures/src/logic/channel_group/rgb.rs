@@ -11,23 +11,25 @@ use logic::ChannelGroupValue;
 use logic::Channel;
 use logic::fade::FadeCurve;
 
-// use rgb_to_hsv;
-// use hsv_to_rgb;
-//
-// use get_fade_steps;
 use logic::fade::get_step_number;
 use logic::fade::get_fade_steps_int;
 use logic::fade::try_stop_fades;
 
 #[derive(Debug)]
+/// Simple channel group to control rgb lights
 pub struct RGB {
+    /// The channel that is used for the red light
     channel_r: Arc<Mutex<Channel>>,
+    /// The channel that is used for the green light
     channel_g: Arc<Mutex<Channel>>,
+    /// The channel that is used for the blue light
     channel_b: Arc<Mutex<Channel>>,
+    /// List of activated switches to activate them again in the reverse order
     pub active_switches: Vec<(usize, ChannelGroupValue)>
 }
 
 impl RGB {
+    /// Create an empty rgb channel group
     pub fn new(channel_r: Arc<Mutex<Channel>>, channel_g: Arc<Mutex<Channel>>, channel_b: Arc<Mutex<Channel>>) -> RGB {
         RGB {
             channel_r: channel_r,
@@ -63,6 +65,7 @@ impl RGB {
     //     });
     // }
 
+    /// fade between the current state and a given state defind by a curve the time to fade and the final channel values
     pub fn fade_simple(&mut self, curve: FadeCurve, time: FadeTime, end_r: DmxValue, end_g: DmxValue, end_b: DmxValue, kill_others: bool) {
         let steps = get_step_number(time);
         let (tx, rx) = mpsc::channel();
@@ -92,6 +95,7 @@ impl RGB {
         }
     }
 
+    /// A function to get a vector of the DMX addresses used by this channel group
     pub fn get_addresses(&self) -> Vec<DmxAddress> {
         vec![
             self.channel_r.lock().expect("Failed to lock Arc!").address,
