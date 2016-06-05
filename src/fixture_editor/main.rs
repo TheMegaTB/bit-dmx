@@ -4,16 +4,13 @@
 extern crate piston_window;
 extern crate rustc_serialize;
 
-//use std::thread::{self, JoinHandle};
 use conrod::{Canvas, Text, Button, Frameable, Colorable, Sizeable, Positionable, Widget, Labelable, TextBox, DropDownList, Slider};
 use piston_window::UpdateEvent;
 use piston_window::Window;
-//use std::any::Any;
 use std::iter::*;
 use std::fs;
-//use std::ffi;
 
-use structures::DmxAddress;
+use structures::logic::channel::DmxAddress;
 
 use structures::ui::colors::FlatColor;
 use structures::ui::window::{create_window};
@@ -88,6 +85,7 @@ impl FixtureWindow {
                     .w(window.size().width as f64)
                     .set(BACKGROUND, &mut conrod_ui);
 
+                //Close
                 if close == true {
                     if save_color == FlatColor::silver() {
                         reset_config = true;
