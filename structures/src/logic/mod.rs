@@ -6,6 +6,7 @@ pub mod fade;
 pub mod fixture;
 pub mod stage;
 pub mod switch;
+pub mod server;
 
 pub use logic::channel_group::ChannelGroup;
 pub use logic::channel_group_value::ChannelGroupValue;

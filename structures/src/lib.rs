@@ -30,3 +30,4 @@ pub use res::git_hash::*;
 pub use res::compressed_data::get_assets_path;
 
 pub mod logic;
+pub use logic::server;

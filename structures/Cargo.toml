@@ -2,6 +2,7 @@
 name = "structures"
 version = "0.2.0"
 authors = ["Til Blechschmidt <til@blechschmidt.de>", "Noah Peeters <noah.peeters99@gmail.com>"]
+links = "interface"
 build = "build.rs"
 
 [dependencies]

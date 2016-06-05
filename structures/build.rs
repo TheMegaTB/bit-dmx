@@ -55,6 +55,14 @@ fn main() {
         println!("cargo:rerun-if-changed={}", branch.display());
     }
 
+    // Tell cargo not to recompile if any of the configs has changed
+    for if_c_source in recursive_ls(&Path::new("src/logic/server/interface/")) {
+        println!("cargo:rerun-if-changed={}", Path::new(&env::var("CARGO_MANIFEST_DIR").unwrap()).join(if_c_source).display());
+    }
+
+    // Compile the interface code
+    gcc::compile_library("libinterface.a", &["src/logic/server/interface/arduino-serial-lib.c", "src/logic/server/interface/arduino-serial-dmx.c"]);
+
     // Read and compress the assets folder into a binary blob included in the binary
     compress_and_save_folder("assets");
 
