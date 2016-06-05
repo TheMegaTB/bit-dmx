@@ -849,19 +849,19 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                         1 => true,
                         2 => true,
                         3 => {
-                            // XYPad::new(data.values[0], 0, 255, // x range.
-                            //            data.values[1], 0, 255)
-                            //     .w_h(item_width - item_x_offset, item_width - item_x_offset)
-                            //     .down(20.0 * app_theme.ui_scale)
-                            //     .align_right_of(EDITOR_CONTENT)
-                            //     .color(app_theme.slider_color)
-                            //     .frame(2.0)
-                            //     .line_thickness(2.0)
-                            //     .react(|new_x, new_y| {
-                            //         data.values[0] = new_x;
-                            //         data.values[1] = new_y;
-                            //     })
-                            //     .set(EDITOR_XY_PAD, conrod_ui);
+                            XYPad::new(data.values[0] as f32, 0.0, 255.0, // x range.
+                                       data.values[1] as f32, 0.0, 255.0)
+                                .w_h(item_width - item_x_offset, item_width - item_x_offset)
+                                .down(20.0 * app_theme.ui_scale)
+                                .align_right_of(EDITOR_CONTENT)
+                                .color(app_theme.slider_color)
+                                .frame(2.0)
+                                .line_thickness(2.0)
+                                .react(|new_x, new_y| {
+                                    ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().values[0] = new_x as u8;
+                                    ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().values[1] = new_y as u8;
+                                })
+                                .set(EDITOR_XY_PAD, conrod_ui);
                             false
                         },
                         _ => true
