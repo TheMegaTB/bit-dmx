@@ -1,3 +1,5 @@
+//TODO create a trait to do fixture.simple_fade
+
 pub mod rgb;
 pub mod rgba;
 pub mod single;
