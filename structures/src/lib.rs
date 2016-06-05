@@ -35,30 +35,32 @@ pub mod res;
 pub use res::git_hash::*;
 pub use res::compressed_data::get_assets_path;
 
+pub mod logic;
+
 // All the generic structs - this may need some restructuring as well
-pub mod channel;
-pub use channel::*;
-
-pub mod channel_group_value;
-pub use channel_group_value::*;
-
-pub mod fixture;
-pub use fixture::*;
-
-pub mod switch;
-pub use switch::*;
-
-pub mod chaser;
-pub use chaser::*;
-
-pub mod stage;
-pub use stage::*;
-
-pub mod fade_curve;
-pub use fade_curve::*;
-
-pub mod channel_groups;
-pub use channel_groups::single::*;
-pub use channel_groups::rgb::*;
-pub use channel_groups::rgba::*;
-pub use channel_groups::moving_2d::*;
+// pub mod channel;
+// pub use channel::*;
+//
+// pub mod channel_group_value;
+// pub use channel_group_value::*;
+//
+// pub mod fixture;
+// pub use fixture::*;
+//
+// pub mod switch;
+// pub use switch::*;
+//
+// pub mod chaser;
+// pub use chaser::*;
+//
+// pub mod stage;
+// pub use stage::*;
+//
+// pub mod fade_curve;
+// pub use fade_curve::*;
+//
+// pub mod channel_groups;
+// pub use channel_groups::single::*;
+// pub use channel_groups::rgb::*;
+// pub use channel_groups::rgba::*;
+// pub use channel_groups::moving_2d::*;
