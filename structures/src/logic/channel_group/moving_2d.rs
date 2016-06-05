@@ -18,8 +18,11 @@ use logic::fade::try_stop_fades;
 #[derive(Debug)]
 /// The channel group to move all these awesome moving heads
 pub struct Moving2D {
+    /// The channel that is used for the x coordinates
     channel_x: Arc<Mutex<Channel>>,
+    /// The channel that is used for the y coordinates
     channel_y: Arc<Mutex<Channel>>,
+    /// List of activated switches to activate them again in the reverse order
     pub active_switches: Vec<(usize, ChannelGroupValue)>
 }
 

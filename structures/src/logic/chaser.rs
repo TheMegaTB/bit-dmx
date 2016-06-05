@@ -7,46 +7,56 @@ use logic::Stage;
 use networking::UDPSocket;
 
 #[derive(Debug, Clone)]
+/// A struct that represents a chaser in the backend
 pub struct Chaser {
+    /// A list of ids of switches, which are part of this chaser
     pub switches: Vec<usize>,
+    /// The sender to interrupt the current chaser thread
     pub current_thread: Option<mpsc::Sender<()>>
 }
 
 #[derive(Debug, Clone, RustcDecodable, RustcEncodable)]
+/// The frontend representation of a chaser
 pub struct FrontendChaser {
+    /// A list of ids of switches, which are part of this chaser
     pub switches: Vec<usize>,
+    /// The bool to save if the chaser thread is running
     pub current_thread: bool
 }
 
 impl FrontendChaser {
+    /// Create an empty Chaser
     pub fn new() -> FrontendChaser {
         FrontendChaser {
             switches: Vec::new(),
             current_thread: true
         }
     }
+    /// Remove a switch with a given switch id from the chaser. This function also changes the ids of all switches
+    /// with a higher id.
     pub fn remove_switch_with_id(&mut self, switch_id: usize) {
         debug!("Removed switch {:?}", switch_id);
-        trace!("{:?}", self.switches);
         self.switches.retain(|&id| id != switch_id);
         self.switches = self.switches.iter().map(|x| if *x < switch_id {*x} else {x - 1}).collect();
-        trace!("{:?}", self.switches);
     }
 }
 
 impl Chaser {
+    /// Create an empty Chaser
     pub fn new() -> Chaser {
         Chaser {
             switches: Vec::new(),
             current_thread: None
         }
     }
+    /// Converts a frontend chaser to a backend chaser
     pub fn from_frontend_data(frontend_chaser: FrontendChaser) -> Chaser {
         Chaser {
             switches: frontend_chaser.switches,
             current_thread: None
         }
     }
+    /// Stops the chaser thread if it is running
     pub fn stop_chaser(&mut self) {
         match self.current_thread {
             Some(ref tx) => {
@@ -56,6 +66,8 @@ impl Chaser {
         }
         self.current_thread = None;
     }
+
+    /// Converts a backend chaser to a frontend chaser
     pub fn get_frontend_data(&self) -> FrontendChaser {
         FrontendChaser {
             switches: self.switches.clone(),
@@ -64,8 +76,8 @@ impl Chaser {
     }
 }
 
+/// This function starts a chaser thread for a chaser of a given switch
 pub fn start_chaser_of_switch(stage: Arc<Mutex<Stage>>, switch_id: usize, dimmer_value: f64) {
-
     let addr_high = (switch_id >> 8) as u8;
     let addr_low = switch_id as u8;
     UDPSocket::new().start_frontend_client().send_to_multicast(&[2, addr_high, addr_low, dimmer_value as u8]);

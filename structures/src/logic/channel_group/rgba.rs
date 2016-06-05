@@ -17,15 +17,22 @@ use logic::fade::try_stop_fades;
 use logic::fade::FadeCurve;
 
 #[derive(Debug)]
-pub struct RGBA{
+/// Simple channel group to control rgba lights
+pub struct RGBA {
+    /// The channel that is used for the red light
     channel_r: Arc<Mutex<Channel>>,
+    /// The channel that is used for the green light
     channel_g: Arc<Mutex<Channel>>,
+    /// The channel that is used for the blue light
     channel_b: Arc<Mutex<Channel>>,
+    /// The channel that is used for the alpha value
     channel_a: Arc<Mutex<Channel>>,
+    /// List of activated switches to activate them again in the reverse order
     pub active_switches: Vec<(usize, ChannelGroupValue)>
 }
 
 impl RGBA {
+    /// Create an empty rgba channel group
     pub fn new(channel_r: Arc<Mutex<Channel>>, channel_g: Arc<Mutex<Channel>>, channel_b: Arc<Mutex<Channel>>, channel_a: Arc<Mutex<Channel>>) -> RGBA {
         RGBA{
             channel_r: channel_r,
@@ -67,6 +74,7 @@ impl RGBA {
     //     });
     // }
 
+    /// fade between the current state and a given state defind by a curve the time to fade and the final channel values
     pub fn fade_simple(&mut self, curve: FadeCurve, time: FadeTime, end_r: DmxValue, end_g: DmxValue, end_b: DmxValue, end_a: DmxValue, kill_others: bool) {
         let steps = get_step_number(time);
         let (tx, rx) = mpsc::channel();
@@ -96,6 +104,7 @@ impl RGBA {
         }
     }
 
+    /// A function to get a vector of the DMX addresses used by this channel group
     pub fn get_addresses(&self) -> Vec<DmxAddress> {
         vec![
             self.channel_r.lock().expect("Failed to lock Arc!").address,

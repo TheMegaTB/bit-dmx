@@ -3,14 +3,19 @@ use std::cmp;
 
 use std::error::Error;
 
+/// The default type for dmx channel values
 pub type DmxValue = u8;
+/// The default type for dmx channel addresses
 pub type DmxAddress = u16;
 
 #[derive(Debug)]
+/// The struct that represents a dmx channel
 pub struct Channel {
+    /// The current value of the channel
     current_value: DmxValue,
-
+    /// The value that is set to the channel. If the preheat value is higher then this value the current_value is set to the preheat value
     pub value: DmxValue,
+    /// The preheat value that is set for the channel
     pub preheat_value: DmxValue,
     pub max_preheat_value: DmxValue,
 
