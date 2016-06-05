@@ -3,8 +3,8 @@ use std::cmp;
 
 use std::error::Error;
 
-use DmxValue;
-use DmxAddress;
+pub type DmxValue = u8;
+pub type DmxAddress = u16;
 
 #[derive(Debug)]
 pub struct Channel {

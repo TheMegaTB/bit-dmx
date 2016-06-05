@@ -1,4 +1,11 @@
 use meval::Expr;
+use logic::channel::DmxValue;
+use logic::Channel;
+use std::sync::mpsc;
+use std::sync::{Arc, Mutex};
+
+pub type FadeTime = usize;
+const FADE_TICKS: FadeTime = 30;
 
 #[derive(Debug, Clone)]
 #[derive(RustcDecodable, RustcEncodable)]
@@ -57,4 +64,36 @@ impl FadeCurve {
             _ => "x".to_string()
         }
     }
+}
+
+pub fn get_step_number(time: FadeTime) -> usize {
+    let steps = time*FADE_TICKS/1000;
+    if steps > 0 {
+        steps
+    }
+    else {
+        1
+    }
+}
+
+pub fn get_fade_steps_int(start_value: DmxValue, target_value: DmxValue, steps: usize, curve: FadeCurve) -> Vec<DmxValue> {
+    get_fade_steps(start_value as f64, target_value as f64, steps, curve).iter().map(|x| *x as DmxValue).collect()
+}
+
+pub fn get_fade_steps(start_value: f64, target_value: f64, steps: usize, curve: FadeCurve) -> Vec<f64> {
+    let curve_fn = &*curve.to_function();
+    let y_offset = curve_fn(0f64);
+    let y_scale = 1f64/(curve_fn(1f64)-y_offset);
+    if target_value > start_value {
+        (1..steps + 1).map(|step| (start_value + ((target_value - start_value) * curve_fn(                step as f64 /steps as f64) - y_offset) *  y_scale).max(0f64).min(255f64)).collect()
+    }
+    else {
+        (1..steps + 1).map(|step| (target_value + ((target_value - start_value) * curve_fn((steps as f64 - step as f64)/steps as f64) - y_offset) * -y_scale).max(0f64).min(255f64)).collect()
+    }
+}
+
+pub fn stop_fade(channel: Arc<Mutex<Channel>>, tx: mpsc::Sender<()>) {
+    let mut channel_locked = channel.lock().expect("Failed to lock Arc!");
+    channel_locked.stop_fade();
+    channel_locked.current_thread = Some(tx);
 }

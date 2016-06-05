@@ -1,4 +1,10 @@
+use std::sync::{Arc, Mutex};
 use std::sync::mpsc;
+use std::time::Duration;
+use std::thread::{self, sleep};
+
+use logic::Stage;
+use networking::UDPSocket;
 
 #[derive(Debug, Clone)]
 pub struct Chaser {
@@ -56,4 +62,37 @@ impl Chaser {
             current_thread: self.current_thread.is_some()
         }
     }
+}
+
+pub fn start_chaser_of_switch(stage: Arc<Mutex<Stage>>, switch_id: usize, dimmer_value: f64) {
+
+    let addr_high = (switch_id >> 8) as u8;
+    let addr_low = switch_id as u8;
+    UDPSocket::new().start_frontend_client().send_to_multicast(&[2, addr_high, addr_low, dimmer_value as u8]);
+    let (chaser, rx) = {
+        let mut stage_locked = stage.lock().expect("Failed to lock Arc!");
+        let chaser_id = stage_locked.switches[switch_id].clone().chaser_id;
+        let mut chaser = stage_locked.chasers.get_mut(&chaser_id).unwrap();
+            chaser.stop_chaser();
+        if dimmer_value == 0.0 {
+            return
+        }
+        let (tx, rx) = mpsc::channel();
+        chaser.current_thread = Some(tx);
+        (chaser.clone(), rx)
+    };
+    thread::spawn(move || {
+        let mut current_switch_id_in_chaser: usize = 0; //TODO use switch_id
+        loop {
+            {stage.lock().expect("Failed to lock Arc!").deactivate_group_of_switch(chaser.switches[current_switch_id_in_chaser]);}
+            {stage.lock().expect("Failed to lock Arc!").set_switch(chaser.switches[current_switch_id_in_chaser], dimmer_value);}
+            let sleep_time = {
+                let stage_locked = stage.lock().expect("Failed to lock Arc!");
+                stage_locked.switches[chaser.switches[current_switch_id_in_chaser]].before_chaser as u64
+            };
+            sleep(Duration::from_millis(sleep_time));
+            if rx.try_recv().is_ok() { return };
+            current_switch_id_in_chaser = (current_switch_id_in_chaser + 1) % chaser.switches.len();
+        }
+    });
 }

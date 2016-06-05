@@ -3,21 +3,21 @@ use std::time::Duration;
 use std::thread::{self, sleep};
 use std::sync::mpsc;
 
-use DmxValue;
-use DmxAddress;
-use FadeTime;
-use ChannelGroupValue;
+use logic::channel::DmxValue;
+use logic::channel::DmxAddress;
+use logic::fade::FadeTime;
+use logic::ChannelGroupValue;
 
-use Channel;
-use FadeCurve;
+use logic::Channel;
+use logic::fade::FadeCurve;
 
 // use rgb_to_hsv;
 // use hsv_to_rgb;
 //
 // use get_fade_steps;
-use get_step_number;
-use get_fade_steps_int;
-use stop_fade;
+use logic::fade::get_step_number;
+use logic::fade::get_fade_steps_int;
+use logic::fade::stop_fade;
 
 #[derive(Debug)]
 pub struct RGB {
