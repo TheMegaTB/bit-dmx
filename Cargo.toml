@@ -2,8 +2,8 @@
 name = "dmx"
 version = "0.1.3"
 authors = ["Til Blechschmidt <til@blechschmidt.de>", "Noah Peeters <noah.peeters99@gmail.com>"]
-links = "interface"
-build = "build.rs"
+# links = "interface"
+# build = "build.rs"
 
 [[bin]]
 name = "frontend"
@@ -19,7 +19,7 @@ path = "src/fixture_editor/main.rs"
 
 [dependencies]
 conrod = "0.35.0"  # UI Framework
-piston_window = "0.47.0"  # Backend for UI
+piston_window = "0.48.0"  # Backend for UI
 find_folder = "0.3.0"  # Finding the assets folder
 log = "0.3.6"  # Base for custom logger
 rustc-serialize = "0.3.19"  # Storing and transmitting of encoded values

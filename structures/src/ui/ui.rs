@@ -7,9 +7,9 @@ use rustc_serialize::json;
 use std::path::PathBuf;
 
 
-use super::super::io::config::{get_config_path, Config};
+use io::config::{get_config_path, Config};
 use networking::UDPSocket;
-use super::frontend_data::FrontendData;
+use ui::FrontendData;
 use networking::WatchDogClient;
 use networking::WATCHDOG_TTL;
 use super::frontend_config::FrontendConfig;
@@ -82,7 +82,7 @@ impl UI {
     }
 
     pub fn get_chaser_config_path(&self) -> PathBuf {
-        get_config_path(Config::Client, &self.frontend_data.name).join(self.frontend_data.name.clone()  + ".local.dmx")
+        get_config_path(Config::Client).join(self.frontend_data.name.clone()  + ".local.dmx")
     }
 
     pub fn load_chaser_config(&mut self) {

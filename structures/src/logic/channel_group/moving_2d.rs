@@ -3,19 +3,20 @@ use std::time::Duration;
 use std::thread::{self, sleep};
 use std::sync::mpsc;
 
-use DmxValue;
-use DmxAddress;
-use FadeTime;
-use ChannelGroupValue;
+use logic::channel::DmxValue;
+use logic::channel::DmxAddress;
+use logic::fade::FadeTime;
+use logic::ChannelGroupValue;
 
-use Channel;
-use FadeCurve;
+use logic::Channel;
+use logic::fade::FadeCurve;
 
-use get_step_number;
-use get_fade_steps_int;
-use try_stop_fades;
+use logic::fade::get_step_number;
+use logic::fade::get_fade_steps_int;
+use logic::fade::try_stop_fades;
 
 #[derive(Debug)]
+/// The channel group to move all these awesome moving heads
 pub struct Moving2D {
     channel_x: Arc<Mutex<Channel>>,
     channel_y: Arc<Mutex<Channel>>,
@@ -23,6 +24,7 @@ pub struct Moving2D {
 }
 
 impl Moving2D {
+    /// Create an empty moving head channel group with 2 channels
     pub fn new(channel_x: Arc<Mutex<Channel>>, channel_y: Arc<Mutex<Channel>>) -> Moving2D {
         Moving2D {
             channel_x: channel_x,
@@ -31,6 +33,7 @@ impl Moving2D {
         }
     }
 
+    /// fade between the current state and a given state defind by a curve the time to fade and the final channel values
     pub fn fade_simple(&mut self, curve: FadeCurve, time: FadeTime, end_x: DmxValue, end_y: DmxValue, kill_others: bool) {
         let steps = get_step_number(time);
         let (tx, rx) = mpsc::channel();
@@ -55,6 +58,7 @@ impl Moving2D {
         }
     }
 
+    /// A function to get a vector of the DMX addresses used by this channel group
     pub fn get_addresses(&self) -> Vec<DmxAddress> {
         vec![
             self.channel_x.lock().expect("Failed to lock Arc!").address,

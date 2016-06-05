@@ -19,19 +19,20 @@ use conrod::{
     Sizeable,
     Slider,
     NumberDialer,
-    TextBox
+    TextBox,
+    XYPad
 };
 use piston_window::{ UpdateEvent, PressEvent, ReleaseEvent, Window };
 
-// use structures::ui::window::{create_window, UiCell, DMXWindow};
-use structures::ui::window::{create_window, UiCell};
-use structures::ui::ui::UI;
-use structures::ui::theme::Theme;
-use structures::ui::error_window::error_message;
-use structures::FadeTime;
-use structures::JsonSwitch;
-use structures::FadeCurve;
+//use structures::ui::window::{create_window, UiCell, DMXWindow};
+use structures::ui::UI;
+use structures::ui::Theme;
+use structures::logic::fade::FadeTime;
+use structures::logic::switch::JsonSwitch;
+use structures::logic::fade::FadeCurve;
 use structures::io::logger::Logger;
+use structures::ui::window::create_window;
+use structures::ui::window::UiCell;
 use structures::GIT_HASH;
 use structures::VERSION;
 
@@ -66,7 +67,8 @@ widget_ids! {
     EDITOR_SWITCH_TEXT with 4000,
     EDITOR_SWITCH_DROP_DOWNS with 4000,
     EDITOR_CURVE_STRING1,
-    EDITOR_CURVE_STRING2
+    EDITOR_CURVE_STRING2,
+    EDITOR_XY_PAD
 }
 
 fn create_output_window(ui: Arc<Mutex<UI>>) {
@@ -841,27 +843,53 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
 
 
                 if dropdown_index as i64 == ui.current_edited_channel_group_id {
-                    for (index, &value) in data.values.iter().enumerate() {
-                        let label = {
-                            let mut text = "Value: ".to_string();
-                            text.push_str(&value.to_string());
-                            text
-                        };
-                        Slider::new(value as f32, 0.0, 255.0)
-                            .w_h(item_width - item_x_offset, item_height)
-                            .down(20.0 * app_theme.ui_scale)
-                            .align_right_of(EDITOR_CONTENT)
-                            .color(app_theme.slider_color)
-                            .frame(2.0)
-                            .label(&label)
-                            .label_color(app_theme.font_color)
-                            .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
-                            .react(|new_value: f32| {
-                                ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().values[index] = new_value as u8;
-                                ui.send_data();
-                            })
-                            .set(EDITOR_SWITCH_SLIDER + editor_switch_slider_count, conrod_ui);
-                        editor_switch_slider_count += 1;
+
+                    let use_slieders = match ui.frontend_data.fixtures[fixture_id].channel_groups[channel_group_id].0 { //ids are defind in fixtures.rs::50
+                        0 => true,
+                        1 => true,
+                        2 => true,
+                        3 => {
+                            XYPad::new(data.values[0] as f32, 0.0, 255.0, // x range.
+                                       data.values[1] as f32, 0.0, 255.0)
+                                .w_h(item_width - item_x_offset, item_width - item_x_offset)
+                                .down(20.0 * app_theme.ui_scale)
+                                .align_right_of(EDITOR_CONTENT)
+                                .color(app_theme.slider_color)
+                                .frame(2.0)
+                                .line_thickness(2.0)
+                                .react(|new_x, new_y| {
+                                    ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().values[0] = new_x as u8;
+                                    ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().values[1] = new_y as u8;
+                                })
+                                .set(EDITOR_XY_PAD, conrod_ui);
+                            false
+                        },
+                        _ => true
+                    };
+
+                    if use_slieders {
+                        for (index, &value) in data.values.iter().enumerate() {
+                            let label = {
+                                let mut text = "Value: ".to_string();
+                                text.push_str(&value.to_string());
+                                text
+                            };
+                            Slider::new(value as f32, 0.0, 255.0)
+                                .w_h(item_width - item_x_offset, item_height)
+                                .down(20.0 * app_theme.ui_scale)
+                                .align_right_of(EDITOR_CONTENT)
+                                .color(app_theme.slider_color)
+                                .frame(2.0)
+                                .label(&label)
+                                .label_color(app_theme.font_color)
+                                .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
+                                .react(|new_value: f32| {
+                                    ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().values[index] = new_value as u8;
+                                    ui.send_data();
+                                })
+                                .set(EDITOR_SWITCH_SLIDER + editor_switch_slider_count, conrod_ui);
+                            editor_switch_slider_count += 1;
+                        }
                     }
 
                     let mut fade_curve_list = vec!("Linear".to_string(), "Squared".to_string(), "Square root".to_string(), "Custom".to_string());

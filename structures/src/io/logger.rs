@@ -1,3 +1,4 @@
+//! Very sexy logger specifically designed for BitDMX.
 use log::{LogRecord, LogLevel, LogLocation, LogMetadata, set_logger, self};
 use std::env;
 use std::str::FromStr;
@@ -5,11 +6,12 @@ pub use ansi_term::*;
 
 use std::error::Error;
 
-use DmxAddress;
-use DmxValue;
+use logic::channel::DmxAddress;
+use logic::channel::DmxValue;
 
 const DEFAULT_LOGLEVEL: LogLevel = LogLevel::Info;
 
+/// The logger type responsible for printing that sexy output you see when launching BitDMX
 pub struct Logger {
     level: LogLevel,
     show_gfx_log: bool,
@@ -17,6 +19,15 @@ pub struct Logger {
 }
 
 impl Logger {
+    /// This function initializes the logger and enables it.
+    ///
+    /// When enabling it reads the following environment variables for configuration:
+    ///
+    /// `LOG`      the loglevel at which it may print (trace, debug, info, warn, error)
+    ///
+    /// `PATHS`    whether or not to show the origin of a message (true, false)
+    ///
+    /// `GFX_LOG`  if the output of the gfx crate regarding system info should be shown or not (true, false)
     pub fn init() {
         match set_logger(|max_log_level| {
             let level = match env::var("LOG") {
@@ -88,40 +99,7 @@ impl log::Log for Logger {
     }
 }
 
-// pub fn init_logger() {//-> Result<(), SetLoggerError> {
-//     match set_logger(|max_log_level| {
-//         let level = match env::var("LOG") {
-//             Ok(level) => {
-//                 match LogLevel::from_str(&level) {
-//                     Ok(level) => level,
-//                     Err(_) => DEFAULT_LOGLEVEL
-//                 }
-//             },
-//             Err(_) => DEFAULT_LOGLEVEL
-//         };
-//         let show_paths = match env::var("PATHS") {
-//             Ok(val) => val == String::from("true"),
-//             Err(_) => false
-//         };
-//         let show_gfx_log = match env::var("GFX_LOG") {
-//             Ok(val) => val == String::from("true"),
-//             Err(_) => false
-//         };
-//         max_log_level.set(level.to_log_level_filter());
-//         Box::new(SimpleLogger {
-//             level: level,
-//             show_gfx_log: show_gfx_log,
-//             show_paths: show_paths
-//         })
-//     }) {
-//         Ok(_) => {},
-//         Err(e) => {
-//             println!("{} Failed to set logger: {}", Colour::Fixed(160).bold().paint("       Error"), e.description());
-//             ::std::process::exit(6);
-//         }
-//     }
-// }
-
+/// Print the (fake) interface output according to the style guidelines set by the logger
 pub fn fake_if_print(channel: DmxAddress, value: DmxValue) {
     let prefix = Colour::Fixed(14).bold().paint("   Interface");
     println!("{} C{} -> V{}", prefix, channel, value);
