@@ -1,16 +1,16 @@
 use std::collections::HashMap;
 use rustc_serialize::json;
 
-use DmxAddress;
-use DmxValue;
+use logic::channel::DmxAddress;
+use logic::channel::DmxValue;
 
-use EmptyFixture;
+use logic::fixture::EmptyFixture;
 
-use ChannelGroupValue;
-use FadeCurve;
-use JsonSwitch;
+use logic::ChannelGroupValue;
+use logic::fade::FadeCurve;
+use logic::switch::JsonSwitch;
 
-use FrontendChaser;
+use logic::chaser::FrontendChaser;
 
 #[derive(Debug, Clone, RustcDecodable, RustcEncodable)]
 pub struct FrontendData {

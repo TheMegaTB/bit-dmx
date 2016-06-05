@@ -3,17 +3,17 @@ use std::time::Duration;
 use std::thread::{self, sleep};
 use std::sync::mpsc;
 
-use DmxValue;
-use DmxAddress;
-use FadeTime;
-use ChannelGroupValue;
+use logic::channel::DmxValue;
+use logic::channel::DmxAddress;
+use logic::fade::FadeTime;
+use logic::ChannelGroupValue;
 
-use Channel;
-use FadeCurve;
+use logic::Channel;
+use logic::fade::FadeCurve;
 
-use get_step_number;
-use get_fade_steps_int;
-use try_stop_fades;
+use logic::fade::get_step_number;
+use logic::fade::get_fade_steps_int;
+use logic::fade::try_stop_fades;
 
 #[derive(Debug)]
 pub struct Moving2D {

@@ -1,11 +1,4 @@
-use DmxValue;
-use FadeCurve;
-use Channel;
-use std::sync::mpsc;
-use std::sync::{Arc, Mutex};
-
-use FadeTime;
-use FADE_TICKS;
+use logic::channel::DmxValue;
 
 #[macro_export]
 macro_rules! exit {
@@ -95,54 +88,4 @@ pub fn hsv_to_rgb(h: f64, s: f64, v: f64) -> (DmxValue, DmxValue, DmxValue) {
         (c, 0f64, x)
     };
     (((r2+m)*255f64) as DmxValue, ((g2+m)*255f64) as DmxValue, ((b2+m)*255f64) as DmxValue)
-}
-
-pub fn get_step_number(time: FadeTime) -> usize {
-    let steps = time*FADE_TICKS/1000;
-    if steps > 0 {
-        steps
-    }
-    else {
-        1
-    }
-}
-
-pub fn get_fade_steps_int(start_value: DmxValue, target_value: DmxValue, steps: usize, curve: FadeCurve) -> Vec<DmxValue> {
-    get_fade_steps(start_value as f64, target_value as f64, steps, curve).iter().map(|x| *x as DmxValue).collect()
-}
-
-pub fn get_fade_steps(start_value: f64, target_value: f64, steps: usize, curve: FadeCurve) -> Vec<f64> {
-    let curve_fn = &*curve.to_function();
-    let y_offset = curve_fn(0f64);
-    let y_scale = 1f64/(curve_fn(1f64)-y_offset);
-    if target_value > start_value {
-        (1..steps + 1).map(|step| (start_value + ((target_value - start_value) * curve_fn(                step as f64 /steps as f64) - y_offset) *  y_scale).max(0f64).min(255f64)).collect()
-    }
-    else {
-        (1..steps + 1).map(|step| (target_value + ((target_value - start_value) * curve_fn((steps as f64 - step as f64)/steps as f64) - y_offset) * -y_scale).max(0f64).min(255f64)).collect()
-    }
-}
-
-pub fn stop_fade(channel: &Arc<Mutex<Channel>>, tx: mpsc::Sender<()>) {
-    let mut channel_locked = channel.lock().expect("Failed to lock Arc!");
-    channel_locked.stop_fade();
-    channel_locked.current_thread = Some(tx);
-}
-
-pub fn try_stop_fades(channels: Vec<&Arc<Mutex<Channel>>>, tx: mpsc::Sender<()>, kill_others: bool) -> bool {
-    let mut channel_blocked = false;
-    for channel in channels.iter() {
-        let channel_locked = channel.lock().expect("Failed to lock Arc!");
-        if channel_locked.current_thread.is_some() {
-            channel_blocked = true;
-        }
-    }
-    if !channel_blocked || (channel_blocked && kill_others) {
-        for channel in channels.iter() {
-            stop_fade(channel, tx.clone())
-        }
-        true
-    }
-    else {false}
-
 }

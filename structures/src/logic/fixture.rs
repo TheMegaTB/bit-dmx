@@ -1,9 +1,6 @@
-use channel_groups::single::*;
-use channel_groups::rgb::*;
-use channel_groups::rgba::*;
-use channel_groups::moving_2d::*;
+use logic::ChannelGroup;
 
-use DmxAddress;
+use logic::channel::DmxAddress;
 
 
 #[derive(Debug, Clone, RustcDecodable, RustcEncodable)]
@@ -54,12 +51,4 @@ fn channel_group_to_id(c: &ChannelGroup) -> (u8, Vec<DmxAddress>) {
         &ChannelGroup::RGBA(ref group) => (2, group.get_addresses()),
         &ChannelGroup::Moving2D(ref group) => (3, group.get_addresses())
     }
-}
-
-#[derive(Debug)]
-pub enum ChannelGroup {
-    Single(Single),
-    RGB(RGB),
-    RGBA(RGBA),
-    Moving2D(Moving2D)
 }

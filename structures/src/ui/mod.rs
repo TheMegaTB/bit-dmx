@@ -5,3 +5,7 @@ pub mod ui;
 pub mod theme;
 pub mod frontend_config;
 pub mod error_window;
+
+pub use ui::ui::UI;
+pub use ui::theme::Theme;
+pub use ui::frontend_data::FrontendData;

@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
-use ChannelGroupValue;
+use logic::ChannelGroupValue;
 use rustc_serialize::json;
-use FadeTime;
+use logic::fade::FadeTime;
 use piston_window::keyboard::Key;
 
 

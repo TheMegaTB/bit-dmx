@@ -1,7 +1,8 @@
-use DmxValue;
-use FadeTime;
-use ChannelGroupValueTuple;
-use FadeCurve;
+use logic::channel::DmxValue;
+use logic::fade::FadeCurve;
+use logic::fade::FadeTime;
+
+pub type ChannelGroupValueTuple = (Vec<DmxValue>, (FadeCurve, FadeTime), (FadeCurve, FadeTime));
 
 #[derive(Debug, Clone, RustcDecodable, RustcEncodable)]
 pub struct ChannelGroupValue {
