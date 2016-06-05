@@ -34,10 +34,10 @@ impl Single {
 
     pub fn fade_simple(&mut self, curve: FadeCurve, time: FadeTime, end_value: DmxValue, kill_others: bool) {
         let start_value = {self.channel1.lock().expect("Failed to lock Arc!").value};
-        self.fade(curve, time, start_value, end_value, false, kill_others);
+        self.fade(curve, time, start_value, end_value, kill_others);
     }
 
-    pub fn fade(&mut self, curve: FadeCurve, time: FadeTime, start_value: DmxValue, end_value: DmxValue, preheat: bool, kill_others: bool) {
+    pub fn fade(&mut self, curve: FadeCurve, time: FadeTime, start_value: DmxValue, end_value: DmxValue, kill_others: bool) {
         let steps = get_step_number(time);
         let (tx, rx) = mpsc::channel();
         let channel1 = self.channel1.clone();
@@ -50,12 +50,7 @@ impl Single {
                         if rx.try_recv().is_ok() { return }
                         let mut channel1_locked = channel1.lock().expect("Failed to lock Arc!");
 
-                        if preheat {
-                                channel1_locked.set_preheat(value);
-                        }
-                        else {
-                            channel1_locked.set(value);
-                        }
+                        channel1_locked.set(value);
                     }
                     sleep(Duration::from_millis((time/steps) as u64));
                 }
@@ -63,29 +58,28 @@ impl Single {
             });
         }
     }
-
-    pub fn activate_preheat(&mut self, curve: FadeCurve, time: FadeTime) {
-        let preheat_value = {self.channel1.lock().expect("Failed to lock Arc!").preheat_value};
-        let max_preheat_value = {self.channel1.lock().expect("Failed to lock Arc!").max_preheat_value};
-        let value = {self.channel1.lock().expect("Failed to lock Arc!").value};
-        if max_preheat_value > value {
-            self.fade(curve, time, preheat_value, max_preheat_value, true, true);
-        }
-        else {
-            self.channel1.lock().expect("Failed to lock Arc!").set_preheat(max_preheat_value);
-        }
-    }
-
-    pub fn deactivate_preheat(&mut self, curve: FadeCurve, time: FadeTime) {
-        let preheat_value = {self.channel1.lock().expect("Failed to lock Arc!").preheat_value};
-        let value = {self.channel1.lock().expect("Failed to lock Arc!").value};
-        if preheat_value > value {
-            self.fade(curve, time, preheat_value, 0, true, true);
-        }
-        else {
-            self.channel1.lock().expect("Failed to lock Arc!").set_preheat(0);
-        }
-    }
+    // pub fn activate_preheat(&mut self, curve: FadeCurve, time: FadeTime) {
+    //     let preheat_value = {self.channel1.lock().expect("Failed to lock Arc!").preheat_value};
+    //     let max_preheat_value = {self.channel1.lock().expect("Failed to lock Arc!").max_preheat_value};
+    //     let value = {self.channel1.lock().expect("Failed to lock Arc!").value};
+    //     if max_preheat_value > value {
+    //         self.fade(curve, time, preheat_value, max_preheat_value, true, true);
+    //     }
+    //     else {
+    //         self.channel1.lock().expect("Failed to lock Arc!").set_preheat(max_preheat_value);
+    //     }
+    // }
+    //
+    // pub fn deactivate_preheat(&mut self, curve: FadeCurve, time: FadeTime) {
+    //     let preheat_value = {self.channel1.lock().expect("Failed to lock Arc!").preheat_value};
+    //     let value = {self.channel1.lock().expect("Failed to lock Arc!").value};
+    //     if preheat_value > value {
+    //         self.fade(curve, time, preheat_value, 0, true, true);
+    //     }
+    //     else {
+    //         self.channel1.lock().expect("Failed to lock Arc!").set_preheat(0);
+    //     }
+    // }
 
     /// A function to get a vector of the DMX addresses used by this channel group
     pub fn get_addresses(&self) -> Vec<DmxAddress> {

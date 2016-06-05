@@ -15,9 +15,6 @@ pub struct Channel {
     current_value: DmxValue,
     /// The value that is set to the channel. If the preheat value is higher then this value the current_value is set to the preheat value
     pub value: DmxValue,
-    /// The preheat value that is set for the channel
-    pub preheat_value: DmxValue,
-    pub max_preheat_value: DmxValue,
 
     pub address: DmxAddress,
     dmx_tx: mpsc::Sender<(DmxAddress, DmxValue)>,
@@ -30,8 +27,6 @@ impl Channel {
         Channel {
             current_value: old_value,
             value: old_value,
-            preheat_value: 0,
-            max_preheat_value: max_preheat_value,
             address: address,
             dmx_tx: dmx_tx,
             current_thread: None
@@ -44,14 +39,9 @@ impl Channel {
         self.value = value;
         self.update();
     }
-    pub fn set_preheat(&mut self, value: DmxValue) {
-        self.preheat_value = value;
-        self.update();
-    }
     fn update(&mut self) {
-        let new_value = cmp::max(self.preheat_value, self.value);
-        if self.current_value != new_value {
-            self.current_value = new_value;
+        if self.current_value != self.value {
+            self.current_value = self.value;
             match self.dmx_tx.send((self.address, self.current_value)) {
                 Ok(_) => {}, Err(e) => {exit!(7, "Failed to send value to dmx interface handler: {}", e.description());}
             };

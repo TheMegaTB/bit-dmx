@@ -32,14 +32,14 @@ pub fn start(instance_name: String, interface_port: String) {
     let mut stage = Parser::new(Stage::new(instance_name, tx)).parse();
     stage.load_config();
 
-    for fixture in stage.fixtures.iter_mut() {
-        match fixture.channel_groups[0] {
-            ChannelGroup::Single(ref mut group) => {
-                group.activate_preheat(FadeCurve::Squared, 1000);
-            },
-            _ => {}
-        }
-    }
+    // for fixture in stage.fixtures.iter_mut() {
+    //     match fixture.channel_groups[0] {
+    //         ChannelGroup::Single(ref mut group) => {
+    //             group.activate_preheat(FadeCurve::Squared, 1000);
+    //         },
+    //         _ => {}
+    //     }
+    // }
 
     let mut socket = UDPSocket::new();
     socket.start_watchdog_server();
