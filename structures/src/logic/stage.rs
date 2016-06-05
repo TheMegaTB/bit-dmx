@@ -61,7 +61,7 @@ impl Stage {
     }
 
     fn get_config_filename(&self) -> PathBuf {
-        get_config_path(Config::Server, &self.name).join(self.name.clone()  + ".server.dmx")
+        get_config_path(Config::Server(self.name.clone())).join(self.name.clone()  + ".server.dmx")
     }
 
     pub fn load_config(&mut self) {

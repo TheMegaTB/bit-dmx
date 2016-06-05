@@ -1,5 +1,4 @@
-extern crate find_folder;
-
+//! Parser for the fixture definitions file type
 use std::io::prelude::*;
 use std::fs::File;
 
@@ -23,17 +22,33 @@ use logic::channel_group::Moving2D;
 
 use FIXTURE_DEF;
 
+/// Struct responsible for parsing the file
 pub struct Parser {
+    /// The `Stage` struct instance which should be filled with data
     stage: Stage
 }
 
 impl Parser {
+    /// Create a new `Parser` from an existing `Stage` instance
     pub fn new(stage: Stage) -> Parser {
         Parser {
             stage: stage
         }
     }
 
+    /// Parse the file and convert the `Parser` instance into a `Stage` based upon the input stage
+    ///
+    /// # Examples
+    /// ```
+    /// # use std::sync::mpsc::channel;
+    /// # use structures::logic::Stage;
+    /// use structures::io::Parser;
+    ///
+    /// # let (interface_tx, interface_rx) = channel();
+    /// # let mut some_stage = Stage::new(String::from("Untitled"), interface_tx);
+    /// let parser = Parser::new(some_stage);
+    /// let stage = parser.parse();
+    /// ```
     pub fn parse(mut self) -> Stage {
         self.read_file();
         self.stage
@@ -171,7 +186,7 @@ impl Parser {
         let fixture_tag = "Fixture".to_string();
         let stage_tag = "Stage".to_string();
 
-        let path = get_config_path(Config::Server, &self.stage.name).join(FIXTURE_DEF);
+        let path = get_config_path(Config::Server(self.stage.name.clone())).join(FIXTURE_DEF);
         let mut f = match File::open(path) {
             Ok(f) => f, Err(e) => {
                 exit!(9, "Unable to read fixture definitions: {}", e.description());

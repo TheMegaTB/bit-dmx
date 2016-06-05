@@ -1,3 +1,4 @@
+//! Helpers, wrappers and structs to make programming the UI just that little bit easier
 pub mod colors;
 pub mod window;
 pub mod frontend_data;

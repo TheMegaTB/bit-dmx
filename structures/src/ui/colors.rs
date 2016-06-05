@@ -1,9 +1,23 @@
+//! Some nice predefined colors
 use conrod::color::{rgb, Color};
 
+/// FlatUI styled colors from https://flatuicolors.com/
+///
+/// # Examples
+/// ```
+/// # extern crate conrod;
+/// # extern crate structures;
+/// # fn main() {
+/// # use conrod::color::{rgb, Color};
+/// use structures::ui::colors::FlatColor;
+///
+/// let color = FlatColor::turquoise();
+/// # assert_eq!(rgb(0.102, 0.737, 0.612), color);
+/// # }
+/// ```
 pub struct FlatColor;
 
 impl FlatColor {
-    //Color codes from https://flatuicolors.com/
     #[allow(dead_code)]
     pub fn turquoise() -> Color {
         rgb(0.102, 0.737, 0.612)
