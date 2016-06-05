@@ -16,6 +16,7 @@ use logic::fade::get_fade_steps_int;
 use logic::fade::try_stop_fades;
 
 #[derive(Debug)]
+/// Simple channel group to control a single channel
 pub struct Single {
     /// The first channel
     pub channel1: Arc<Mutex<Channel>>,
@@ -32,11 +33,13 @@ impl Single {
         }
     }
 
+    /// A simple fade function that does not need to know the start value.
     pub fn fade_simple(&mut self, curve: FadeCurve, time: FadeTime, end_value: DmxValue, kill_others: bool) {
-        let start_value = {self.channel1.lock().expect("Failed to lock Arc!").value};
+        let start_value = {self.channel1.lock().expect("Failed to lock Arc!").get()};
         self.fade(curve, time, start_value, end_value, kill_others);
     }
 
+    /// Fade between the current state and a given state defind by a curve the time to fade and the final channel values
     pub fn fade(&mut self, curve: FadeCurve, time: FadeTime, start_value: DmxValue, end_value: DmxValue, kill_others: bool) {
         let steps = get_step_number(time);
         let (tx, rx) = mpsc::channel();
@@ -81,7 +84,7 @@ impl Single {
     //     }
     // }
 
-    /// A function to get a vector of the DMX addresses used by this channel group
+    /// Get a vector of the DMX addresses used by this channel group
     pub fn get_addresses(&self) -> Vec<DmxAddress> {
         vec![
             self.channel1.lock().expect("Failed to lock Arc!").address

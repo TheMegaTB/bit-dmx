@@ -21,9 +21,9 @@ fn main() {
     };
 
     let interface_port = if args.len() > 2 {
-        args[2].clone()
+        Some(args[2].clone())
     } else {
-        "/dev/ttyACM0".to_string()
+        None
     };
     server_handler::start(instance_name, interface_port);
 }

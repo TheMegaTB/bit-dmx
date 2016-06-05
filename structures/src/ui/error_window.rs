@@ -10,7 +10,9 @@ widget_ids! {
     BUTTON,
 }
 
-trait Unwrap2<T> { //TODO find better name
+/// Trait to unwrap or show an error message depending on the input data
+pub trait Unwrap2<T> { //TODO find better name
+    /// Function to unwrap or show an error message depending on the input data
     fn unwrap2(self, msg: &'static str) -> T;
 }
 
@@ -19,14 +21,15 @@ impl<T> Unwrap2<T> for Option<T> {
         match self {
             Some(x) => x,
             None => {
-                error_message(msg);
+                error_message(msg, 10);
                 panic!(msg);
             }
         }
     }
 }
 
-pub fn error_message(msg: &'static str) { //TODO add send report buttonP
+/// Shows a window with a given error message and quits the application.
+pub fn error_message(msg: &'static str, error_value: i32) { //TODO add send report button
     let (mut window, mut conrod_ui) = match create_window("Error".to_string(), (200, 100), 30, true) {
         Ok(res) => res,
         Err(e) => {
@@ -58,7 +61,7 @@ pub fn error_message(msg: &'static str) { //TODO add send report buttonP
                 .label_font_size(15)
                 .mid_bottom_of(CANVAS)
                 .react(|| {
-                    exit!(4, msg.clone());
+                    exit!(error_value, msg.clone());
                 })
                 .set(BUTTON, &mut conrod_ui);
         }));

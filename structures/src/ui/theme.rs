@@ -2,7 +2,7 @@
 use conrod::color;
 use ui::colors::FlatColor;
 
-/// A collection of colors and floats to define the look of the UI
+/// A collection of colors and floats to define the design of the UI
 #[derive(Debug, Clone)]
 pub struct Theme {
     /// Scaling factor for the UI

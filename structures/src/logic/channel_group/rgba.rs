@@ -74,7 +74,7 @@ impl RGBA {
     //     });
     // }
 
-    /// fade between the current state and a given state defind by a curve the time to fade and the final channel values
+    /// Fade between the current state and a given state defind by a curve the time to fade and the final channel values
     pub fn fade_simple(&mut self, curve: FadeCurve, time: FadeTime, end_r: DmxValue, end_g: DmxValue, end_b: DmxValue, end_a: DmxValue, kill_others: bool) {
         let steps = get_step_number(time);
         let (tx, rx) = mpsc::channel();
@@ -104,7 +104,7 @@ impl RGBA {
         }
     }
 
-    /// A function to get a vector of the DMX addresses used by this channel group
+    /// Get a vector of the DMX addresses used by this channel group
     pub fn get_addresses(&self) -> Vec<DmxAddress> {
         vec![
             self.channel_r.lock().expect("Failed to lock Arc!").address,

@@ -87,10 +87,10 @@ pub fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: 
              y_offset = next_y_offset;
         }
         let x_pos = x_offset + column*button_width;
-        let current_edited_chaser_names = ui.current_edited_chaser_names.clone();
-        if ui.edit_state {
-            // let tmp_name = {current_edited_chaser_names.lock().expect("Failed to lock Arc!")[id].clone()};
-            let ref mut current_chaser_name = current_edited_chaser_names.lock().expect("Failed to lock Arc!")[id];
+        let current_editor_chaser_names = ui.current_editor_chaser_names.clone();
+        if ui.editor_state {
+            // let tmp_name = {current_editor_chaser_names.lock().expect("Failed to lock Arc!")[id].clone()};
+            let ref mut current_chaser_name = current_editor_chaser_names.lock().expect("Failed to lock Arc!")[id];
 
             // let ref mut switch_name = switch_name.lock().expect("Failed to lock Arc!")[0];
             TextBox::new(current_chaser_name)
@@ -121,7 +121,7 @@ pub fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: 
 
         for (switch_id_in_chaser, (switch_id, switch)) in chaser.switches.iter().map(|&switch_id| (switch_id, &ui.frontend_data.switches[switch_id])).enumerate() {
             let y_pos = y_offset - 50.0 * application_theme.ui_scale - switch_id_in_chaser as f64*button_height;
-            let current_edited_switch = ui.current_edited_switch_id.clone();
+            let current_editor_switch = ui.current_editor_switch_id.clone();
 
             let label = match switch.get_keybinding_as_text() {
                 Some(keybinding) => switch.name.clone() + ": " + &keybinding,
@@ -142,9 +142,9 @@ pub fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: 
                 .label(&label)
                 .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
                 .react(|| {
-                    if ui.edit_state {
-                        current_edited_switch.lock().expect("Failed to lock Arc!")[0] = Some(switch_id);
-                        ui.current_edited_switch_name.lock().expect("Failed to lock Arc!")[0] = switch.name.clone();
+                    if ui.editor_state {
+                        current_editor_switch.lock().expect("Failed to lock Arc!")[0] = Some(switch_id);
+                        ui.current_editor_switch_name.lock().expect("Failed to lock Arc!")[0] = switch.name.clone();
                     }
                     else {
                         let new_value = if switch.dimmer_value == 0.0 {255} else {0};
@@ -155,7 +155,7 @@ pub fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: 
                 current_button_id = current_button_id + 1;
         }
         let mut y_pos = y_offset - 50.0 * application_theme.ui_scale - (chaser.switches.len() as f64 - 0.25)*button_height;
-        if !ui.edit_state {
+        if !ui.editor_state {
             {
                 let tx = tx.clone();
                 //let x_pos = (id as f64 - 5f64/6f64) * button_width;
@@ -252,8 +252,8 @@ pub fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: 
                 .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
                 .react(|| {
                     let switch_id = ui.frontend_data.add_switch(JsonSwitch::new("Untitled".to_string(), name.clone()));
-                    ui.current_edited_switch_id.lock().expect("Failed to lock Arc!")[0] = Some(switch_id);
-                    ui.current_edited_switch_name.lock().expect("Failed to lock Arc!")[0] = "Untitled".to_string();
+                    ui.current_editor_switch_id.lock().expect("Failed to lock Arc!")[0] = Some(switch_id);
+                    ui.current_editor_switch_name.lock().expect("Failed to lock Arc!")[0] = "Untitled".to_string();
 
                     ui.send_data();
                     test = true;

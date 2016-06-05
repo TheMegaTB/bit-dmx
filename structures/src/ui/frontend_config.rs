@@ -5,18 +5,23 @@ use std::path::PathBuf;
 use std::io::prelude::*;
 
 #[derive(Debug, Clone, RustcDecodable, RustcEncodable)]
+/// The struct to save the client project configuration.
 pub struct FrontendConfig {
+    /// The id of the theme that is used.
     pub theme_id: usize,
+    /// A list of chasers that are shown in this client.
     pub chasers: Vec<String>
 }
 
 impl FrontendConfig {
+    /// Generates a default configuration.
     pub fn empty() -> FrontendConfig {
         FrontendConfig {
             theme_id: 0,
             chasers: Vec::new()
         }
     }
+    /// Loads a client project configuration from a given path.
     pub fn load(path: PathBuf) -> Option<FrontendConfig> {
         match File::open(path) {
             Ok(file) => {
@@ -30,6 +35,7 @@ impl FrontendConfig {
             }
         }
     }
+    /// Saves the client project configuration to a given path.
     pub fn save(&self, path: PathBuf) {
         let file = File::create(path).expect("no such file");
         let mut buf = BufWriter::new(file);

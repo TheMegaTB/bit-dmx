@@ -17,24 +17,40 @@ use VERSION;
 use GIT_HASH;
 
 #[derive(Debug, Clone)]
+/// The struct to save all important information about the frontend ui.
 pub struct UI {
+    /// The watchdog client to request the server ip.
     pub watchdog: WatchDogClient,
+    /// The sender to interrupt the watchdog client.
     pub tx: mpsc::Sender<Vec<u8>>,
+    /// The frontend data struct to save the current project state.
     pub frontend_data: FrontendData,
+    /// The configuration of the frontend.
     pub config: FrontendConfig,
+    /// The shift key state.
     pub shift_state: bool,
+    /// The control key state.
     pub control_state: bool,
+    /// The alt key state.
     pub alt_state: bool,
-    pub edit_state: bool,
+    /// The editor state.
+    pub editor_state: bool,
+    /// Saves whether the ui waites for a new keybinding.
     pub waiting_for_keybinding: bool,
-    pub current_edited_switch_id: Arc<Mutex<[Option<usize>; 1]>>,
-    pub current_edited_channel_group_id: i64,
-    pub current_edited_switch_name: Arc<Mutex<[String; 1]>>,
-    pub current_edited_curve_strings: Arc<Mutex<[String; 2]>>,
-    pub current_edited_chaser_names: Arc<Mutex<Vec<String>>>
+    /// The id of the switch that is opened in the editor.
+    pub current_editor_switch_id: Arc<Mutex<[Option<usize>; 1]>>,
+    /// The id of the channel group that is opened in the editor.
+    pub current_editor_channel_group_id: i64,
+    /// The name of the opened switch.
+    pub current_editor_switch_name: Arc<Mutex<[String; 1]>>,
+    /// The custom curve strings that are opened in the editor.
+    pub current_editor_curve_strings: Arc<Mutex<[String; 2]>>,
+    /// The list of all chaser names for the editor.
+    pub current_editor_chaser_names: Arc<Mutex<Vec<String>>>
 }
 
 impl UI {
+    /// Createsan ui struct with default values and initialized services.
     pub fn new() -> Arc<Mutex<UI>> {
         let mut socket = UDPSocket::new();
         let watchdog = socket.create_watchdog_client();
@@ -65,13 +81,13 @@ impl UI {
             shift_state: false,
             control_state: false,
             alt_state: false,
-            edit_state: false,
+            editor_state: false,
             waiting_for_keybinding: false,
-            current_edited_switch_id: Arc::new(Mutex::new([None])),
-            current_edited_channel_group_id: -1,
-            current_edited_switch_name: Arc::new(Mutex::new(["".to_string()])),
-            current_edited_curve_strings: Arc::new(Mutex::new(["".to_string(), "".to_string()])),
-            current_edited_chaser_names: Arc::new(Mutex::new(Vec::new()))
+            current_editor_switch_id: Arc::new(Mutex::new([None])),
+            current_editor_channel_group_id: -1,
+            current_editor_switch_name: Arc::new(Mutex::new(["".to_string()])),
+            current_editor_curve_strings: Arc::new(Mutex::new(["".to_string(), "".to_string()])),
+            current_editor_chaser_names: Arc::new(Mutex::new(Vec::new()))
         };
 
         let ui = Arc::new(Mutex::new(ui));
@@ -81,10 +97,12 @@ impl UI {
         ui
     }
 
+    /// Return the path to the client configration of the current project.
     pub fn get_chaser_config_path(&self) -> PathBuf {
         get_config_path(Config::Client).join(self.frontend_data.name.clone()  + ".local.dmx")
     }
 
+    /// Load the client configration.
     pub fn load_chaser_config(&mut self) {
         match FrontendConfig::load(self.get_chaser_config_path()) {
             Some(config) => self.config = config,
@@ -94,10 +112,12 @@ impl UI {
         }
     }
 
+    /// Save the client configuration.
     pub fn save_chaser_config(&self) {
         self.config.save(self.get_chaser_config_path());
     }
 
+    /// Start th UDP server th receive data (refresh, channel, switch and chaser)
     pub fn start_udp_server(ui: Arc<Mutex<UI>>, mut socket: UDPSocket) {
         thread::spawn(move || {
             let socket = socket.start_frontend_server();
@@ -123,8 +143,8 @@ impl UI {
                     }
                     else if address_type == 2 {
                         // chaser
-                        let chaser_id = ui_locked.frontend_data.switches[address as usize].clone().chaser_id;
-                        let mut chaser = ui_locked.frontend_data.chasers.get_mut(&chaser_id).unwrap();
+                        let chaser_name = ui_locked.frontend_data.switches[address as usize].clone().chaser_name;
+                        let mut chaser = ui_locked.frontend_data.chasers.get_mut(&chaser_name).unwrap();
 
                         chaser.current_thread = value != 0;
                     }
@@ -134,6 +154,7 @@ impl UI {
         });
     }
 
+    /// Start the watchdog server to receive the ip of the server
     pub fn start_watchdog_client(ui: Arc<Mutex<UI>>, mut socket: UDPSocket) {
         let sock = socket.assemble_socket(Some(2));
         {
@@ -180,6 +201,7 @@ impl UI {
         }
     }
 
+    /// Fetch the data from the server. This function return whether the request was successful.
     pub fn fetch_data(&mut self) -> bool {
         if self.watchdog.get_server_addr().is_some() {
             match TcpStream::connect((&*self.watchdog.get_server_addr().unwrap().to_string(), 8000)) {
@@ -202,12 +224,12 @@ impl UI {
         }
     }
 
+    /// Send the local configuration to the server. This function return whether the request was successful.
     pub fn send_data(&mut self) -> bool {
         if self.watchdog.get_server_addr().is_some() {
             match TcpStream::connect((&*self.watchdog.get_server_addr().unwrap().to_string(), 8001)) {
                 Ok(mut stream) => {
                     stream.write(self.frontend_data.get_json_string().as_bytes()).unwrap();
-                    // stream.write(json::encode(&self.frontend_data).unwrap().as_bytes()).unwrap();
                     true
                 }
                 Err(_) => {

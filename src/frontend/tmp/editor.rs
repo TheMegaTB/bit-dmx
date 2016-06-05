@@ -60,13 +60,13 @@ pub fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: T
 
     y_pos = y_pos - 40.0 * application_theme.ui_scale;
 
-    let current_edited_switch = {
-        ui.current_edited_switch_id.lock().expect("Failed to lock Arc!")[0].clone()
+    let current_editor_switch = {
+        ui.current_editor_switch_id.lock().expect("Failed to lock Arc!")[0].clone()
     };
 
-    let switch_name = ui.current_edited_switch_name.clone();
+    let switch_name = ui.current_editor_switch_name.clone();
 
-    match current_edited_switch {
+    match current_editor_switch {
         Some(switch_id) => {
 
             Text::new(&("Switch #".to_string() + &switch_id.to_string() + ": " + &ui.frontend_data.switches[switch_id].name.clone()))
@@ -212,14 +212,14 @@ pub fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: T
                     .label_color(color::WHITE)
                     .react(|_: &mut Option<usize>, new_idx, _: &str| {
                         if ui.frontend_data.change_channel_group(switch_id, id_string.clone(), dropdown_background_list_fixture[new_idx], dropdown_background_list_channel_groups[new_idx]) {
-                            ui.current_edited_channel_group_id = new_idx as i64;
+                            ui.current_editor_channel_group_id = new_idx as i64;
                             ui.send_data();
                         }
                     })
                     .set(EDITOR_SWITCH_DROP_DOWNS + editor_switch_drop_downs_count, conrod_ui);
                     editor_switch_drop_downs_count += 1;
 
-                let label = if dropdown_index as i64 == ui.current_edited_channel_group_id {
+                let label = if dropdown_index as i64 == ui.current_editor_channel_group_id {
                     "v".to_string()
                 }
                 else {
@@ -234,14 +234,14 @@ pub fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: T
                     .label(&label)
                     .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
                     .react(|| {
-                        if dropdown_index as i64 == ui.current_edited_channel_group_id {
-                            ui.current_edited_channel_group_id = -1;
+                        if dropdown_index as i64 == ui.current_editor_channel_group_id {
+                            ui.current_editor_channel_group_id = -1;
                         }
                         else {
-                            ui.current_edited_channel_group_id = dropdown_index as i64;
-                            let mut current_edited_curve_strings_locked = ui.current_edited_curve_strings.lock().expect("Failed to lock Arc!");
-                            current_edited_curve_strings_locked[0] = data.curve_in.get_string();
-                            current_edited_curve_strings_locked[1] = data.curve_out.get_string();
+                            ui.current_editor_channel_group_id = dropdown_index as i64;
+                            let mut current_editor_curve_strings_locked = ui.current_editor_curve_strings.lock().expect("Failed to lock Arc!");
+                            current_editor_curve_strings_locked[0] = data.curve_in.get_string();
+                            current_editor_curve_strings_locked[1] = data.curve_out.get_string();
                         };
                     })
                     .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
@@ -249,7 +249,7 @@ pub fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: T
                 y_pos = y_pos - 60.0 * application_theme.ui_scale;
 
 
-                if dropdown_index as i64 == ui.current_edited_channel_group_id {
+                if dropdown_index as i64 == ui.current_editor_channel_group_id {
 
                     for (index, &value) in data.values.iter().enumerate() {
                         let label = {
@@ -296,7 +296,7 @@ pub fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: T
                         y_pos = y_pos - 60.0 * application_theme.ui_scale;
 
                         if fade_curve_id == 3 {
-                            let ref mut curve_string = {ui.current_edited_curve_strings.lock().expect("Failed to lock Arc!")[0].clone()};
+                            let ref mut curve_string = {ui.current_editor_curve_strings.lock().expect("Failed to lock Arc!")[0].clone()};
 
                             TextBox::new(curve_string)
                                 .w_h(item_width - item_x_offset, item_height)
@@ -352,7 +352,7 @@ pub fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: T
                         y_pos = y_pos - 60.0 * application_theme.ui_scale;
 
                         if fade_curve_id == 3 {
-                            let ref mut curve_string = {ui.current_edited_curve_strings.lock().expect("Failed to lock Arc!")[1].clone()};
+                            let ref mut curve_string = {ui.current_editor_curve_strings.lock().expect("Failed to lock Arc!")[1].clone()};
 
                             TextBox::new(curve_string)
                                 .w_h(item_width - item_x_offset, item_height)
@@ -431,7 +431,7 @@ pub fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: T
                 .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
                 .react(|| {
                     ui.frontend_data.remove_switch_with_id(switch_id);
-                    ui.current_edited_switch_id.lock().expect("Failed to lock Arc!")[0] = None;
+                    ui.current_editor_switch_id.lock().expect("Failed to lock Arc!")[0] = None;
                     ui.send_data();
                 })
                 .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);

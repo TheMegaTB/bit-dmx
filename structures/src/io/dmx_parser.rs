@@ -10,7 +10,6 @@ use io::config::{get_config_path, Config};
 
 use logic::ChannelGroup;
 use logic::channel::DmxAddress;
-use logic::channel::DmxValue;
 
 use logic::Stage;
 use logic::Fixture;
