@@ -146,7 +146,7 @@ impl UI {
                 let payload = VERSION.to_string() + &GIT_HASH.to_string();
                 let mut buf = (0..(payload.as_bytes().len())).map(|_| 0).collect::<Vec<_>>();
                 loop {
-                    info!("watchdog message");
+                    trace!("watchdog message");
                     match sock.recv_from(&mut buf) {
                         Ok((_, addr)) => {
                             if buf == payload.as_bytes() {
