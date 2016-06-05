@@ -1,19 +1,27 @@
+//! Functions and enums to provide a dynamic config path
 use std::path::PathBuf;
 use find_folder;
 
 use std::error::Error;
 
+/// The `Config` type. It defines what config a program uses.
 pub enum Config {
-    Server,
+    /// Configuration directory for server named after the value
+    Server(String),
+    /// Configuration directory for client containing all configs of all servers
     Client
 }
 
-pub fn get_config_path(conf: Config, name: &String) -> PathBuf {
+/// This function converts the provided `conf` type into a fully qualified path pointing to the specific directory
+///
+/// Even though this function returns a path whilst the binary resists in the target directory it does not create a config directory yet.
+///
+pub fn get_config_path(conf: Config) -> PathBuf {
     // TODO: Move to .config / %AppData% and create if it doesn't exist
     let mut config_path = find_folder::Search::KidsThenParents(3, 5)
         .for_folder("config").unwrap();
     config_path = match conf {
-        Config::Server => config_path.join("server").join(name),
+        Config::Server(name) => config_path.join("server").join(name),
         Config::Client => config_path.join("client")
     };
     if match config_path.metadata() {

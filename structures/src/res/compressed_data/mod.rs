@@ -1,3 +1,4 @@
+//! Methods for reading and extracting the assets compiled into the binary
 use rustc_serialize::json;
 use std::collections::HashMap;
 use std::io::prelude::*;
@@ -67,6 +68,7 @@ fn decompress_assets() -> PathBuf {
     tmp.join("assets/")
 }
 
+/// Get the absolute path to the assets folder and extract the assets into it if required
 pub fn get_assets_path() -> PathBuf {
     let mut tmp = env::temp_dir();
     tmp.push("BitDMX/assets");

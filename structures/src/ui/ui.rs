@@ -82,7 +82,7 @@ impl UI {
     }
 
     pub fn get_chaser_config_path(&self) -> PathBuf {
-        get_config_path(Config::Client, &self.frontend_data.name).join(self.frontend_data.name.clone()  + ".local.dmx")
+        get_config_path(Config::Client).join(self.frontend_data.name.clone()  + ".local.dmx")
     }
 
     pub fn load_chaser_config(&mut self) {

@@ -4,16 +4,21 @@ use conrod::{Theme, self};
 
 use get_assets_path;
 
+/// Backend used with conrod
 pub type Backend = (<piston_window::G2d<'static> as conrod::Graphics>::Texture, Glyphs);
+/// Ui type based upon `conrod::Ui` containing `Backend`
 pub type Ui = conrod::Ui<Backend>;
+/// UiCell type based upon `conrod::UiCell` containing `Backend`
 pub type UiCell<'a> = conrod::UiCell<'a, Backend>;
 
 const OPEN_GL: OpenGL = OpenGL::V3_2;
 
+/// A window wrapper for creating windows
 pub trait DMXWindow {
     fn join(self) -> Result<(), Box<Any + Send + 'static>>;
 }
 
+/// Function to create a window with a specific title, size, fps/ups and whether or not it should close when pressing escape
 pub fn create_window(title: String, size: (u32, u32), ups: u64, esc: bool) -> Result<(PistonWindow, Ui), &'static str> {
     let mut window: PistonWindow = WindowSettings::new(title, size)
                                     .opengl(OPEN_GL).exit_on_esc(esc).vsync(true).build().unwrap();

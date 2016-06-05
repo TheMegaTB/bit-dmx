@@ -1,3 +1,4 @@
+//! Module containing all modules that provide the logic components behind the BitDMX software
 pub mod channel_group;
 pub mod channel_group_value;
 pub mod channel;
