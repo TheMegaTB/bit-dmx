@@ -3,17 +3,11 @@ use std::sync::{Arc, Mutex};
 use std::error::Error;
 
 use std::io::prelude::*;
-use std::env;
 
 use logic::server::interface_handler::*;
 
-use io::logger::Logger;
-use GIT_HASH;
-use VERSION;
 use io::dmx_parser::Parser;
 use logic::Stage;
-use logic::fade::FadeCurve;
-use logic::ChannelGroup;
 use networking::UDPSocket;
 use logic::chaser::start_chaser_of_switch;
 use ui::frontend_data::FrontendData;
