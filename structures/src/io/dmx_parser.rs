@@ -7,19 +7,19 @@ use std::error::Error;
 
 use std::collections::HashMap;
 
-use super::config::{get_config_path, Config};
+use io::config::{get_config_path, Config};
 
-use ChannelGroup;
-use DmxAddress;
-use DmxValue;
+use logic::ChannelGroup;
+use logic::channel::DmxAddress;
+use logic::channel::DmxValue;
 
-use Stage;
-use Fixture;
+use logic::Stage;
+use logic::Fixture;
 
-use RGB;
-use RGBA;
-use Single;
-use Moving2D;
+use logic::channel_group::RGB;
+use logic::channel_group::RGBA;
+use logic::channel_group::Single;
+use logic::channel_group::Moving2D;
 
 use FIXTURE_DEF;
 

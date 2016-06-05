@@ -12,12 +12,6 @@ extern crate meval;
 pub const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
 // Globally important type definitions
-pub type FadeTime = usize;
-pub type DmxAddress = u16;
-pub type DmxValue = u8;
-pub type ChannelGroupValueTuple = (Vec<DmxValue>, (FadeCurve, FadeTime), (FadeCurve, FadeTime));
-const FADE_TICKS: FadeTime = 30;
-
 const FIXTURE_DEF: &'static str = "fixtures.dmx";
 
 // Various helper functions
@@ -35,30 +29,4 @@ pub mod res;
 pub use res::git_hash::*;
 pub use res::compressed_data::get_assets_path;
 
-// All the generic structs - this may need some restructuring as well
-pub mod channel;
-pub use channel::*;
-
-pub mod channel_group_value;
-pub use channel_group_value::*;
-
-pub mod fixture;
-pub use fixture::*;
-
-pub mod switch;
-pub use switch::*;
-
-pub mod chaser;
-pub use chaser::*;
-
-pub mod stage;
-pub use stage::*;
-
-pub mod fade_curve;
-pub use fade_curve::*;
-
-pub mod channel_groups;
-pub use channel_groups::single::*;
-pub use channel_groups::rgb::*;
-pub use channel_groups::rgba::*;
-pub use channel_groups::moving_2d::*;
+pub mod logic;

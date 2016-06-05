@@ -5,8 +5,8 @@ pub use ansi_term::*;
 
 use std::error::Error;
 
-use DmxAddress;
-use DmxValue;
+use logic::channel::DmxAddress;
+use logic::channel::DmxValue;
 
 const DEFAULT_LOGLEVEL: LogLevel = LogLevel::Info;
 

@@ -15,11 +15,11 @@ use structures::io::logger::Logger;
 use structures::GIT_HASH;
 use structures::VERSION;
 use structures::io::dmx_parser::Parser;
-use structures::Stage;
-use structures::FadeCurve;
-use structures::ChannelGroup;
+use structures::logic::Stage;
+use structures::logic::fade::FadeCurve;
+use structures::logic::ChannelGroup;
 use structures::networking::UDPSocket;
-use structures::start_chaser_of_switch;
+use structures::logic::chaser::start_chaser_of_switch;
 use structures::ui::frontend_data::FrontendData;
 
 fn main() {

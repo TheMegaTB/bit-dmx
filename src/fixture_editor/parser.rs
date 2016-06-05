@@ -1,5 +1,5 @@
 use rustc_serialize::json;
-use structures::DmxAddress;
+use structures::logic::channel::DmxAddress;
 
 #[derive(RustcDecodable, RustcEncodable, Debug)]
 pub enum ChannelGroup {

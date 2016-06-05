@@ -4,8 +4,8 @@ use std::thread;
 use std::ffi::CString;
 use std::os::raw::c_char;
 
-use structures::DmxAddress;
-use structures::DmxValue;
+use structures::logic::channel::DmxAddress;
+use structures::logic::channel::DmxValue;
 use structures::io::logger::fake_if_print;
 
 use std::error::Error;

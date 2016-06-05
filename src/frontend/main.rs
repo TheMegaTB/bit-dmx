@@ -23,15 +23,15 @@ use conrod::{
 };
 use piston_window::{ UpdateEvent, PressEvent, ReleaseEvent, Window };
 
-// use structures::ui::window::{create_window, UiCell, DMXWindow};
-use structures::ui::window::{create_window, UiCell};
-use structures::ui::ui::UI;
-use structures::ui::theme::Theme;
-use structures::ui::error_window::error_message;
-use structures::FadeTime;
-use structures::JsonSwitch;
-use structures::FadeCurve;
+//use structures::ui::window::{create_window, UiCell, DMXWindow};
+use structures::ui::UI;
+use structures::ui::Theme;
+use structures::logic::fade::FadeTime;
+use structures::logic::switch::JsonSwitch;
+use structures::logic::fade::FadeCurve;
 use structures::io::logger::Logger;
+use structures::ui::window::create_window;
+use structures::ui::window::UiCell;
 use structures::GIT_HASH;
 use structures::VERSION;
 
