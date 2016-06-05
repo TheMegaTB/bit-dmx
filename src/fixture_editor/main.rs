@@ -13,7 +13,7 @@ use std::iter::*;
 use std::fs;
 //use std::ffi;
 
-use structures::DmxAddress;
+use structures::logic::channel::DmxAddress;
 
 use structures::ui::colors::FlatColor;
 use structures::ui::window::{create_window};
