@@ -191,7 +191,7 @@ impl UI {
                             }
                         },
                         Err(_) => {
-                            info!("watchdog timeout");
+                            trace!("watchdog timeout");
                             s.lock().expect("Failed to lock Arc!")[0] = false;
                             s_addr.lock().expect("Failed to lock Arc!")[0] = None;
                         }
