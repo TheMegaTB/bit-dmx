@@ -728,7 +728,7 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
             let mut editor_switch_slider_count = 0;
             let mut editor_switch_number_dialer_count = 0;
             let mut editor_switch_button_count = 0;
-            let mut editor_switch_text_count = 0;
+            let editor_switch_text_count = 0;
             let mut editor_switch_drop_downs_count = 0;
 
 
