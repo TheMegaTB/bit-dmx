@@ -24,7 +24,6 @@ use conrod::{
 };
 use piston_window::{ UpdateEvent, PressEvent, ReleaseEvent, Window };
 
-//use structures::ui::window::{create_window, UiCell, DMXWindow};
 use structures::ui::UI;
 use structures::ui::Theme;
 use structures::logic::fade::FadeTime;
@@ -753,7 +752,7 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                 .font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                 .color(app_theme.bg_editor.plain_contrast())
                 .set(EDITOR_SWITCH_TEXT + editor_switch_text_count, conrod_ui);
-            editor_switch_text_count += 1;
+            //TODO KEEP THIS editor_switch_text_count += 1;
 
             let cloned_ui = ui.clone();
 
