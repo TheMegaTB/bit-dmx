@@ -313,6 +313,8 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, window
           ])
         .set(CANVAS, &mut conrod_ui);
 
+    ui.dropdown_clicked = false;
+
     draw_header(conrod_ui, ui, app_theme.clone());
 
     let chasers_usable_width = window_width-editor_width-2.0*app_theme.ui_padding;
@@ -741,7 +743,9 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                 .label(&label)
                 .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                 .react(|| {
-                    ui.waiting_for_keybinding = true;
+                    if !ui.dropdown_clicked {
+                        ui.waiting_for_keybinding = true;
+                    }
                 })
                 .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
                 editor_switch_button_count += 1;
@@ -808,6 +812,7 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                             ui.current_editor_channel_group_id = new_idx as i64;
                             ui.send_data();
                         }
+                        ui.dropdown_clicked = true;
                     })
                     .set(EDITOR_SWITCH_DROP_DOWNS + editor_switch_drop_downs_count, conrod_ui);
                     editor_switch_drop_downs_count += 1;
@@ -827,15 +832,17 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                     .label(&label)
                     .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                     .react(|| {
-                        if dropdown_index as i64 == ui.current_editor_channel_group_id {
-                            ui.current_editor_channel_group_id = -1;
+                        if !ui.dropdown_clicked {
+                            if dropdown_index as i64 == ui.current_editor_channel_group_id {
+                                ui.current_editor_channel_group_id = -1;
+                            }
+                            else {
+                                ui.current_editor_channel_group_id = dropdown_index as i64;
+                                let mut current_editor_curve_strings_locked = ui.current_editor_curve_strings.lock().expect("Failed to lock Arc!");
+                                current_editor_curve_strings_locked[0] = data.curve_in.get_string();
+                                current_editor_curve_strings_locked[1] = data.curve_out.get_string();
+                            };
                         }
-                        else {
-                            ui.current_editor_channel_group_id = dropdown_index as i64;
-                            let mut current_editor_curve_strings_locked = ui.current_editor_curve_strings.lock().expect("Failed to lock Arc!");
-                            current_editor_curve_strings_locked[0] = data.curve_in.get_string();
-                            current_editor_curve_strings_locked[1] = data.curve_out.get_string();
-                        };
                     })
                     .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
                 editor_switch_button_count += 1;
@@ -910,6 +917,7 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                             .react(|_: &mut Option<usize>, new_idx, _: &str| {
                                 ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().curve_in = FadeCurve::get_by_id(new_idx, "x".to_string());
                                 ui.send_data();
+                                ui.dropdown_clicked = true;
                             })
                             .set(EDITOR_SWITCH_DROP_DOWNS + editor_switch_drop_downs_count, conrod_ui);
                         editor_switch_drop_downs_count += 1;
@@ -965,6 +973,7 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                             .react(|_: &mut Option<usize>, new_idx, _: &str| {
                                 ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().curve_out = FadeCurve::get_by_id(new_idx, "x".to_string());
                                 ui.send_data();
+                                ui.dropdown_clicked = true;
                             })
                             .set(EDITOR_SWITCH_DROP_DOWNS + editor_switch_drop_downs_count, conrod_ui);
                         editor_switch_drop_downs_count += 1;
@@ -1014,8 +1023,10 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                         .label("Delete")
                         .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                         .react(|| {
-                            ui.frontend_data.remove_channel_group(switch_id, id_string.clone());
-                            ui.send_data();
+                            if !ui.dropdown_clicked {
+                                ui.frontend_data.remove_channel_group(switch_id, id_string.clone());
+                                ui.send_data();
+                            }
                         })
                         .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
                         editor_switch_button_count += 1;
@@ -1030,8 +1041,10 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                 .label("Add")
                 .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                 .react(|| {
-                    ui.frontend_data.add_channel_group(switch_id);
-                    ui.send_data();
+                    if !ui.dropdown_clicked {
+                        ui.frontend_data.add_channel_group(switch_id);
+                        ui.send_data();
+                    }
                 })
                 .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
             editor_switch_button_count += 1;
@@ -1045,9 +1058,11 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                 .label("Delete")
                 .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                 .react(|| {
-                    ui.frontend_data.remove_switch_with_id(switch_id);
-                    ui.current_editor_switch_id.lock().expect("Failed to lock Arc!")[0] = None;
-                    ui.send_data();
+                    if !ui.dropdown_clicked {
+                        ui.frontend_data.remove_switch_with_id(switch_id);
+                        ui.current_editor_switch_id.lock().expect("Failed to lock Arc!")[0] = None;
+                        ui.send_data();
+                    }
                 })
                 .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
         }

@@ -37,6 +37,7 @@ pub struct UI {
     pub editor_state: bool,
     /// Saves whether the ui waites for a new keybinding.
     pub waiting_for_keybinding: bool,
+    pub dropdown_clicked: bool,
     /// The id of the switch that is opened in the editor.
     pub current_editor_switch_id: Arc<Mutex<[Option<usize>; 1]>>,
     /// The id of the channel group that is opened in the editor.
@@ -83,6 +84,7 @@ impl UI {
             alt_state: false,
             editor_state: false,
             waiting_for_keybinding: false,
+            dropdown_clicked: false,
             current_editor_switch_id: Arc::new(Mutex::new([None])),
             current_editor_channel_group_id: -1,
             current_editor_switch_name: Arc::new(Mutex::new(["".to_string()])),
