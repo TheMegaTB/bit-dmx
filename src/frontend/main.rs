@@ -24,7 +24,6 @@ use conrod::{
 };
 use piston_window::{ UpdateEvent, PressEvent, ReleaseEvent, Window };
 
-//use structures::ui::window::{create_window, UiCell, DMXWindow};
 use structures::ui::UI;
 use structures::ui::Theme;
 use structures::logic::fade::FadeTime;
@@ -98,7 +97,7 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
                 ui_locked.alt_state = true;
             }
             if ui_locked.waiting_for_keybinding {
-                let switch_id = ui_locked.current_edited_switch_id.lock().expect("Failed to lock Arc!")[0];
+                let switch_id = ui_locked.current_editor_switch_id.lock().expect("Failed to lock Arc!")[0];
                 match switch_id {
                     Some(switch_id) => {
                         match button {
@@ -117,7 +116,7 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
                     None => {}
                 }
             }
-            else if !ui_locked.edit_state {
+            else if !ui_locked.editor_state {
                 match button {
                     piston_window::Button::Keyboard(key) =>  {
                         for (switch_id, switch) in ui_locked.frontend_data.switches.iter().enumerate() {
@@ -132,10 +131,10 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
             }
             else {
                 if button == piston_window::Button::Keyboard(piston_window::Key::Escape) {
-                    ui_locked.edit_state = false;
+                    ui_locked.editor_state = false;
                 }
                 else if ui_locked.control_state || ui_locked.alt_state {
-                    let switch_id = ui_locked.current_edited_switch_id.lock().unwrap()[0];
+                    let switch_id = ui_locked.current_editor_switch_id.lock().unwrap()[0];
                     match switch_id {
                         Some(switch_id) => {
                             if ui_locked.control_state {
@@ -143,15 +142,15 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
                                     let mut switch = ui_locked.frontend_data.switches[switch_id].clone();
                                     let mut frontend_data = &mut ui_locked.frontend_data;
                                     if button == piston_window::Button::Keyboard(piston_window::Key::Up) {
-                                        let chaser = frontend_data.chasers.get_mut(&switch.chaser_id).unwrap();
+                                        let chaser = frontend_data.chasers.get_mut(&switch.chaser_name).unwrap();
                                         let index = chaser.switches.iter().position(|&r| r == switch_id).unwrap();
                                         if ui_locked.shift_state {
                                             switch.name = switch.name + " Cloned";
-                                            ui_locked.current_edited_switch_name = Arc::new(Mutex::new([switch.name.clone()]));
+                                            ui_locked.current_editor_switch_name = Arc::new(Mutex::new([switch.name.clone()]));
                                             frontend_data.switches.push(switch);
                                             let new_switch_id = frontend_data.switches.len() - 1;
                                             chaser.switches.insert(index, new_switch_id);
-                                            ui_locked.current_edited_switch_id = Arc::new(Mutex::new([Some(new_switch_id)]));
+                                            ui_locked.current_editor_switch_id = Arc::new(Mutex::new([Some(new_switch_id)]));
                                         }
                                         else if index > 0 {
                                             let tmp = chaser.switches[index - 1];
@@ -160,15 +159,15 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
                                         }
                                     }
                                     else if button == piston_window::Button::Keyboard(piston_window::Key::Down) {
-                                        let chaser = frontend_data.chasers.get_mut(&switch.chaser_id).unwrap();
+                                        let chaser = frontend_data.chasers.get_mut(&switch.chaser_name).unwrap();
                                         let index = chaser.switches.iter().position(|&r| r == switch_id).unwrap();
                                         if ui_locked.shift_state {
                                             switch.name = switch.name + " Cloned";
-                                            ui_locked.current_edited_switch_name = Arc::new(Mutex::new([switch.name.clone()]));
+                                            ui_locked.current_editor_switch_name = Arc::new(Mutex::new([switch.name.clone()]));
                                             frontend_data.switches.push(switch);
                                             let new_switch_id = frontend_data.switches.len() - 1;
                                             chaser.switches.insert(index + 1, new_switch_id);
-                                            ui_locked.current_edited_switch_id = Arc::new(Mutex::new([Some(new_switch_id)]));
+                                            ui_locked.current_editor_switch_id = Arc::new(Mutex::new([Some(new_switch_id)]));
                                         }
                                         else if index < chaser.switches.len() - 1 {
                                             let tmp = chaser.switches[index + 1];
@@ -177,52 +176,52 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
                                         }
                                     }
                                     else if button == piston_window::Button::Keyboard(piston_window::Key::Left) {
-                                        let chaser_index = ui_locked.config.chasers.iter().position(|r| r == &switch.chaser_id).unwrap();
+                                        let chaser_index = ui_locked.config.chasers.iter().position(|r| r == &switch.chaser_name).unwrap();
                                         if chaser_index > 0 {
-                                            let new_chaser_id = &mut ui_locked.config.chasers[chaser_index - 1];
+                                            let new_chaser_name = &mut ui_locked.config.chasers[chaser_index - 1];
                                             let new_switch_id = {
-                                                let chaser = frontend_data.chasers.get_mut(&switch.chaser_id).unwrap();
+                                                let chaser = frontend_data.chasers.get_mut(&switch.chaser_name).unwrap();
                                                 let index = chaser.switches.iter().position(|&r| r == switch_id).unwrap();
                                                 if ui_locked.shift_state {
                                                     switch.name = switch.name + " Cloned";
-                                                    ui_locked.current_edited_switch_name = Arc::new(Mutex::new([switch.name.clone()]));
-                                                    switch.chaser_id = new_chaser_id.clone();
+                                                    ui_locked.current_editor_switch_name = Arc::new(Mutex::new([switch.name.clone()]));
+                                                    switch.chaser_name = new_chaser_name.clone();
                                                     frontend_data.switches.push(switch);
                                                     let new_switch_id = frontend_data.switches.len() - 1;
-                                                    ui_locked.current_edited_switch_id = Arc::new(Mutex::new([Some(new_switch_id)]));
+                                                    ui_locked.current_editor_switch_id = Arc::new(Mutex::new([Some(new_switch_id)]));
                                                     new_switch_id
                                                 }
                                                 else {
-                                                    frontend_data.switches[switch_id].chaser_id = new_chaser_id.clone();
+                                                    frontend_data.switches[switch_id].chaser_name = new_chaser_name.clone();
                                                     chaser.switches.remove(index)
                                                 }
                                             };
-                                            let new_chaser = frontend_data.chasers.get_mut(new_chaser_id).unwrap();
+                                            let new_chaser = frontend_data.chasers.get_mut(new_chaser_name).unwrap();
                                             new_chaser.switches.push(new_switch_id);
                                         }
                                     }
                                     else if button == piston_window::Button::Keyboard(piston_window::Key::Right) {
-                                        let chaser_index = ui_locked.config.chasers.iter().position(|r| r == &switch.chaser_id).unwrap();
+                                        let chaser_index = ui_locked.config.chasers.iter().position(|r| r == &switch.chaser_name).unwrap();
                                         if chaser_index < ui_locked.config.chasers.len() - 1 {
-                                            let new_chaser_id = &mut ui_locked.config.chasers[chaser_index + 1];
+                                            let new_chaser_name = &mut ui_locked.config.chasers[chaser_index + 1];
                                             let new_switch_id = {
-                                                let chaser = frontend_data.chasers.get_mut(&switch.chaser_id).unwrap();
+                                                let chaser = frontend_data.chasers.get_mut(&switch.chaser_name).unwrap();
                                                 let index = chaser.switches.iter().position(|&r| r == switch_id).unwrap();
                                                 if ui_locked.shift_state {
                                                     switch.name = switch.name + " Cloned";
-                                                    ui_locked.current_edited_switch_name = Arc::new(Mutex::new([switch.name.clone()]));
-                                                    switch.chaser_id = new_chaser_id.clone();
+                                                    ui_locked.current_editor_switch_name = Arc::new(Mutex::new([switch.name.clone()]));
+                                                    switch.chaser_name = new_chaser_name.clone();
                                                     frontend_data.switches.push(switch);
                                                     let new_switch_id = frontend_data.switches.len() - 1;
-                                                    ui_locked.current_edited_switch_id = Arc::new(Mutex::new([Some(new_switch_id)]));
+                                                    ui_locked.current_editor_switch_id = Arc::new(Mutex::new([Some(new_switch_id)]));
                                                     new_switch_id
                                                 }
                                                 else {
-                                                    frontend_data.switches[switch_id].chaser_id = new_chaser_id.clone();
+                                                    frontend_data.switches[switch_id].chaser_name = new_chaser_name.clone();
                                                     chaser.switches.remove(index)
                                                 }
                                             };
-                                            let new_chaser = frontend_data.chasers.get_mut(new_chaser_id).unwrap();
+                                            let new_chaser = frontend_data.chasers.get_mut(new_chaser_name).unwrap();
                                             new_chaser.switches.push(new_switch_id);
                                         }
                                     }
@@ -232,25 +231,25 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
                             else if ui_locked.alt_state {
                                 if button == piston_window::Button::Keyboard(piston_window::Key::Right) {
                                     let switch = ui_locked.frontend_data.switches[switch_id].clone(); //TODO borrow multiple struct parts
-                                    let index = ui_locked.config.chasers.iter().position(|r| r == &switch.chaser_id).unwrap();
+                                    let index = ui_locked.config.chasers.iter().position(|r| r == &switch.chaser_name).unwrap();
                                     if index < ui_locked.config.chasers.len() - 1 {
                                         let tmp = ui_locked.config.chasers[index + 1].clone();
                                         ui_locked.config.chasers[index + 1] = ui_locked.config.chasers[index].clone();
                                         ui_locked.config.chasers[index] = tmp;
                                     }
-                                    ui_locked.current_edited_chaser_names = Arc::new(Mutex::new(ui_locked.config.chasers.clone()));
+                                    ui_locked.current_editor_chaser_names = Arc::new(Mutex::new(ui_locked.config.chasers.clone()));
                                     ui_locked.save_chaser_config();
 
                                 }
                                 else if button == piston_window::Button::Keyboard(piston_window::Key::Left) {
                                     let switch = ui_locked.frontend_data.switches[switch_id].clone(); //TODO borrow multiple struct parts
-                                    let index = ui_locked.config.chasers.iter().position(|r| r == &switch.chaser_id).unwrap();
+                                    let index = ui_locked.config.chasers.iter().position(|r| r == &switch.chaser_name).unwrap();
                                     if index > 0 {
                                         let tmp = ui_locked.config.chasers[index - 1].clone();
                                         ui_locked.config.chasers[index - 1] = ui_locked.config.chasers[index].clone();
                                         ui_locked.config.chasers[index] = tmp;
                                     }
-                                    ui_locked.current_edited_chaser_names = Arc::new(Mutex::new(ui_locked.config.chasers.clone()));
+                                    ui_locked.current_editor_chaser_names = Arc::new(Mutex::new(ui_locked.config.chasers.clone()));
                                     ui_locked.save_chaser_config();
                                 }
                             }
@@ -288,7 +287,7 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
 
 fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, window_width: f64, window_height:f64, button_pressed: bool) {
 
-    let editor_width = if ui.edit_state {
+    let editor_width = if ui.editor_state {
         (window_width/3.0).min(350.0)
     }
     else {
@@ -319,7 +318,7 @@ fn set_widgets(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, window
     let chasers_usable_width = window_width-editor_width-2.0*app_theme.ui_padding;
     draw_chasers(conrod_ui, ui, app_theme.clone(), chasers_usable_width, button_pressed);
 
-    if ui.edit_state {
+    if ui.editor_state {
         draw_editor(conrod_ui, ui, app_theme.clone(), editor_width, editor_height, button_pressed);
     }
 }
@@ -356,26 +355,26 @@ fn draw_header(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme) {
         .label(&"Edit Mode".to_string())
         .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
         .and(|b| {
-            if ui.edit_state {
+            if ui.editor_state {
                 b.color(app_theme.switch_on_color)
             } else {
                 b.color(app_theme.switch_off_color)
             }
         })
         .react(|| {
-            ui.current_edited_switch_id.lock().expect("Failed to lock Arc!")[0] = None;
-            ui.current_edited_switch_name.lock().expect("Failed to lock Arc!")[0] = "".to_string();
-            if ui.edit_state {
+            ui.current_editor_switch_id.lock().expect("Failed to lock Arc!")[0] = None;
+            ui.current_editor_switch_name.lock().expect("Failed to lock Arc!")[0] = "".to_string();
+            if ui.editor_state {
                 ui.send_data();
             }
             else {
-                ui.current_edited_chaser_names = Arc::new(Mutex::new(ui.config.chasers.clone()));
+                ui.current_editor_chaser_names = Arc::new(Mutex::new(ui.config.chasers.clone()));
             }
-            ui.edit_state = !ui.edit_state;
+            ui.editor_state = !ui.editor_state;
         })
         .set(EDITOR_BUTTON, conrod_ui);
 
-    if ui.edit_state {
+    if ui.editor_state {
         Button::new()
             .w_h(140.0 * app_theme.ui_scale, 35.0 * app_theme.ui_scale)
             .right_from(EDITOR_BUTTON, 5.0 * app_theme.ui_scale)
@@ -386,7 +385,7 @@ fn draw_header(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme) {
             .react(|| {
                 let name = ui.frontend_data.add_chaser();
                 ui.config.chasers.push(name);
-                ui.current_edited_chaser_names = Arc::new(Mutex::new(ui.config.chasers.clone()));
+                ui.current_editor_chaser_names = Arc::new(Mutex::new(ui.config.chasers.clone()));
                 ui.save_chaser_config();
                 ui.send_data();
             })
@@ -439,9 +438,9 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usabl
              y_offset = next_y_offset;
         }
         let x_pos = x_offset + column*button_width;
-        let current_edited_chaser_names = ui.current_edited_chaser_names.clone();
-        if ui.edit_state {
-            let ref mut current_chaser_name = current_edited_chaser_names.lock().expect("Failed to lock Arc!")[id];
+        let current_editor_chaser_names = ui.current_editor_chaser_names.clone();
+        if ui.editor_state {
+            let ref mut current_chaser_name = current_editor_chaser_names.lock().expect("Failed to lock Arc!")[id];
 
             TextBox::new(current_chaser_name)
                 .font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
@@ -472,14 +471,14 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usabl
 
         for (switch_id_in_chaser, (switch_id, switch)) in chaser.switches.iter().map(|&switch_id| (switch_id, &ui.frontend_data.switches[switch_id])).enumerate() {
             let y_pos = y_offset - 50.0 * app_theme.ui_scale - switch_id_in_chaser as f64*button_height;
-            let current_edited_switch = ui.current_edited_switch_id.clone();
+            let current_editor_switch = ui.current_editor_switch_id.clone();
 
             Button::new()
                 .w_h(button_width, button_height)
                 .xy_relative_to(CHASER_TITLE, [x_pos, y_pos])
                 .and(|b| {
-                    let edited_switch_id = current_edited_switch.lock().unwrap();
-                    if ui.edit_state && edited_switch_id[0].is_some() && switch_id == edited_switch_id[0].unwrap() {
+                    let edited_switch_id = current_editor_switch.lock().unwrap();
+                    if ui.editor_state && edited_switch_id[0].is_some() && switch_id == edited_switch_id[0].unwrap() {
                         b.color(app_theme.selected_switch_color)
                     }
                     else if switch.dimmer_value != 0.0 {
@@ -493,9 +492,9 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usabl
                 .label(&switch.name)
                 .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                 .react(|| {
-                    if ui.edit_state {
-                        current_edited_switch.lock().expect("Failed to lock Arc!")[0] = Some(switch_id);
-                        ui.current_edited_switch_name.lock().expect("Failed to lock Arc!")[0] = switch.name.clone();
+                    if ui.editor_state {
+                        current_editor_switch.lock().expect("Failed to lock Arc!")[0] = Some(switch_id);
+                        ui.current_editor_switch_name.lock().expect("Failed to lock Arc!")[0] = switch.name.clone();
                         if ui.control_state {
                             // ui.waiting_for_keybinding = true; //TODO make this working
                         }
@@ -521,7 +520,7 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usabl
 
         }
         let mut y_pos = y_offset - 50.0 * app_theme.ui_scale - (chaser.switches.len() as f64 - 0.25)*button_height;
-        if !ui.edit_state {
+        if !ui.editor_state {
             {
                 let tx = tx.clone();
                 Button::new()
@@ -621,8 +620,8 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usabl
                 .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                 .react(|| {
                     let switch_id = ui.frontend_data.add_switch(JsonSwitch::new("Untitled".to_string(), name.clone()));
-                    ui.current_edited_switch_id.lock().expect("Failed to lock Arc!")[0] = Some(switch_id);
-                    ui.current_edited_switch_name.lock().expect("Failed to lock Arc!")[0] = "Untitled".to_string();
+                    ui.current_editor_switch_id.lock().expect("Failed to lock Arc!")[0] = Some(switch_id);
+                    ui.current_editor_switch_name.lock().expect("Failed to lock Arc!")[0] = "Untitled".to_string();
 
                     ui.send_data();
                     test = true;
@@ -640,7 +639,7 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usabl
                     .react(|| {
                         ui.frontend_data.delete_chaser(name.clone());
                         ui.config.chasers.retain(|x| x != name);
-                        ui.current_edited_chaser_names = Arc::new(Mutex::new(ui.config.chasers.clone()));
+                        ui.current_editor_chaser_names = Arc::new(Mutex::new(ui.config.chasers.clone()));
                         ui.save_chaser_config();
                         ui.send_data();
                         test = true;
@@ -668,13 +667,13 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
         .color(app_theme.bg_editor.plain_contrast())
         .set(EDITOR_TITLE, conrod_ui);
 
-    let current_edited_switch = {
-        ui.current_edited_switch_id.lock().expect("Failed to lock Arc!")[0].clone()
+    let current_editor_switch = {
+        ui.current_editor_switch_id.lock().expect("Failed to lock Arc!")[0].clone()
     };
 
-    let switch_name = ui.current_edited_switch_name.clone();
+    let switch_name = ui.current_editor_switch_name.clone();
 
-    match current_edited_switch {
+    match current_editor_switch {
         Some(switch_id) => {
 
             let time = ui.frontend_data.switches[switch_id].before_chaser;
@@ -729,7 +728,7 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
             let mut editor_switch_slider_count = 0;
             let mut editor_switch_number_dialer_count = 0;
             let mut editor_switch_button_count = 0;
-            let mut editor_switch_text_count = 0;
+            let editor_switch_text_count = 0;
             let mut editor_switch_drop_downs_count = 0;
 
 
@@ -753,7 +752,7 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                 .font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                 .color(app_theme.bg_editor.plain_contrast())
                 .set(EDITOR_SWITCH_TEXT + editor_switch_text_count, conrod_ui);
-            editor_switch_text_count += 1;
+            //TODO KEEP THIS editor_switch_text_count += 1;
 
             let cloned_ui = ui.clone();
 
@@ -806,14 +805,14 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                     .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                     .react(|_: &mut Option<usize>, new_idx, _: &str| {
                         if ui.frontend_data.change_channel_group(switch_id, id_string.clone(), dropdown_background_list_fixture[new_idx], dropdown_background_list_channel_groups[new_idx]) {
-                            ui.current_edited_channel_group_id = new_idx as i64;
+                            ui.current_editor_channel_group_id = new_idx as i64;
                             ui.send_data();
                         }
                     })
                     .set(EDITOR_SWITCH_DROP_DOWNS + editor_switch_drop_downs_count, conrod_ui);
                     editor_switch_drop_downs_count += 1;
 
-                let label = if dropdown_index as i64 == ui.current_edited_channel_group_id {
+                let label = if dropdown_index as i64 == ui.current_editor_channel_group_id {
                     "v".to_string()
                 }
                 else {
@@ -828,23 +827,23 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                     .label(&label)
                     .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                     .react(|| {
-                        if dropdown_index as i64 == ui.current_edited_channel_group_id {
-                            ui.current_edited_channel_group_id = -1;
+                        if dropdown_index as i64 == ui.current_editor_channel_group_id {
+                            ui.current_editor_channel_group_id = -1;
                         }
                         else {
-                            ui.current_edited_channel_group_id = dropdown_index as i64;
-                            let mut current_edited_curve_strings_locked = ui.current_edited_curve_strings.lock().expect("Failed to lock Arc!");
-                            current_edited_curve_strings_locked[0] = data.curve_in.get_string();
-                            current_edited_curve_strings_locked[1] = data.curve_out.get_string();
+                            ui.current_editor_channel_group_id = dropdown_index as i64;
+                            let mut current_editor_curve_strings_locked = ui.current_editor_curve_strings.lock().expect("Failed to lock Arc!");
+                            current_editor_curve_strings_locked[0] = data.curve_in.get_string();
+                            current_editor_curve_strings_locked[1] = data.curve_out.get_string();
                         };
                     })
                     .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);
                 editor_switch_button_count += 1;
 
 
-                if dropdown_index as i64 == ui.current_edited_channel_group_id {
+                if dropdown_index as i64 == ui.current_editor_channel_group_id {
 
-                    let use_slieders = match ui.frontend_data.fixtures[fixture_id].channel_groups[channel_group_id].0 { //ids are defind in fixtures.rs::50
+                    let use_slieders = match ui.frontend_data.fixtures[fixture_id].channel_groups[channel_group_id].0 { //ids are defind in fixtures.rs::55
                         0 => true,
                         1 => true,
                         2 => true,
@@ -916,7 +915,7 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                         editor_switch_drop_downs_count += 1;
 
                         if fade_curve_id == 3 {
-                            let ref mut curve_string = {ui.current_edited_curve_strings.lock().expect("Failed to lock Arc!")[0].clone()};
+                            let ref mut curve_string = {ui.current_editor_curve_strings.lock().expect("Failed to lock Arc!")[0].clone()};
 
                             TextBox::new(curve_string)
                                 .w_h(item_width - item_x_offset, item_height)
@@ -971,7 +970,7 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                         editor_switch_drop_downs_count += 1;
 
                         if fade_curve_id == 3 {
-                            let ref mut curve_string = {ui.current_edited_curve_strings.lock().expect("Failed to lock Arc!")[1].clone()};
+                            let ref mut curve_string = {ui.current_editor_curve_strings.lock().expect("Failed to lock Arc!")[1].clone()};
 
                             TextBox::new(curve_string)
                                 .w_h(item_width - item_x_offset, item_height)
@@ -1047,7 +1046,7 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                 .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                 .react(|| {
                     ui.frontend_data.remove_switch_with_id(switch_id);
-                    ui.current_edited_switch_id.lock().expect("Failed to lock Arc!")[0] = None;
+                    ui.current_editor_switch_id.lock().expect("Failed to lock Arc!")[0] = None;
                     ui.send_data();
                 })
                 .set(EDITOR_SWITCH_BUTTON + editor_switch_button_count, conrod_ui);

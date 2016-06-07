@@ -47,6 +47,7 @@ fn square_root(x: f64) -> f64 {
 }
 
 impl FadeCurve {
+    /// Generate a function to calculate values.
     pub fn to_function(self) -> Box<Fn(f64) -> f64> {
         match self {
             FadeCurve::Linear => Box::new(linear),
@@ -56,6 +57,7 @@ impl FadeCurve {
             FadeCurve::Custom(e) => Expr::from_str(e).unwrap().bind("x").unwrap()
         }
     }
+    /// Convert the fade curve to an id.
     pub fn get_id(&self) -> usize {
         match *self {
             FadeCurve::Linear => 0,
@@ -66,6 +68,7 @@ impl FadeCurve {
         }
     }
 
+    /// Convert an id to a fade curve.
     pub fn get_by_id(id: usize, custom_string: String) -> FadeCurve {
         match id {
             0 => FadeCurve::Linear,
@@ -75,7 +78,8 @@ impl FadeCurve {
             _ => FadeCurve::Linear,
         }
     }
-    pub fn get_string(&self) -> String {
+    /// Return a fade curve as String.
+    pub fn get_string(&self) -> String { //TODO add the string for the other functions
         match *self {
             FadeCurve::Custom(ref e) => e.clone(),
             _ => "x".to_string()
@@ -83,6 +87,7 @@ impl FadeCurve {
     }
 }
 
+/// Calculate the number of steps by the given fade time.
 pub fn get_step_number(time: FadeTime) -> usize {
     let steps = time*FADE_TICKS/1000;
     if steps > 0 {
@@ -93,10 +98,12 @@ pub fn get_step_number(time: FadeTime) -> usize {
     }
 }
 
+/// Calculate all dmx values as integer needed for a fade.
 pub fn get_fade_steps_int(start_value: DmxValue, target_value: DmxValue, steps: usize, curve: FadeCurve) -> Vec<DmxValue> {
     get_fade_steps(start_value as f64, target_value as f64, steps, curve).iter().map(|x| *x as DmxValue).collect()
 }
 
+/// Calculate all dmx values as float needed for a fade.
 pub fn get_fade_steps(start_value: f64, target_value: f64, steps: usize, curve: FadeCurve) -> Vec<f64> {
     let curve_fn = &*curve.to_function();
     let y_offset = curve_fn(0f64);
@@ -109,12 +116,14 @@ pub fn get_fade_steps(start_value: f64, target_value: f64, steps: usize, curve: 
     }
 }
 
+/// Stop the fade of a given channel and save the interrupt sender of the new fade.
 pub fn stop_fade(channel: &Arc<Mutex<Channel>>, tx: mpsc::Sender<()>) {
     let mut channel_locked = channel.lock().expect("Failed to lock Arc!");
     channel_locked.stop_fade();
     channel_locked.current_thread = Some(tx);
 }
 
+/// Stop fade only if kill others is true and save the interrupt sender of the new fade if no fade is running.
 pub fn try_stop_fades(channels: Vec<&Arc<Mutex<Channel>>>, tx: mpsc::Sender<()>, kill_others: bool) -> bool {
     let mut channel_blocked = false;
     for channel in channels.iter() {

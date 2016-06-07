@@ -36,17 +36,20 @@ fn write_to_dmx(address: DmxAddress, value: DmxValue) {
     unsafe { write_dmx(address, value) }
 }
 
+/// Struct to represent an interface.
 pub struct Interface {
     baudrate: usize,
     port: String
 }
 
+/// Struct to represent an interface handler.
 pub struct InterfaceHandle {
     interface: Interface,
     fake: bool
 }
 
 impl Interface {
+    /// Generate a Interface with default values.
     pub fn new() -> Interface {
         Interface {
             baudrate: 115200,
@@ -55,17 +58,20 @@ impl Interface {
     }
 
     #[allow(dead_code)]
+    /// Change the baudrate of the interface.
     pub fn baudrate(mut self, baudrate: usize) -> Interface {
         self.baudrate = baudrate;
         self
     }
 
     #[allow(dead_code)]
+    /// Change the port of the interface.
     pub fn port(mut self, port: String) -> Interface {
         self.port = port;
         self
     }
 
+    /// Connect to the device. If the device can not be fount a fake interface is returned.
     pub fn connect(self) -> Result<InterfaceHandle, InterfaceHandle> {
         match connect(self.baudrate, self.port.clone()) {
             true => Ok(InterfaceHandle {interface: self, fake: false}),
@@ -77,8 +83,10 @@ impl Interface {
         }
     }
 }
-
+/// A touple with an address and a value.
 type DmxTouple = (DmxAddress, DmxValue);
+
+/// inserts a DMXTouple in a Vector of DmxTouple.
 fn insert_to_vector(cache: &mut Vec<DmxTouple>, elem: DmxTouple) {
     match cache.iter().position(|&x| x.0 == elem.0 ) {
         Some(index) => cache[index] = elem,
@@ -87,6 +95,7 @@ fn insert_to_vector(cache: &mut Vec<DmxTouple>, elem: DmxTouple) {
 }
 
 impl InterfaceHandle {
+    /// Start a thread for the interface handler
     pub fn to_thread(self) -> (mpsc::Sender<(DmxAddress, DmxValue)>, mpsc::Sender<bool>) {
         let (tx, rx) = mpsc::channel();
         let (interrupt_tx, interrupt_rx) = mpsc::channel();
@@ -135,11 +144,13 @@ impl InterfaceHandle {
         (tx, interrupt_tx)
     }
 
+    /// Send dmx value to device.
     pub fn write_to_dmx(&self, address: DmxAddress, value: DmxValue) {
         if self.fake { fake_if_print(address, value); }
         write_to_dmx(address, value);
     }
 
+    /// Disconnect from device
     pub fn disconnect(self) -> Interface {
         disconnect();
         self.interface

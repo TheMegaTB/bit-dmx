@@ -10,7 +10,6 @@ use io::config::{get_config_path, Config};
 
 use logic::ChannelGroup;
 use logic::channel::DmxAddress;
-use logic::channel::DmxValue;
 
 use logic::Stage;
 use logic::Fixture;
@@ -119,20 +118,21 @@ impl Parser {
                         // let command_content_str = vec_as_str(command_chars.clone());
                         //trace!("Got new command of type {} with content {}", command_type_str, command_content_str);
 
-                        if command_type_str == "preheat".to_string() {
-                            //trace!("PREHEAT WOHOOOO");
-                            let cg = channel_groups.pop().expect(&format!("No channel group defined for preheat. ({})", command));
-
-                            channel_groups.push(match cg {
-                                ChannelGroup::Single(group) => {
-                                    group.channel1.lock().expect("Failed to lock Arc!").max_preheat_value = command_args[0].parse::<DmxValue>().unwrap();
-                                    ChannelGroup::Single(group)
-                                },
-                                _ => {
-                                    exit!(10, "Preheat is not available for fixture type {:?}", cg);
-                                }
-                            });
-                        } else {
+                        // if command_type_str == "preheat".to_string() {
+                        //     //trace!("PREHEAT WOHOOOO");
+                        //     let cg = channel_groups.pop().expect(&format!("No channel group defined for preheat. ({})", command));
+                        //
+                        //     channel_groups.push(match cg {
+                        //         ChannelGroup::Single(group) => {
+                        //             group.channel1.lock().expect("Failed to lock Arc!").max_preheat_value = command_args[0].parse::<DmxValue>().unwrap();
+                        //             ChannelGroup::Single(group)
+                        //         },
+                        //         _ => {
+                        //             exit!(10, "Preheat is not available for fixture type {:?}", cg);
+                        //         }
+                        //     });
+                        // } else
+                        {
                             match command_type_str.trim() {
                                 "rgb" => {
                                     channel_groups.push(

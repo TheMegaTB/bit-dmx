@@ -29,16 +29,24 @@ use logic::Chaser;
 use ui::frontend_data::FrontendData;
 
 #[derive(Debug)]
+/// The implementation of a Stage.
 pub struct Stage {
+    /// The name of the stage.
     pub name: String,
+    /// The list of all channels.
     pub channels: Vec<Arc<Mutex<Channel>>>,
+    /// The list if all fixtures.
     pub fixtures: Vec<Fixture>,
+    /// The list of all switches.
     pub switches: Vec<Switch>,
+    /// The sander for the interface.
     dmx_tx: mpsc::Sender<(DmxAddress, DmxValue)>,
+    /// The list of all chasers
     pub chasers: HashMap<String, Chaser>
 }
 
 impl Stage {
+    /// Generate a Stage with default values.
     pub fn new(name: String, dmx_tx: mpsc::Sender<(DmxAddress, DmxValue)>) -> Stage {
         Stage {
             name: name,
@@ -50,6 +58,7 @@ impl Stage {
         }
     }
 
+    /// Convert a stage into FrontendData
     pub fn get_frontend_data(&self) -> FrontendData {
         FrontendData {
             name: self.name.clone(),
@@ -59,11 +68,11 @@ impl Stage {
             chasers: self.chasers.iter().map(|(name, data)| (name.clone(), data.get_frontend_data())).collect()
         }
     }
-
+    /// Return the path to the project configuration file.
     fn get_config_filename(&self) -> PathBuf {
         get_config_path(Config::Server(self.name.clone())).join(self.name.clone()  + ".server.dmx")
     }
-
+    /// Load the project configuration
     pub fn load_config(&mut self) {
         let path = self.get_config_filename();
         match File::open(path) {
@@ -77,14 +86,14 @@ impl Stage {
             _ => {}
         }
     }
-
+    /// Save the project configuration
     pub fn save_config(&self) {
         let path = self.get_config_filename();
         let file = File::create(path).expect("no such file");
         let mut buf = BufWriter::new(file);
         buf.write_all(self.get_frontend_data().get_json_string().as_bytes()).unwrap();
     }
-
+    /// Convert FrontendData into a stage
     pub fn from_frontend_data(&mut self, frontend_data: FrontendData) {
 
         self.switches = frontend_data.switches.iter().map(|x| Switch::load_from_json_switch(x.clone())).collect();
@@ -95,35 +104,36 @@ impl Stage {
         self.chasers = frontend_data.chasers.iter().map(|(name, data)| (name.clone(), Chaser::from_frontend_data(data.clone()))).collect()
 
     }
-
+    /// Add a fixture to the stage.
     pub fn add_fixture(&mut self, fixture: Fixture) -> usize {
         self.fixtures.push(fixture);
         self.fixtures.len() - 1
     }
-
-    fn add_fixture_to_switch_group(&mut self, switch_id:usize, chaser_id: String) {
-        if !self.chasers.contains_key(&chaser_id) {
-            self.chasers.insert(chaser_id.clone(), Chaser::new());
+    /// Add a switch to a chaser.
+    fn add_switch_to_chaser(&mut self, switch_id:usize, chaser_name: String) {
+        if !self.chasers.contains_key(&chaser_name) {
+            self.chasers.insert(chaser_name.clone(), Chaser::new());
         }
-        self.chasers.get_mut(&chaser_id).unwrap().switches.push(switch_id);
+        self.chasers.get_mut(&chaser_name).unwrap().switches.push(switch_id);
     }
-
+    /// Add  a switch to the stage.
     pub fn add_switch(&mut self, switch: Switch) -> usize {
         let id = self.switches.len();
-        self.add_fixture_to_switch_group(id, switch.chaser_id.clone());
+        self.add_switch_to_chaser(id, switch.chaser_name.clone());
         self.switches.push(switch);
 
         id
     }
-
+    /// Deactivate all switches in a chaser of a given switch except of this switch.
     pub fn deactivate_group_of_switch(&mut self, switch_id: usize, kill_others: bool) {
-        let switches = self.chasers.get(&self.switches[switch_id].chaser_id).unwrap().switches.iter().filter(|&x| *x != switch_id).map(|&x| x).collect::<Vec<usize>>();
+        let switches = self.chasers.get(&self.switches[switch_id].chaser_name).unwrap().switches.iter().filter(|&x| *x != switch_id).map(|&x| x).collect::<Vec<usize>>();
 
         for switch_id in switches.iter() {
             self.set_switch(*switch_id, 0.0, kill_others);
         };
     }
 
+    /// Set the dimmer value of a switch. To deactivate a switch set the dimmer value to 0.
     pub fn set_switch(&mut self, switch_id: usize, dimmer_value: f64, kill_others: bool) {
         self.switches[switch_id].dimmer_value = dimmer_value;
         if dimmer_value == 0.0 {
@@ -158,6 +168,7 @@ impl Stage {
         UDPSocket::new().start_frontend_client().send_to_multicast(&[1, addr_high, addr_low, dimmer_value as u8]);
     }
 
+    /// Deactivate a switch
     fn deactivate_switch(&mut self, switch_id: usize, kill_others: bool) {
         for (&(fixture_id, channel_group_id), data) in self.switches[switch_id].channel_groups.iter() {
             match self.fixtures[fixture_id].channel_groups[channel_group_id] {
@@ -188,16 +199,16 @@ impl Stage {
             }
         }
     }
-
+    /// Return a channel of a given dmx address.
     pub fn get_channel_object(&mut self, channel: DmxAddress) -> Arc<Mutex<Channel>> {
         for i in self.channels.len() as u16..channel as u16 {
-            self.channels.push(Arc::new(Mutex::new(Channel::new(i + 1, 0, 0, self.dmx_tx.clone()))));
+            self.channels.push(Arc::new(Mutex::new(Channel::new(i + 1, 0, self.dmx_tx.clone()))));
             trace!("Created channel {}", i + 1);
         }
         self.channels[channel as usize - 1].clone()
     }
 }
-
+/// Removes a switch from a list of activated switches.
 fn remove_from_active_switches(active_switches: &mut Vec<(usize, ChannelGroupValue)>, switch_id: usize) -> bool {
     if active_switches.len() > 0 { //TODO: Replace this workaround.
         let last_index = active_switches.len() - 1;
@@ -206,7 +217,7 @@ fn remove_from_active_switches(active_switches: &mut Vec<(usize, ChannelGroupVal
         last_id == switch_id
     } else { false }
 }
-
+/// Generate new values for a channel group based of the history of activated switches.
 fn extract_new_values(active_switches: &mut Vec<(usize, ChannelGroupValue)>, default_values: Vec<DmxValue>, old_curve: FadeCurve, old_time: FadeTime) -> (Vec<DmxValue>, FadeCurve, FadeTime) {
     if active_switches.len() == 0 {
         (default_values, old_curve, old_time)

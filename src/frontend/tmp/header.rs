@@ -73,26 +73,26 @@ pub fn draw_header(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: T
         .label(&"Edit Mode".to_string())
         .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
         .and(|b| {
-            if ui.edit_state {
+            if ui.editor_state {
                 b.rgb(0.1, 0.9, 0.1)
             } else {
                 b.rgb(0.9, 0.1, 0.1)
             }
         })
         .react(|| {
-            ui.current_edited_switch_id.lock().expect("Failed to lock Arc!")[0] = None;
-            ui.current_edited_switch_name.lock().expect("Failed to lock Arc!")[0] = "".to_string();
-            if ui.edit_state {
+            ui.current_editor_switch_id.lock().expect("Failed to lock Arc!")[0] = None;
+            ui.current_editor_switch_name.lock().expect("Failed to lock Arc!")[0] = "".to_string();
+            if ui.editor_state {
                 ui.send_data();
             }
             else {
-                ui.current_edited_chaser_names = Arc::new(Mutex::new(ui.chasers.clone()));
+                ui.current_editor_chaser_names = Arc::new(Mutex::new(ui.chasers.clone()));
             }
-            ui.edit_state = !ui.edit_state;
+            ui.editor_state = !ui.editor_state;
         })
         .set(EDITOR_BUTTON, conrod_ui);
 
-    if ui.edit_state {
+    if ui.editor_state {
         Button::new()
             .w_h(105.0 * application_theme.ui_scale, 35.0 * application_theme.ui_scale)
             .right_from(EDITOR_BUTTON, 5.0 * application_theme.ui_scale)
@@ -100,7 +100,7 @@ pub fn draw_header(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: T
             .label(&"Add Chaser".to_string())
             .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
             .and(|b| {
-                if ui.edit_state {
+                if ui.editor_state {
                     b.rgb(0.1, 0.9, 0.1)
                 } else {
                     b.rgb(0.9, 0.1, 0.1)
@@ -109,7 +109,7 @@ pub fn draw_header(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: T
             .react(|| {
                 let name = ui.frontend_data.add_chaser();
                 ui.chasers.push(name);
-                ui.current_edited_chaser_names = Arc::new(Mutex::new(ui.chasers.clone()));
+                ui.current_editor_chaser_names = Arc::new(Mutex::new(ui.chasers.clone()));
                 ui.save_chaser_config();
                 ui.send_data();
             })

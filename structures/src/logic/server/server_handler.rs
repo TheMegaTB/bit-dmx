@@ -3,22 +3,22 @@ use std::sync::{Arc, Mutex};
 use std::error::Error;
 
 use std::io::prelude::*;
-use std::env;
 
 use logic::server::interface_handler::*;
 
-use io::logger::Logger;
-use GIT_HASH;
-use VERSION;
 use io::dmx_parser::Parser;
 use logic::Stage;
-use logic::fade::FadeCurve;
-use logic::ChannelGroup;
 use networking::UDPSocket;
 use logic::chaser::start_chaser_of_switch;
 use ui::frontend_data::FrontendData;
 
-pub fn start(instance_name: String, interface_port: String) {
+/// Start a server with instance name and optional a port.
+pub fn start(instance_name: String, interface_port: Option<String>) {
+    let interface_port = match interface_port {
+        Some(interface_port_string) => interface_port_string,
+        None => "/dev/ttyACM0".to_string()
+    };
+
     info!("Server started as \"{}\"", instance_name);
 
     let (tx, _interrupt_tx) = match Interface::new().port(interface_port).connect() {
@@ -31,15 +31,6 @@ pub fn start(instance_name: String, interface_port: String) {
 
     let mut stage = Parser::new(Stage::new(instance_name, tx)).parse();
     stage.load_config();
-
-    for fixture in stage.fixtures.iter_mut() {
-        match fixture.channel_groups[0] {
-            ChannelGroup::Single(ref mut group) => {
-                group.activate_preheat(FadeCurve::Squared, 1000);
-            },
-            _ => {}
-        }
-    }
 
     let mut socket = UDPSocket::new();
     socket.start_watchdog_server();

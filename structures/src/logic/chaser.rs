@@ -83,8 +83,8 @@ pub fn start_chaser_of_switch(stage: Arc<Mutex<Stage>>, switch_id: usize, dimmer
     UDPSocket::new().start_frontend_client().send_to_multicast(&[2, addr_high, addr_low, dimmer_value as u8]);
     let (chaser, rx) = {
         let mut stage_locked = stage.lock().expect("Failed to lock Arc!");
-        let chaser_id = stage_locked.switches[switch_id].clone().chaser_id;
-        let mut chaser = stage_locked.chasers.get_mut(&chaser_id).unwrap();
+        let chaser_name = stage_locked.switches[switch_id].clone().chaser_name;
+        let mut chaser = stage_locked.chasers.get_mut(&chaser_name).unwrap();
             chaser.stop_chaser();
         if dimmer_value == 0.0 {
             return

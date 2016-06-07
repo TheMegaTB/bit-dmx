@@ -1,5 +1,5 @@
 use piston_window::{ EventLoop, OpenGL, Glyphs, PistonWindow, WindowSettings, self };
-use std::any::Any;
+// use std::any::Any;
 use conrod::{Theme, self};
 
 use get_assets_path;
@@ -13,10 +13,11 @@ pub type UiCell<'a> = conrod::UiCell<'a, Backend>;
 
 const OPEN_GL: OpenGL = OpenGL::V3_2;
 
-/// A window wrapper for creating windows
-pub trait DMXWindow {
-    fn join(self) -> Result<(), Box<Any + Send + 'static>>;
-}
+// /// A window wrapper for creating windows
+// pub trait DMXWindow {
+//     /// Join the window thread
+//     fn join(self) -> Result<(), Box<Any + Send + 'static>>;
+// }
 
 /// Function to create a window with a specific title, size, fps/ups and whether or not it should close when pressing escape
 pub fn create_window(title: String, size: (u32, u32), ups: u64, esc: bool) -> Result<(PistonWindow, Ui), &'static str> {

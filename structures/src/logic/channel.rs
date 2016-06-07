@@ -1,5 +1,4 @@
 use std::sync::mpsc;
-use std::cmp;
 
 use std::error::Error;
 
@@ -12,51 +11,44 @@ pub type DmxAddress = u16;
 /// The struct that represents a dmx channel
 pub struct Channel {
     /// The current value of the channel
-    current_value: DmxValue,
-    /// The value that is set to the channel. If the preheat value is higher then this value the current_value is set to the preheat value
-    pub value: DmxValue,
-    /// The preheat value that is set for the channel
-    pub preheat_value: DmxValue,
-    pub max_preheat_value: DmxValue,
-
+    value: DmxValue,
+    /// The dmx address of the channel.
     pub address: DmxAddress,
+    /// The sender to send channel informaton to the interface.
     dmx_tx: mpsc::Sender<(DmxAddress, DmxValue)>,
+    /// The interrupt sender to interrupt a fade.
     pub current_thread: Option<mpsc::Sender<()>>
 }
 
 impl Channel {
-    pub fn new(address: DmxAddress, old_value: DmxValue, max_preheat_value: DmxValue, dmx_tx: mpsc::Sender<(DmxAddress, DmxValue)>) -> Channel {
+    /// Generate a Channel from the given information.
+    pub fn new(address: DmxAddress, old_value: DmxValue, dmx_tx: mpsc::Sender<(DmxAddress, DmxValue)>) -> Channel {
         dmx_tx.send((address, old_value)).unwrap();
         Channel {
-            current_value: old_value,
             value: old_value,
-            preheat_value: 0,
-            max_preheat_value: max_preheat_value,
             address: address,
             dmx_tx: dmx_tx,
             current_thread: None
         }
     }
+    /// Return the current value
     pub fn get(&self) -> DmxValue {
-        self.current_value
+        self.value
     }
+    /// Set the value of the channel
     pub fn set(&mut self, value: DmxValue) {
-        self.value = value;
-        self.update();
-    }
-    pub fn set_preheat(&mut self, value: DmxValue) {
-        self.preheat_value = value;
-        self.update();
-    }
-    fn update(&mut self) {
-        let new_value = cmp::max(self.preheat_value, self.value);
-        if self.current_value != new_value {
-            self.current_value = new_value;
-            match self.dmx_tx.send((self.address, self.current_value)) {
-                Ok(_) => {}, Err(e) => {exit!(7, "Failed to send value to dmx interface handler: {}", e.description());}
-            };
+        if self.value != value {
+            self.value = value;
+            self.update();
         }
     }
+    /// send an update request to the inerface, if the value has changed.
+    fn update(&mut self) {
+        match self.dmx_tx.send((self.address, self.value)) {
+            Ok(_) => {}, Err(e) => {exit!(7, "Failed to send value to dmx interface handler: {}", e.description());}
+        };
+    }
+    /// Stop the current fade if it exists
     pub fn stop_fade(&mut self) {
         match self.current_thread {
             Some(ref tx) => {
