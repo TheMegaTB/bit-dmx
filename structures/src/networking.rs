@@ -14,7 +14,7 @@ use GIT_HASH;
 /// Buffer length for incoming datagrams
 pub const INPUT_BUFFER: usize = 4;
 /// Interval at which the watchdog broadcasts
-pub const WATCHDOG_TTL: u64 = 1;
+pub const WATCHDOG_TTL: u64 = 3;
 
 const MULTICAST: &'static str = "228.228.228.228";
 const BASE_PORT: u16 = 8000;
