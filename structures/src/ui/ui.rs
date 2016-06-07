@@ -37,6 +37,7 @@ pub struct UI {
     pub editor_state: bool,
     /// Saves whether the ui waites for a new keybinding.
     pub waiting_for_keybinding: bool,
+    /// This is set to true after a DropDownList element was selected, so that buttons below the opend DropDownList aren't triggert
     pub dropdown_clicked: bool,
     /// The id of the switch that is opened in the editor.
     pub current_editor_switch_id: Arc<Mutex<[Option<usize>; 1]>>,
