@@ -90,7 +90,7 @@ pub fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: 
         let current_editor_chaser_names = ui.current_editor_chaser_names.clone();
         if ui.editor_state {
             // let tmp_name = {current_editor_chaser_names.lock().expect("Failed to lock Arc!")[id].clone()};
-            let ref mut current_chaser_name = current_editor_chaser_names.lock().expect("Failed to lock Arc!")[id];
+            let ref mut current_chaser_name = lock!(current_editor_chaser_names)[id];
 
             // let ref mut switch_name = switch_name.lock().expect("Failed to lock Arc!")[0];
             TextBox::new(current_chaser_name)
@@ -143,8 +143,8 @@ pub fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: 
                 .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
                 .react(|| {
                     if ui.editor_state {
-                        current_editor_switch.lock().expect("Failed to lock Arc!")[0] = Some(switch_id);
-                        ui.current_editor_switch_name.lock().expect("Failed to lock Arc!")[0] = switch.name.clone();
+                        lock!(current_editor_switch)[0] = Some(switch_id);
+                        lock!(ui.current_editor_switch_name)[0] = switch.name.clone();
                     }
                     else {
                         let new_value = if switch.dimmer_value == 0.0 {255} else {0};
@@ -252,8 +252,8 @@ pub fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, application_theme: 
                 .label_font_size((application_theme.base_font_size * application_theme.ui_scale) as u32)
                 .react(|| {
                     let switch_id = ui.frontend_data.add_switch(JsonSwitch::new("Untitled".to_string(), name.clone()));
-                    ui.current_editor_switch_id.lock().expect("Failed to lock Arc!")[0] = Some(switch_id);
-                    ui.current_editor_switch_name.lock().expect("Failed to lock Arc!")[0] = "Untitled".to_string();
+                    lock!(ui.current_editor_switch_id)[0] = Some(switch_id);
+                    lock!(ui.current_editor_switch_name)[0] = "Untitled".to_string();
 
                     ui.send_data();
                     test = true;

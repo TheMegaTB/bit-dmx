@@ -173,7 +173,7 @@ impl UDPSocketHandle {
 impl WatchDogClient {
     /// Check whether or not the watchdog is connected to a server that is still alive
     pub fn is_alive(&self) -> bool {
-        let state = self.state.lock().expect("Failed to lock Arc!");
+        let state = lock!(self.state);
         state[0]
     }
 
@@ -181,7 +181,7 @@ impl WatchDogClient {
     ///
     /// This may or may not return a value hence the `Option`
     pub fn get_server_addr(&self) -> Option<IpAddr> {
-        let server_addr = self.server_addr.lock().expect("Failed to lock Arc!");
+        let server_addr = lock!(self.server_addr);
         server_addr[0]
     }
 }

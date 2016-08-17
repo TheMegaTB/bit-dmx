@@ -53,14 +53,14 @@ pub fn start(instance_name: String, interface_port: Option<String>) {
 
                 if address_type == 0 {
                     // Channel
-                    let stage_locked = stage.lock().expect("Failed to lock Arc!");
-                    let mut channel_locked = stage_locked.channels[address as usize].lock().expect("Failed to lock Arc!");
+                    let stage_locked = lock!(stage);
+                    let mut channel_locked = lock!(stage_locked.channels[address as usize]);
                     channel_locked.stop_fade();
                     channel_locked.set(value);
                 }
                 else if address_type == 1 {
                     // Switch
-                    let mut stage_locked = stage.lock().expect("Failed to lock Arc!");
+                    let mut stage_locked = lock!(stage);
                     debug!("Set switch with address {:?} to {:?} (shifted: {:?})", address, value, shift);
                     if shift {
                         stage_locked.deactivate_group_of_switch(address as usize, true)
@@ -87,7 +87,7 @@ pub fn start(instance_name: String, interface_port: Option<String>) {
             for stream in listener.incoming() {
                 let stage = stage.clone();
                 thread::spawn(move || {
-                    let stage_locked = stage.lock().expect("Failed to lock Arc!");
+                    let stage_locked = lock!(stage);
                     let mut stream = stream.unwrap();
                     stream.write(stage_locked.get_frontend_data().get_json_string().as_bytes()).unwrap();
                 });
@@ -110,7 +110,7 @@ pub fn start(instance_name: String, interface_port: Option<String>) {
                     stream.read_to_string(&mut buffer).unwrap();
                     match FrontendData::from_json(buffer) {
                         Ok(data) => {
-                            let mut stage_locked = stage.lock().expect("Failed to lock Arc!");
+                            let mut stage_locked = lock!(stage);
                             stage_locked.from_frontend_data(data);
                             stage_locked.save_config();
                             UDPSocket::new().start_frontend_client().send_to_multicast(&[255, 255, 255, 255]);

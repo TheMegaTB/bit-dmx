@@ -4,6 +4,8 @@ use std::error::Error;
 
 /// The default type for dmx channel values
 pub type DmxValue = u8;
+/// The default type for 16-Bit dmx channel values
+pub type DmxValue16 = u16;
 /// The default type for dmx channel addresses
 pub type DmxAddress = u16;
 

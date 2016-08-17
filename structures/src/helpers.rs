@@ -46,6 +46,13 @@ macro_rules! exit {
     };
 }
 
+#[macro_export]
+macro_rules! lock {
+    ($var:expr) => {
+        $var.lock().expect("Failed to lock Mutex!")
+    }
+}
+
 // #[macro_export]
 // macro_rules! hashmap {
 //     ($( $key: expr => $val: expr ),*) => {{

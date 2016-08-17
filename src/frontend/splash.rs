@@ -68,7 +68,7 @@ impl SplashWindow {
                 i = if i > 2 { 0 } else { i+1 };
             }));
 
-            if ui.lock().expect("Failed to lock Arc!").watchdog.is_alive() { break };
+            if lock!(ui).watchdog.is_alive() { break };
         };
     }
 

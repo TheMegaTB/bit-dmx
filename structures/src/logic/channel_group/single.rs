@@ -35,7 +35,7 @@ impl Single {
 
     /// A simple fade function that does not need to know the start value.
     pub fn fade_simple(&mut self, curve: FadeCurve, time: FadeTime, end_value: DmxValue, kill_others: bool) {
-        let start_value = {self.channel1.lock().expect("Failed to lock Arc!").get()};
+        let start_value = {lock!(self.channel1).get()};
         self.fade(curve, time, start_value, end_value, kill_others);
     }
 
@@ -51,13 +51,13 @@ impl Single {
                 for value in get_fade_steps_int(start_value, end_value, steps, curve) {
                     {
                         if rx.try_recv().is_ok() { return }
-                        let mut channel1_locked = channel1.lock().expect("Failed to lock Arc!");
+                        let mut channel1_locked = lock!(channel1);
 
                         channel1_locked.set(value);
                     }
                     sleep(Duration::from_millis((time/steps) as u64));
                 }
-                channel1.lock().expect("Failed to lock Arc!").current_thread = None;
+                lock!(channel1).current_thread = None;
             });
         }
     }
@@ -87,7 +87,7 @@ impl Single {
     /// Get a vector of the DMX addresses used by this channel group
     pub fn get_addresses(&self) -> Vec<DmxAddress> {
         vec![
-            self.channel1.lock().expect("Failed to lock Arc!").address
+            lock!(self.channel1).address
         ]
     }
 }

@@ -86,17 +86,17 @@ impl RGBA {
 
 
             thread::spawn(move || {
-                let start_r = channel_r.lock().expect("Failed to lock Arc!").get();
-                let start_g = channel_g.lock().expect("Failed to lock Arc!").get();
-                let start_b = channel_b.lock().expect("Failed to lock Arc!").get();
-                let start_a = channel_a.lock().expect("Failed to lock Arc!").get();
+                let start_r = lock!(channel_r).get();
+                let start_g = lock!(channel_g).get();
+                let start_b = lock!(channel_b).get();
+                let start_a = lock!(channel_a).get();
                 for (((&r, &g), &b), &a) in get_fade_steps_int(start_r, end_r, steps, curve.clone()).iter().zip(get_fade_steps_int(start_g, end_g, steps, curve.clone()).iter()).zip(get_fade_steps_int(start_b, end_b, steps, curve.clone()).iter()).zip(get_fade_steps_int(start_a, end_a, steps, curve.clone()).iter()) {
                     {
                         if rx.try_recv().is_ok() { return }
-                        channel_r.lock().expect("Failed to lock Arc!").set(r);
-                        channel_g.lock().expect("Failed to lock Arc!").set(g);
-                        channel_b.lock().expect("Failed to lock Arc!").set(b);
-                        channel_a.lock().expect("Failed to lock Arc!").set(a);
+                        lock!(channel_r).set(r);
+                        lock!(channel_g).set(g);
+                        lock!(channel_b).set(b);
+                        lock!(channel_a).set(a);
                     }
                     sleep(Duration::from_millis((time/steps) as u64));
                 }
@@ -107,10 +107,10 @@ impl RGBA {
     /// Get a vector of the DMX addresses used by this channel group
     pub fn get_addresses(&self) -> Vec<DmxAddress> {
         vec![
-            self.channel_r.lock().expect("Failed to lock Arc!").address,
-            self.channel_g.lock().expect("Failed to lock Arc!").address,
-            self.channel_b.lock().expect("Failed to lock Arc!").address,
-            self.channel_a.lock().expect("Failed to lock Arc!").address
+            lock!(self.channel_r).address,
+            lock!(self.channel_g).address,
+            lock!(self.channel_b).address,
+            lock!(self.channel_a).address
         ]
     }
 }

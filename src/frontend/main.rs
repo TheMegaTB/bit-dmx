@@ -83,7 +83,7 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
     // Poll events from the window.
     let mut button_pressed = false;
     while let Some(event) = window.next() {
-        let mut ui_locked = &mut *ui.lock().expect("Failed to lock Arc!");
+        let mut ui_locked = &mut *lock!(ui);
 
         // Button/Mouse events
         if let Some(button) = event.press_args() {
@@ -97,7 +97,7 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
                 ui_locked.alt_state = true;
             }
             if ui_locked.waiting_for_keybinding {
-                let switch_id = ui_locked.current_editor_switch_id.lock().expect("Failed to lock Arc!")[0];
+                let switch_id = lock!(ui_locked.current_editor_switch_id)[0];
                 match switch_id {
                     Some(switch_id) => {
                         match button {
@@ -364,8 +364,8 @@ fn draw_header(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme) {
             }
         })
         .react(|| {
-            ui.current_editor_switch_id.lock().expect("Failed to lock Arc!")[0] = None;
-            ui.current_editor_switch_name.lock().expect("Failed to lock Arc!")[0] = "".to_string();
+            lock!(ui.current_editor_switch_id)[0] = None;
+            lock!(ui.current_editor_switch_name)[0] = "".to_string();
             if ui.editor_state {
                 ui.send_data();
             }
@@ -442,7 +442,7 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usabl
         let x_pos = x_offset + column*button_width;
         let current_editor_chaser_names = ui.current_editor_chaser_names.clone();
         if ui.editor_state {
-            let ref mut current_chaser_name = current_editor_chaser_names.lock().expect("Failed to lock Arc!")[id];
+            let ref mut current_chaser_name = lock!(current_editor_chaser_names)[id];
 
             TextBox::new(current_chaser_name)
                 .font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
@@ -495,8 +495,8 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usabl
                 .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                 .react(|| {
                     if ui.editor_state {
-                        current_editor_switch.lock().expect("Failed to lock Arc!")[0] = Some(switch_id);
-                        ui.current_editor_switch_name.lock().expect("Failed to lock Arc!")[0] = switch.name.clone();
+                        lock!(current_editor_switch)[0] = Some(switch_id);
+                        lock!(ui.current_editor_switch_name)[0] = switch.name.clone();
                         if ui.control_state {
                             // ui.waiting_for_keybinding = true; //TODO make this working
                         }
@@ -622,8 +622,8 @@ fn draw_chasers(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usabl
                 .label_font_size((app_theme.base_font_size * app_theme.ui_scale) as u32)
                 .react(|| {
                     let switch_id = ui.frontend_data.add_switch(JsonSwitch::new("Untitled".to_string(), name.clone()));
-                    ui.current_editor_switch_id.lock().expect("Failed to lock Arc!")[0] = Some(switch_id);
-                    ui.current_editor_switch_name.lock().expect("Failed to lock Arc!")[0] = "Untitled".to_string();
+                    lock!(ui.current_editor_switch_id)[0] = Some(switch_id);
+                    lock!(ui.current_editor_switch_name)[0] = "Untitled".to_string();
 
                     ui.send_data();
                     test = true;
@@ -670,7 +670,7 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
         .set(EDITOR_TITLE, conrod_ui);
 
     let current_editor_switch = {
-        ui.current_editor_switch_id.lock().expect("Failed to lock Arc!")[0].clone()
+        lock!(ui.current_editor_switch_id)[0].clone()
     };
 
     let switch_name = ui.current_editor_switch_name.clone();
@@ -683,7 +683,7 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
             let item_height = usable_width/8.0 * app_theme.ui_scale;
             let item_x_offset = 20.0 * app_theme.ui_scale;
             let line = "-----------------------------------------";
-            let ref mut switch_name = switch_name.lock().expect("Failed to lock Arc!")[0];
+            let ref mut switch_name = lock!(switch_name)[0];
 
 
             TextBox::new(switch_name)
@@ -838,7 +838,7 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                             }
                             else {
                                 ui.current_editor_channel_group_id = dropdown_index as i64;
-                                let mut current_editor_curve_strings_locked = ui.current_editor_curve_strings.lock().expect("Failed to lock Arc!");
+                                let mut current_editor_curve_strings_locked = lock!(ui.current_editor_curve_strings);
                                 current_editor_curve_strings_locked[0] = data.curve_in.get_string();
                                 current_editor_curve_strings_locked[1] = data.curve_out.get_string();
                             };
@@ -923,7 +923,7 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                         editor_switch_drop_downs_count += 1;
 
                         if fade_curve_id == 3 {
-                            let ref mut curve_string = {ui.current_editor_curve_strings.lock().expect("Failed to lock Arc!")[0].clone()};
+                            let ref mut curve_string = {lock!(ui.current_editor_curve_strings)[0].clone()};
 
                             TextBox::new(curve_string)
                                 .w_h(item_width - item_x_offset, item_height)
@@ -979,7 +979,7 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                         editor_switch_drop_downs_count += 1;
 
                         if fade_curve_id == 3 {
-                            let ref mut curve_string = {ui.current_editor_curve_strings.lock().expect("Failed to lock Arc!")[1].clone()};
+                            let ref mut curve_string = {lock!(ui.current_editor_curve_strings)[1].clone()};
 
                             TextBox::new(curve_string)
                                 .w_h(item_width - item_x_offset, item_height)
@@ -1060,7 +1060,7 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                 .react(|| {
                     if !ui.dropdown_clicked {
                         ui.frontend_data.remove_switch_with_id(switch_id);
-                        ui.current_editor_switch_id.lock().expect("Failed to lock Arc!")[0] = None;
+                        lock!(ui.current_editor_switch_id)[0] = None;
                         ui.send_data();
                     }
                 })
@@ -1084,5 +1084,5 @@ fn main() {
     let ui = UI::new();
     // SplashWindow::new(ui.clone()).join().unwrap();
     SplashWindow::start(ui.clone());
-    if {ui.lock().expect("Failed to lock Arc!").watchdog.is_alive()} { create_output_window(ui.clone()); }
+    if {lock!(ui).watchdog.is_alive()} { create_output_window(ui.clone()); }
 }
