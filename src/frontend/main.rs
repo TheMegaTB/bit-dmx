@@ -34,6 +34,8 @@ use structures::ui::window::create_window;
 use structures::ui::window::UiCell;
 use structures::GIT_HASH;
 use structures::VERSION;
+use structures::logic::channel_group::moving_2d16::from_u16;
+use structures::logic::channel_group::moving_2d16::to_u16;
 
 mod splash;
 use splash::*;
@@ -849,7 +851,7 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
 
 
                 if dropdown_index as i64 == ui.current_editor_channel_group_id {
-
+                    trace!("{:?}", data);
                     let use_slieders = match ui.frontend_data.fixtures[fixture_id].channel_groups[channel_group_id].0 { //ids are defind in fixtures.rs::55
                         0 => true,
                         1 => true,
@@ -866,6 +868,29 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                                 .react(|new_x, new_y| {
                                     ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().values[0] = new_x as u8;
                                     ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().values[1] = new_y as u8;
+                                })
+                                .set(EDITOR_XY_PAD, conrod_ui);
+                            false
+                        },
+                        4 => {
+                            XYPad::new(to_u16(data.values[0], data.values[1]) as f32, 0.0, 65535.0, // x range.
+                                       to_u16(data.values[2], data.values[3]) as f32, 0.0, 65535.0)
+                                .w_h(item_width - item_x_offset, item_width - item_x_offset)
+                                .down(20.0 * app_theme.ui_scale)
+                                .align_right_of(EDITOR_CONTENT)
+                                .color(app_theme.slider_color)
+                                .frame(2.0)
+                                .line_thickness(2.0)
+                                .react(|new_x, new_y| {
+                                    let (x1, x2) = from_u16(new_x as u16);
+                                    let (y1, y2) = from_u16(new_y as u16);
+                                    println!("{} {} -> {} {} {} {}", new_x, new_y, x1, x2, y1, y2);
+                                    // ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().values[1] = new_y as u8;
+                                    // ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().values[0] = new_x as u8;
+                                    ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().values[0] = x1;
+                                    ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().values[1] = x2;
+                                    ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().values[2] = y1;
+                                    ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().values[3] = y2;
                                 })
                                 .set(EDITOR_XY_PAD, conrod_ui);
                             false

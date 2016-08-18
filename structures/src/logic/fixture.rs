@@ -58,6 +58,7 @@ fn channel_group_to_id(c: &ChannelGroup) -> (u8, Vec<DmxAddress>) {
         &ChannelGroup::Single(ref group) => (0, group.get_addresses()),
         &ChannelGroup::RGB(ref group) => (1, group.get_addresses()),
         &ChannelGroup::RGBA(ref group) => (2, group.get_addresses()),
-        &ChannelGroup::Moving2D(ref group) => (3, group.get_addresses())
+        &ChannelGroup::Moving2D(ref group) => (3, group.get_addresses()),
+        &ChannelGroup::Moving2D16(ref group) => (4, group.get_addresses())
     }
 }

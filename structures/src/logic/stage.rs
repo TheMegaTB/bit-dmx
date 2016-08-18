@@ -142,6 +142,7 @@ impl Stage {
         else {
             for (&(fixture_id, channel_group_id), data) in self.switches[switch_id].channel_groups.iter() {
                 let new_values: Vec<_> = data.values.iter().map(|a| (*a as f64 * (dimmer_value / 255.0)) as DmxValue).collect();
+                println!("new_values: {:?}   {:?}", new_values, data);
                 match self.fixtures[fixture_id].channel_groups[channel_group_id] {
                     //TODO Check if there are enough values in new_values
                     ChannelGroup::Single(ref mut group) => {
@@ -159,6 +160,10 @@ impl Stage {
                     ChannelGroup::Moving2D(ref mut group) => {
                         group.active_switches.push((switch_id, ChannelGroupValue::from_tuple((new_values.clone(), (data.curve_in.clone(), data.time_in), (data.curve_out.clone(), data.time_out)))));
                         group.fade_simple(data.curve_in.clone(), data.time_in, new_values[0], new_values[1], kill_others);
+                    },
+                    ChannelGroup::Moving2D16(ref mut group) => {
+                        group.active_switches.push((switch_id, ChannelGroupValue::from_tuple((new_values.clone(), (data.curve_in.clone(), data.time_in), (data.curve_out.clone(), data.time_out)))));
+                        group.fade_simple(data.curve_in.clone(), data.time_in, new_values[0], new_values[1], new_values[2], new_values[3], kill_others);
                     }
                 }
             }
@@ -194,6 +199,12 @@ impl Stage {
                     if remove_from_active_switches(&mut group.active_switches, switch_id) {
                         let (new_values, new_curve, new_time) = extract_new_values(&mut group.active_switches, vec![0, 0], data.curve_out.clone(), data.time_out);
                         group.fade_simple(new_curve, new_time, new_values[0], new_values[1], kill_others);
+                    }
+                },
+                ChannelGroup::Moving2D16(ref mut group) => {
+                    if remove_from_active_switches(&mut group.active_switches, switch_id) {
+                        let (new_values, new_curve, new_time) = extract_new_values(&mut group.active_switches, vec![0, 0, 0, 0], data.curve_out.clone(), data.time_out);
+                        group.fade_simple(new_curve, new_time, new_values[0], new_values[1], new_values[2], new_values[3], kill_others);
                     }
                 }
             }

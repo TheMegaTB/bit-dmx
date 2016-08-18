@@ -18,6 +18,7 @@ use logic::channel_group::RGB;
 use logic::channel_group::RGBA;
 use logic::channel_group::Single;
 use logic::channel_group::Moving2D;
+use logic::channel_group::Moving2D16;
 
 use FIXTURE_DEF;
 
@@ -167,6 +168,16 @@ impl Parser {
                                             self.stage.get_channel_object(start_channel + (command_args[1].parse::<DmxAddress>().unwrap()))
                                         ))
                                     );
+                                },
+                                "moving_2d16" => {
+                                    channel_groups.push(
+                                        ChannelGroup::Moving2D16(Moving2D16::new(
+                                            self.stage.get_channel_object(start_channel + (command_args[0].parse::<DmxAddress>().unwrap())),
+                                            self.stage.get_channel_object(start_channel + (command_args[1].parse::<DmxAddress>().unwrap())),
+                                            self.stage.get_channel_object(start_channel + (command_args[2].parse::<DmxAddress>().unwrap())),
+                                            self.stage.get_channel_object(start_channel + (command_args[3].parse::<DmxAddress>().unwrap()))
+                                        ))
+                                    )
                                 },
                                 _ => {}
                             }

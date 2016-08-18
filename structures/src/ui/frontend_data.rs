@@ -53,7 +53,8 @@ impl FrontendData {
             1 => vec!(0, 0, 0),
             2 => vec!(0, 0, 0, 0),
             3 => vec!(128, 128),
-            _ => vec!()
+            4 => vec!(128, 128, 128, 128),
+            _ => unreachable!()
         }
     }
     /// Change the channel group of a channel group in a switch and sets default data for the new channel group. This function returns false, if the requested channelgroup does not exists.
