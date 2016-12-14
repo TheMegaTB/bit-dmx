@@ -4,7 +4,7 @@
 extern crate piston_window;
 extern crate rustc_serialize;
 
-use conrod::{Canvas, Text, Button, Frameable, Colorable, Sizeable, Positionable, Widget, Labelable, TextBox, DropDownList, Slider};
+use conrod::{Canvas, Text, Button, Frameable, Colorable, Sizeable, Positionable, Widget, Labelable, TextBox, DropDownList, NumberDialer};
 use piston_window::UpdateEvent;
 use piston_window::Window;
 use std::iter::*;
@@ -32,25 +32,34 @@ widget_ids! {
     RIGHT,
     CONFIG_SELECT_BUTTON with 100,
     CREATE_NEW_BUTTON,
+    FIXTURE_TEMPLATE with 1000,
     FIXTURE with 1000,
     CHANNEL_GROUP with 256,
     ADD_FIXTURE_TEMPLATE_BUTTON,
     ADD_CHANNEL_GROUP_BUTTON,
+    ADD_FIXTURE_BUTTON,
     BACK_TO_FIXTURE_TEMPLATE_LIST_BUTTON,
     RENAME_TEXTBOX,
     CHOOSE_CHANNEL_GROUP,
     BACK_TO_CHANNEL_GROUP_LIST_BUTTON,
     DELETE_CHANNEL_GROUP_BUTTON,
-    CHANNEL_SLIDER with 256,
+    CHANNEL_SLIDER with 4,
+    CHANNEL_TEXTBOX with 4,
     DELETE_FIXTURE_TEMPLATE_BUTTON,
-    RENAME_PROJECT_TEXTBOX
+    RENAME_STAGE_TEXTBOX,
+    RENAME_PROJECT_TEXTBOX,
+    FIXTURE_RENAME_TEXTBOX,
+    BACK_TO_FIXTURE_LIST_BUTTON,
+    ADD_FIXTURE_TEMPLATE_TO_FIXTURE_BUTTON,
+    FIXTURE_TEMPLATE_LIST with 1000,
+    FIXTURE_CHANNEL_SLIDER
 }
 
 pub struct FixtureWindow {}
 
 impl FixtureWindow {
     pub fn start() {
-        let (mut window, mut conrod_ui) = match create_window("BitDMX Fixture Editor".to_string(), (711, 400), 30, true) {
+        let (mut window, mut conrod_ui) = match create_window("BitDMX Fixture Editor".to_string(), (1280, 720), 30, true) {
             Ok(res) => res, Err(e) => {exit!(3, e);}
         };
 
@@ -67,6 +76,8 @@ impl FixtureWindow {
 
         let mut current_fixture_templat_id: Option<usize> = None;
         let mut current_channel_group_id: Option<usize> = None;
+
+        let mut current_fixture_id: Option<usize> = None;
 
         let mut channel_group_type = 0;
         let mut channel_group_values: Vec<DmxAddress> = vec!(0);
@@ -105,7 +116,7 @@ impl FixtureWindow {
                             .label("Yes")
                             .label_font_size(30)
                             .react(|| {
-                                file::write_file_content(path_to_config.clone(), parser::encode_file(config.clone().unwrap()));
+                                file::write_file_content("config/server/".to_string()+&config_name.clone(), parser::encode_file(config.clone().unwrap()));
                                 compare_config = parser::encode_file(config.clone().unwrap());
                                 close = false;
                                 reset_config = true;
@@ -173,7 +184,7 @@ impl FixtureWindow {
                                 .label("Save")
                                 .label_font_size(15)
                                 .react(|| {
-                                    file::write_file_content(path_to_config.clone(), parser::encode_file(config.clone()));
+                                    file::write_file_content("config/server/".to_string()+&config_name.clone(), parser::encode_file(config.clone()));
                                     compare_config = parser::encode_file(config.clone());
                                 })
                                 .set(SAVE_BUTTON, &mut conrod_ui);
@@ -197,8 +208,12 @@ impl FixtureWindow {
                                 .h(50.0)
                                 .w(150.0)
                                 .font_size(20)
-                                .react(|_: &mut String| {})
+                                .react(|name: &mut String| {
+                                    path_to_config = "config/server/".to_string()+name;
+                                })
                                 .set(RENAME_PROJECT_TEXTBOX, &mut conrod_ui);
+
+
 
                             ///////////////
                             // Left Side //
@@ -277,15 +292,15 @@ impl FixtureWindow {
                                                 })
                                                 .set(DELETE_CHANNEL_GROUP_BUTTON, &mut conrod_ui);
 
-                                            //Sliders
+                                            //NumberDialers
                                             for (count, cgv) in channel_group_values.clone().iter_mut().enumerate() {
-                                                Slider::new(*cgv as f32, 0.0, 255.0)
+                                                NumberDialer::new(*cgv as f32, 0.0, 255.0, 1)
                                                     .h(30.0)
                                                     .and_if(window.size().width > 399, |b| {
-                                                        b.w(200.0)
+                                                        b.w(380.0)
                                                     })
                                                     .and_if(window.size().width < 400, |b| {
-                                                        b.w(window.size().width as f64 / 2.0 - 20.0)
+                                                        b.w(window.size().width as f64 - 20.0)
                                                     })
                                                     .and_if(count > 0, |b| {
                                                         b.down_from(CHANNEL_SLIDER + (count - 1), 10.0)
@@ -294,7 +309,6 @@ impl FixtureWindow {
                                                         b.down_from(BACK_TO_CHANNEL_GROUP_LIST_BUTTON, 10.0)
                                                     })
                                                     .color(FlatColor::clouds())
-                                                    .skew(1.0)
                                                     .react(|value: f32| channel_group_values[count] = value as DmxAddress)
                                                     .set(CHANNEL_SLIDER + count, &mut conrod_ui);
                                             }
@@ -382,7 +396,7 @@ impl FixtureWindow {
                                                 .and_if(window.size().width < 800, |b| {
                                                     b.w(window.size().width as f64 / 4.0 - 20.0)
                                                 })
-                                                .label("Delete")
+                                                .label("Delete Fixture Template")
                                                 .right_from(BACK_TO_FIXTURE_TEMPLATE_LIST_BUTTON, 10.0)
                                                 .color(FlatColor::alizarin())
                                                 .react(|| {
@@ -392,7 +406,7 @@ impl FixtureWindow {
                                                 .set(DELETE_FIXTURE_TEMPLATE_BUTTON, &mut conrod_ui);
                                         }
                                     }
-                                }
+                                },
                                 None => {
                                     //New Template Button
                                     Button::new()
@@ -421,14 +435,14 @@ impl FixtureWindow {
                                             })
                                             .label(&fixture_template.name)
                                             .and_if(count > 0, |b| {
-                                                b.down_from(FIXTURE + (count - 1), 10.0)
+                                                b.down_from(FIXTURE_TEMPLATE + (count - 1), 10.0)
                                             })
                                             .and_if(count == 0, |b| {
                                                 b.down_from(ADD_FIXTURE_TEMPLATE_BUTTON, 10.0)
                                             })
                                             .color(FlatColor::clouds())
                                             .react(|| current_fixture_templat_id = Some(count))
-                                            .set(FIXTURE + count, &mut conrod_ui);
+                                            .set(FIXTURE_TEMPLATE + count, &mut conrod_ui);
                                     }
                                 }
                             }
@@ -441,10 +455,110 @@ impl FixtureWindow {
                                 .scroll_kids()
                                 .pad(5.0)
                                 .w_h(window.size().width as f64 / 2.0, window.size().height as f64 - title_size)
-                                .align_right_of(BODY)
+                                .right_from(LEFT, 0.0)
                                 .color(FlatColor::pickled_bluewood())
                                 .set(RIGHT, &mut conrod_ui);
 
+                            //Stage Title
+                            TextBox::new(&mut config.stage.name)
+                                .enabled(true)
+                                .top_left_with_margin_on(RIGHT, 10.0)
+                                .w_h((window.size().width as f64  / 2.0) - 20.0, 40.0)
+                                .font_size(30)
+                                .react(|_: &mut String| {})
+                                .set(RENAME_STAGE_TEXTBOX, &mut conrod_ui);
+
+                            //New Fixture Button
+                            Button::new()
+                                .h(30.0)
+                                .and_if(window.size().width > 399, |b| {
+                                    b.w(200.0)
+                                })
+                                .and_if(window.size().width < 400, |b| {
+                                    b.w(window.size().width as f64 / 2.0 - 20.0)
+                                })
+                                .label("Add Fixture")
+                                .down_from(RENAME_STAGE_TEXTBOX, 10.0)
+                                .color(FlatColor::emerald())
+                                .react(|| {
+                                    if config.fixture_templates.len() != 0 {
+                                        config.stage.fixtures.push(parser::Fixture::new_empty(0))
+                                    }
+                                })
+                                .set(ADD_FIXTURE_BUTTON, &mut conrod_ui);
+
+                            //Creating Dropdown List
+                            let mut dropdown_list: Vec<String> = vec![];
+                            for fixture_template in config.fixture_templates.clone() {
+                                dropdown_list.push(fixture_template.clone().name);
+                            }
+
+                            //Fixture List
+                            for (count, _) in config.clone().stage.fixtures.iter().enumerate() {
+                                //Fixture Name TextBox
+                                TextBox::new(&mut config.stage.fixtures[count].name)
+                                    .enabled(true)
+                                    .font_size(17)
+                                    .h(30.0)
+                                    .and_if(window.size().width > 1059, |b| {
+                                        b.w(120.0)
+                                    })
+                                    .and_if(window.size().width < 1060, |b| {
+                                        b.w((window.size().width as f64/2.0-50.0)/4.0)
+                                    })
+                                    .and_if(count > 0, |b| {
+                                        b.down_from(FIXTURE_RENAME_TEXTBOX + (count - 1), 10.0)
+                                    })
+                                    .and_if(count == 0, |b| {
+                                        b.down_from(ADD_FIXTURE_BUTTON, 10.0)
+                                    })
+                                    .react(|_: &mut String| {})
+                                    .set(FIXTURE_RENAME_TEXTBOX + count, &mut conrod_ui);
+
+                                //ListBox
+                                DropDownList::new(&mut dropdown_list.clone(), &mut Some(config.stage.fixtures[count].template_id as usize))
+                                    .react(|_: &mut Option<usize>, id, _: &str| {
+                                        config.stage.fixtures[count].template_id = id as i32;
+                                    })
+                                    .and_if(window.size().width > 1059, |b| {
+                                        b.w(120.0)
+                                    })
+                                    .and_if(window.size().width < 1060, |b| {
+                                        b.w((window.size().width as f64/2.0-50.0)/4.0)
+                                    })
+                                    .right_from(FIXTURE_RENAME_TEXTBOX + count, 10.0)
+                                    .set(FIXTURE_TEMPLATE_LIST + count, &mut conrod_ui);
+
+                                NumberDialer::new(config.stage.fixtures[count].channel as f32, 0.0, 255.0, 1)
+                                    .h(30.0)
+                                    .and_if(window.size().width > 1059, |b| {
+                                        b.w(120.0)
+                                    })
+                                    .and_if(window.size().width < 1060, |b| {
+                                        b.w((window.size().width as f64/2.0-50.0)/4.0)
+                                    })
+                                    .right_from(FIXTURE_TEMPLATE_LIST + count, 10.0)
+                                    .color(FlatColor::clouds())
+                                    .react(|value: f32| config.stage.fixtures[count].channel = value as i32)
+                                    .set(FIXTURE_CHANNEL_SLIDER + count, &mut conrod_ui);
+
+                                //Delete
+                                Button::new()
+                                    .h(30.0)
+                                    .and_if(window.size().width > 1059, |b| {
+                                        b.w(120.0)
+                                    })
+                                    .and_if(window.size().width < 1060, |b| {
+                                        b.w((window.size().width as f64/2.0-50.0)/4.0)
+                                    })
+                                    .label("Delete Fixture")
+                                    .right_from(FIXTURE_CHANNEL_SLIDER + count, 10.0)
+                                    .color(FlatColor::alizarin())
+                                    .react(|| {
+                                        config.stage.fixtures.remove(count);
+                                    })
+                                    .set(DELETE_FIXTURE_TEMPLATE_BUTTON + count, &mut conrod_ui);
+                            }
 
                             changed_counter = changed_counter + 1;
                             if changed_counter > 29 {
@@ -474,25 +588,38 @@ impl FixtureWindow {
 
                                 Button::new()
                                     .w_h(200.0, 30.0)
-                                    .color(FlatColor::silver())
                                     .and_if(pathnumber > 0, |b| {
                                         b.down_from(CONFIG_SELECT_BUTTON + (pathnumber - 1), 10.0)
                                     })
                                     .and_if(pathnumber == 0, |b| {
                                         b.down_from(CREATE_NEW_BUTTON, 10.0)
                                     })
+                                    .color(FlatColor::alizarin())
+                                    .and_if({
+                                            let cp = fs::read_dir(file::get_path()).unwrap().nth(pathnumber).unwrap().unwrap().path().display().to_string().clone();
+                                            if file::check_for_file(cp.clone()) {
+                                                match parser::decode_file(file::get_file_content(cp.clone())) {
+                                                    Some(_) => true,
+                                                    _ => false
+                                                }
+                                            } else {
+                                                false
+                                            }
+                                        }, |b| {
+                                            b.color(FlatColor::emerald())
+                                    })
                                     .label(&config_names[pathnumber].clone())
                                     .label_font_size(15)
                                     .react(|| {
                                         config_name = config_names[pathnumber].clone();
-                                        path_to_config = fs::read_dir(file::get_path()).unwrap().nth(pathnumber).unwrap().unwrap().path().display().to_string().clone() + "/fixtures.dmx";
+                                        path_to_config = fs::read_dir(file::get_path()).unwrap().nth(pathnumber).unwrap().unwrap().path().display().to_string().clone();
                                         if file::check_for_file(path_to_config.clone()) {
                                             match parser::decode_file(file::get_file_content(path_to_config.clone())) {
                                                 Some(c) => {
                                                     config = Some(c);
                                                     compare_config = parser::encode_file(config.clone().unwrap());
                                                 },
-                                                _ => println!("There has been an error parsing the file.\nTry an other file or create a new one.")
+                                                _ => println!("There has been an error parsing the file.\nTry another file or create a new one.")
                                             }
                                         } else {
                                             path_to_config = "".to_string();
@@ -503,9 +630,25 @@ impl FixtureWindow {
                         },
                     }
                 }
+
                 if reset_config {
                     config = None;
+                    compare_config = "".to_string();
+                    path_to_config = "".to_string();
+                    config_name = "".to_string();
+                    config_names = Vec::new();
+
+                    save_color = FlatColor::silver();
+                    changed_counter = 0;
+
+                    close = false;
                     reset_config = false;
+
+                    current_fixture_templat_id = None;
+                    current_channel_group_id = None;
+                    current_fixture_id = None;
+                    channel_group_type = 0;
+                    channel_group_values = vec![0];
                 }
             }));
         };
