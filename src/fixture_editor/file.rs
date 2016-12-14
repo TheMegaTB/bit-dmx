@@ -8,7 +8,7 @@ pub fn get_path() -> String {
 
 pub fn check_for_file(path: String) -> bool {
     match File::open(path) {
-        Ok(file) => true,
+        Ok(_) => true,
         _ => false
     }
 }
@@ -23,7 +23,7 @@ pub fn get_file_content(path: String) -> String {
 
     let mut content = String::new();
 
-    f.read_to_string(&mut content);
+    let _ = f.read_to_string(&mut content);
 
     content.clone().to_string()
 }
@@ -32,12 +32,12 @@ pub fn write_file_content(path: String, content: String) {
     let mut file_to_save: File;
     match File::create(path) {
         Ok(file) => file_to_save = file,
-        _ => panic!("Couldn't create file")
+        _ => {panic!("Could not create file!")}
     }
 
     let to_write: &[u8] = content.as_bytes();
 
-    file_to_save.write_all(to_write);
+    let _ = file_to_save.write_all(to_write);
 
 
 }

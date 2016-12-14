@@ -27,39 +27,38 @@ impl FixtureTemplate {
 #[derive(RustcDecodable, RustcEncodable, Debug, Clone)]
 pub struct Fixture {
     pub channel: i32,
-    pub template_name: String,
+    pub template_id: i32,
     pub name: String,
 }
 
 impl Fixture {
-    //Do not delete
-    /*fn new(c: i32, t_n: String, n: String) -> Fixture {
+    /*pub fn new(c: i32, t_n: String, n: String) -> Fixture {
         Fixture {
             channel: c,
             template_name: t_n,
             name: n,
         }
-    }
-    fn new_empty() -> Fixture {
+    }*/
+    pub fn new_empty(id: i32) -> Fixture {
         Fixture {
             channel: 0,
-            template_name: "Empty".to_string(),
+            template_id: id,
             name: "Empty".to_string(),
         }
-    }*/
+    }
 }
 
 #[derive(RustcDecodable, RustcEncodable, Debug, Clone)]
 pub struct Stage {
     pub name: String,
-    pub fixture: Vec<Fixture>,
+    pub fixtures: Vec<Fixture>,
 }
 
 impl Stage {
     fn new_empty() -> Stage {
         Stage {
             name: "Untitled".to_string(),
-            fixture: Vec::new(),
+            fixtures: Vec::new(),
         }
     }
 }
