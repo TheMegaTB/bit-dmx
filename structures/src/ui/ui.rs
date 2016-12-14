@@ -35,6 +35,8 @@ pub struct UI {
     pub alt_state: bool,
     /// The editor state.
     pub editor_state: bool,
+    /// The editor state.
+    pub show_ip: bool,
     /// Saves whether the ui waites for a new keybinding.
     pub waiting_for_keybinding: bool,
     /// This is set to true after a DropDownList element was selected, so that buttons below the opend DropDownList aren't triggert
@@ -84,6 +86,7 @@ impl UI {
             control_state: false,
             alt_state: false,
             editor_state: false,
+            show_ip: false,
             waiting_for_keybinding: false,
             dropdown_clicked: false,
             current_editor_switch_id: Arc::new(Mutex::new([None])),
@@ -98,6 +101,19 @@ impl UI {
         UI::start_udp_server(ui.clone(), UDPSocket::new());
         UI::start_watchdog_client(ui.clone(), UDPSocket::new());
         ui
+    }
+
+    /// Enters the edit Mode
+    pub fn toggle_edit_mode(&mut self) {
+        lock!(self.current_editor_switch_id)[0] = None;
+        lock!(self.current_editor_switch_name)[0] = "".to_string();
+        if self.editor_state {
+            self.send_data();
+        }
+        else {
+            self.current_editor_chaser_names = Arc::new(Mutex::new(self.config.chasers.clone()));
+        }
+        self.editor_state = !self.editor_state;
     }
 
     /// Return the path to the client configration of the current project.

@@ -120,6 +120,9 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
             }
             else if !ui_locked.editor_state {
                 match button {
+                    piston_window::Button::Keyboard(piston_window::Key::Escape) => {
+                        ui_locked.toggle_edit_mode();
+                    },
                     piston_window::Button::Keyboard(key) =>  {
                         for (switch_id, switch) in ui_locked.frontend_data.switches.iter().enumerate() {
                             if switch.keybinding == Some(key) {
@@ -211,7 +214,6 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
                                         let chaser = frontend_data.chasers.get_mut(&switch.chaser_name).unwrap();
                                         let index = chaser.switches.iter().position(|&r| r == switch_id).unwrap();
                                         if ui_locked.shift_state {
-                                            switch.name = switch.name + " Cloned";
                                             ui_locked.current_editor_switch_name = Arc::new(Mutex::new([switch.name.clone()]));
                                             frontend_data.switches.push(switch);
                                             let new_switch_id = frontend_data.switches.len() - 1;
@@ -228,7 +230,6 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
                                         let chaser = frontend_data.chasers.get_mut(&switch.chaser_name).unwrap();
                                         let index = chaser.switches.iter().position(|&r| r == switch_id).unwrap();
                                         if ui_locked.shift_state {
-                                            switch.name = switch.name + " Cloned";
                                             ui_locked.current_editor_switch_name = Arc::new(Mutex::new([switch.name.clone()]));
                                             frontend_data.switches.push(switch);
                                             let new_switch_id = frontend_data.switches.len() - 1;
@@ -249,7 +250,6 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
                                                 let chaser = frontend_data.chasers.get_mut(&switch.chaser_name).unwrap();
                                                 let index = chaser.switches.iter().position(|&r| r == switch_id).unwrap();
                                                 if ui_locked.shift_state {
-                                                    switch.name = switch.name + " Cloned";
                                                     ui_locked.current_editor_switch_name = Arc::new(Mutex::new([switch.name.clone()]));
                                                     switch.chaser_name = new_chaser_name.clone();
                                                     frontend_data.switches.push(switch);
@@ -274,7 +274,6 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
                                                 let chaser = frontend_data.chasers.get_mut(&switch.chaser_name).unwrap();
                                                 let index = chaser.switches.iter().position(|&r| r == switch_id).unwrap();
                                                 if ui_locked.shift_state {
-                                                    switch.name = switch.name + " Cloned";
                                                     ui_locked.current_editor_switch_name = Arc::new(Mutex::new([switch.name.clone()]));
                                                     switch.chaser_name = new_chaser_name.clone();
                                                     frontend_data.switches.push(switch);
@@ -374,9 +373,11 @@ fn draw_header(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme) {
         .set(TITLE, conrod_ui);
 
     let connected = ui.watchdog.is_alive();
-    let label = if connected { "Connected".to_string() } else { "Disconnected".to_string() };
+    let label = if connected {
+            if ui.show_ip {format!("{}", ui.watchdog.get_server_addr().unwrap())} else {"Connected".to_string()}
+        } else { "Disconnected".to_string() };
     Button::new()
-        .w_h(140.0 * app_theme.ui_scale, 35.0 * app_theme.ui_scale)
+        .w_h(180.0 * app_theme.ui_scale, 35.0 * app_theme.ui_scale)
         .down_from(TITLE, 7.0 * app_theme.ui_scale)
         .frame(1.0)
         .label(&label)
@@ -388,11 +389,13 @@ fn draw_header(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme) {
                 b.color(app_theme.switch_off_color)
             }
         })
-        .react(|| {})
+        .react(|| {
+            ui.show_ip = !ui.show_ip;
+        })
         .set(CONNECTED_BUTTON, conrod_ui);
 
     Button::new()
-        .w_h(140.0 * app_theme.ui_scale, 35.0 * app_theme.ui_scale)
+        .w_h(180.0 * app_theme.ui_scale, 35.0 * app_theme.ui_scale)
         .right_from(CONNECTED_BUTTON, 5.0 * app_theme.ui_scale)
         .frame(1.0)
         .label(&"Edit Mode".to_string())
@@ -405,15 +408,7 @@ fn draw_header(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme) {
             }
         })
         .react(|| {
-            lock!(ui.current_editor_switch_id)[0] = None;
-            lock!(ui.current_editor_switch_name)[0] = "".to_string();
-            if ui.editor_state {
-                ui.send_data();
-            }
-            else {
-                ui.current_editor_chaser_names = Arc::new(Mutex::new(ui.config.chasers.clone()));
-            }
-            ui.editor_state = !ui.editor_state;
+            ui.toggle_edit_mode();
         })
         .set(EDITOR_BUTTON, conrod_ui);
 
