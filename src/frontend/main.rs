@@ -165,7 +165,7 @@ fn create_output_window(ui: Arc<Mutex<UI>>) {
                                 }
                             } else if ui_locked.alt_state {
                                 let switch = ui_locked.frontend_data.switches[switch_id].clone();
-                                let mut frontend_data = &mut ui_locked.frontend_data;
+                                let frontend_data = &ui_locked.frontend_data;
                                 if button == piston_window::Button::Keyboard(piston_window::Key::Up) {
                                     let chaser = frontend_data.chasers.get(&switch.chaser_name).unwrap();
                                     let index = chaser.switches.iter().position(|&r| r == switch_id).unwrap();

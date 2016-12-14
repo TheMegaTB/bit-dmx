@@ -2,8 +2,7 @@
 use structures::ui::UI;
 use conrod::{Canvas, Text, Frameable, Colorable, Sizeable, Positionable, Widget};
 use std::sync::{Arc, Mutex};
-use piston_window::{UpdateEvent, PistonWindow};
-use piston_window::Event;
+use piston_window::{UpdateEvent};
 // use piston_window::input::Event;
 // use std::any::Any;
 
