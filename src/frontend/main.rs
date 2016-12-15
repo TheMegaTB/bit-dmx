@@ -903,7 +903,9 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                                     ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().values[0] = new_x as u8;
                                     ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().values[1] = new_y as u8;
                                     ui.send_data();
-                                    ui.tx.send(get_switch_update(false, switch_id as u16, 255)).unwrap();
+                                    if ui.shift_state {
+                                        ui.tx.send(get_switch_update(false, switch_id as u16, 255)).unwrap();
+                                    }
                                 })
                                 .set(EDITOR_XY_PAD, conrod_ui);
                             false
@@ -928,7 +930,9 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                                     ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().values[2] = y1;
                                     ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().values[3] = y2;
                                     ui.send_data();
-                                    ui.tx.send(get_switch_update(false, switch_id as u16, 255)).unwrap();
+                                    if ui.shift_state {
+                                        ui.tx.send(get_switch_update(false, switch_id as u16, 255)).unwrap();
+                                    }
                                 })
                                 .set(EDITOR_XY_PAD, conrod_ui);
                             false
@@ -955,7 +959,9 @@ fn draw_editor(mut conrod_ui: &mut UiCell, ui: &mut UI, app_theme: Theme, usable
                                 .react(|new_value: f32| {
                                     ui.frontend_data.switches[switch_id].channel_groups.get_mut(id_string).unwrap().values[index] = new_value as u8;
                                     ui.send_data();
-                                    ui.tx.send(get_switch_update(false, switch_id as u16, 255)).unwrap();
+                                    if ui.shift_state {
+                                        ui.tx.send(get_switch_update(false, switch_id as u16, 255)).unwrap();
+                                    }
                                 })
                                 .set(EDITOR_SWITCH_SLIDER + editor_switch_slider_count, conrod_ui);
                             editor_switch_slider_count += 1;
