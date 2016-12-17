@@ -16,6 +16,12 @@
 		4F8216171E04531900744816 /* Stage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F8216151E04531900744816 /* Stage.cpp */; };
 		4F82161D1E04547900744816 /* Channel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F82161B1E04547900744816 /* Channel.cpp */; };
 		4F8216201E0454AD00744816 /* FadeCurve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F82161E1E0454AD00744816 /* FadeCurve.cpp */; };
+		4F8216231E04683C00744816 /* UIElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F8216211E04683C00744816 /* UIElement.cpp */; };
+		4F8216261E04838400744816 /* UIElementWrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F8216241E04838400744816 /* UIElementWrapper.cpp */; };
+		4F82162C1E049A7600744816 /* Switch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F82162A1E049A7600744816 /* Switch.cpp */; };
+		4F82162F1E049FD200744816 /* ChannelGroup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F82162D1E049FD200744816 /* ChannelGroup.cpp */; };
+		4F8216331E04A01B00744816 /* Fixture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F8216311E04A01B00744816 /* Fixture.cpp */; };
+		4F8216361E04A42C00744816 /* UIElementActivatable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F8216341E04A42C00744816 /* UIElementActivatable.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +41,18 @@
 		4F82161C1E04547900744816 /* Channel.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Channel.hpp; sourceTree = "<group>"; };
 		4F82161E1E0454AD00744816 /* FadeCurve.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FadeCurve.cpp; sourceTree = "<group>"; };
 		4F82161F1E0454AD00744816 /* FadeCurve.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FadeCurve.hpp; sourceTree = "<group>"; };
+		4F8216211E04683C00744816 /* UIElement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UIElement.cpp; sourceTree = "<group>"; };
+		4F8216221E04683C00744816 /* UIElement.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UIElement.hpp; sourceTree = "<group>"; };
+		4F8216241E04838400744816 /* UIElementWrapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UIElementWrapper.cpp; sourceTree = "<group>"; };
+		4F8216251E04838400744816 /* UIElementWrapper.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UIElementWrapper.hpp; sourceTree = "<group>"; };
+		4F82162A1E049A7600744816 /* Switch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Switch.cpp; sourceTree = "<group>"; };
+		4F82162B1E049A7600744816 /* Switch.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Switch.hpp; sourceTree = "<group>"; };
+		4F82162D1E049FD200744816 /* ChannelGroup.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ChannelGroup.cpp; sourceTree = "<group>"; };
+		4F82162E1E049FD200744816 /* ChannelGroup.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ChannelGroup.hpp; sourceTree = "<group>"; };
+		4F8216311E04A01B00744816 /* Fixture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Fixture.cpp; sourceTree = "<group>"; };
+		4F8216321E04A01B00744816 /* Fixture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Fixture.hpp; sourceTree = "<group>"; };
+		4F8216341E04A42C00744816 /* UIElementActivatable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UIElementActivatable.cpp; sourceTree = "<group>"; };
+		4F8216351E04A42C00744816 /* UIElementActivatable.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UIElementActivatable.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +117,8 @@
 		4F8216141E0452F900744816 /* Logic */ = {
 			isa = PBXGroup;
 			children = (
+				4F8216301E049FD900744816 /* ChannelGroups */,
+				4F8216291E049A6200744816 /* UIElements */,
 				4F8216151E04531900744816 /* Stage.cpp */,
 				4F8216161E04531900744816 /* Stage.hpp */,
 				4F8216191E04538A00744816 /* Types.hpp */,
@@ -106,8 +126,34 @@
 				4F82161C1E04547900744816 /* Channel.hpp */,
 				4F82161E1E0454AD00744816 /* FadeCurve.cpp */,
 				4F82161F1E0454AD00744816 /* FadeCurve.hpp */,
+				4F8216211E04683C00744816 /* UIElement.cpp */,
+				4F8216221E04683C00744816 /* UIElement.hpp */,
+				4F8216241E04838400744816 /* UIElementWrapper.cpp */,
+				4F8216251E04838400744816 /* UIElementWrapper.hpp */,
+				4F8216311E04A01B00744816 /* Fixture.cpp */,
+				4F8216321E04A01B00744816 /* Fixture.hpp */,
 			);
 			name = Logic;
+			sourceTree = "<group>";
+		};
+		4F8216291E049A6200744816 /* UIElements */ = {
+			isa = PBXGroup;
+			children = (
+				4F8216341E04A42C00744816 /* UIElementActivatable.cpp */,
+				4F8216351E04A42C00744816 /* UIElementActivatable.hpp */,
+				4F82162A1E049A7600744816 /* Switch.cpp */,
+				4F82162B1E049A7600744816 /* Switch.hpp */,
+			);
+			name = UIElements;
+			sourceTree = "<group>";
+		};
+		4F8216301E049FD900744816 /* ChannelGroups */ = {
+			isa = PBXGroup;
+			children = (
+				4F82162D1E049FD200744816 /* ChannelGroup.cpp */,
+				4F82162E1E049FD200744816 /* ChannelGroup.hpp */,
+			);
+			name = ChannelGroups;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -198,11 +244,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4F8216231E04683C00744816 /* UIElement.cpp in Sources */,
+				4F82162F1E049FD200744816 /* ChannelGroup.cpp in Sources */,
 				4F8216201E0454AD00744816 /* FadeCurve.cpp in Sources */,
+				4F8216361E04A42C00744816 /* UIElementActivatable.cpp in Sources */,
 				4F8216051E0452C500744816 /* main.cpp in Sources */,
 				4F82161D1E04547900744816 /* Channel.cpp in Sources */,
 				4F8216021E0452C500744816 /* ResourcePath.mm in Sources */,
+				4F82162C1E049A7600744816 /* Switch.cpp in Sources */,
+				4F8216261E04838400744816 /* UIElementWrapper.cpp in Sources */,
 				4F8216171E04531900744816 /* Stage.cpp in Sources */,
+				4F8216331E04A01B00744816 /* Fixture.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -213,7 +265,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
-				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
 				CLANG_CXX_LIBRARY = "libc++";
 				FRAMEWORK_SEARCH_PATHS = (
 					/Library/Frameworks/,
@@ -257,7 +309,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
-				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
 				CLANG_CXX_LIBRARY = "libc++";
 				FRAMEWORK_SEARCH_PATHS = (
 					/Library/Frameworks/,

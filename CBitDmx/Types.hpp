@@ -11,7 +11,10 @@
 
 #include <stdio.h>
 
-typedef unsigned char ChannelAddress;
-typedef unsigned char ChannelValue;
+typedef int ChannelAddress;
+typedef int ChannelValue;
+
+#define UIElementWidth 90
+#define UIElementDistance 5
 
 #endif /* Types_hpp */
