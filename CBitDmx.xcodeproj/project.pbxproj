@@ -18,8 +18,6 @@
 		4F8216201E0454AD00744816 /* FadeCurve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F82161E1E0454AD00744816 /* FadeCurve.cpp */; };
 		4F8216231E04683C00744816 /* UIControlElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F8216211E04683C00744816 /* UIControlElement.cpp */; };
 		4F82162C1E049A7600744816 /* UISwitch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F82162A1E049A7600744816 /* UISwitch.cpp */; };
-		4F82162F1E049FD200744816 /* ChannelGroup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F82162D1E049FD200744816 /* ChannelGroup.cpp */; };
-		4F8216331E04A01B00744816 /* Fixture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F8216311E04A01B00744816 /* Fixture.cpp */; };
 		4F8216391E05787500744816 /* UIChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F8216371E05787500744816 /* UIChannel.cpp */; };
 		4F82163D1E05C30500744816 /* UIPart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F82163B1E05C30500744816 /* UIPart.cpp */; };
 		4F8216401E05C33900744816 /* UIController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F82163E1E05C33900744816 /* UIController.cpp */; };
@@ -57,10 +55,6 @@
 		4F8216221E04683C00744816 /* UIControlElement.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UIControlElement.hpp; sourceTree = "<group>"; };
 		4F82162A1E049A7600744816 /* UISwitch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UISwitch.cpp; sourceTree = "<group>"; };
 		4F82162B1E049A7600744816 /* UISwitch.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UISwitch.hpp; sourceTree = "<group>"; };
-		4F82162D1E049FD200744816 /* ChannelGroup.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ChannelGroup.cpp; sourceTree = "<group>"; };
-		4F82162E1E049FD200744816 /* ChannelGroup.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ChannelGroup.hpp; sourceTree = "<group>"; };
-		4F8216311E04A01B00744816 /* Fixture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Fixture.cpp; sourceTree = "<group>"; };
-		4F8216321E04A01B00744816 /* Fixture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Fixture.hpp; sourceTree = "<group>"; };
 		4F8216371E05787500744816 /* UIChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UIChannel.cpp; sourceTree = "<group>"; };
 		4F8216381E05787500744816 /* UIChannel.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UIChannel.hpp; sourceTree = "<group>"; };
 		4F82163B1E05C30500744816 /* UIPart.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UIPart.cpp; sourceTree = "<group>"; };
@@ -79,8 +73,8 @@
 		4F82164E1E0616D800744816 /* Selector.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Selector.hpp; sourceTree = "<group>"; };
 		4F8216501E0617B200744816 /* Label.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Label.cpp; sourceTree = "<group>"; };
 		4F8216511E0617B200744816 /* Label.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Label.hpp; sourceTree = "<group>"; };
-		4F8216561E06AA9300744816 /* exampleStage.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = exampleStage.json; sourceTree = "<group>"; };
-		4F8216581E06B7D900744816 /* exampleUI.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = exampleUI.json; sourceTree = "<group>"; };
+		4F8216561E06AA9300744816 /* exampleStage.json */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = text.json; path = exampleStage.json; sourceTree = "<group>"; tabWidth = 2; };
+		4F8216581E06B7D900744816 /* exampleUI.json */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = text.json; path = exampleUI.json; sourceTree = "<group>"; tabWidth = 2; };
 		4F82165A1E06C04200744816 /* UISingleHotkey.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UISingleHotkey.cpp; sourceTree = "<group>"; };
 		4F82165B1E06C04200744816 /* UISingleHotkey.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UISingleHotkey.hpp; sourceTree = "<group>"; };
 		4F82165D1E06D27200744816 /* XYPad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = XYPad.cpp; sourceTree = "<group>"; };
@@ -154,7 +148,6 @@
 			isa = PBXGroup;
 			children = (
 				4F82163A1E05C2F600744816 /* UIPart */,
-				4F8216301E049FD900744816 /* ChannelGroups */,
 				4F8216291E049A6200744816 /* UIControlElement */,
 				4F8216151E04531900744816 /* Stage.cpp */,
 				4F8216161E04531900744816 /* Stage.hpp */,
@@ -163,8 +156,6 @@
 				4F82161C1E04547900744816 /* Channel.hpp */,
 				4F82161E1E0454AD00744816 /* FadeCurve.cpp */,
 				4F82161F1E0454AD00744816 /* FadeCurve.hpp */,
-				4F8216311E04A01B00744816 /* Fixture.cpp */,
-				4F8216321E04A01B00744816 /* Fixture.hpp */,
 			);
 			name = Logic;
 			sourceTree = "<group>";
@@ -186,15 +177,6 @@
 				4F8216611E06DAAD00744816 /* UIXYPad.hpp */,
 			);
 			name = UIControlElement;
-			sourceTree = "<group>";
-		};
-		4F8216301E049FD900744816 /* ChannelGroups */ = {
-			isa = PBXGroup;
-			children = (
-				4F82162D1E049FD200744816 /* ChannelGroup.cpp */,
-				4F82162E1E049FD200744816 /* ChannelGroup.hpp */,
-			);
-			name = ChannelGroups;
 			sourceTree = "<group>";
 		};
 		4F82163A1E05C2F600744816 /* UIPart */ = {
@@ -313,7 +295,6 @@
 				4F82165C1E06C04200744816 /* UISingleHotkey.cpp in Sources */,
 				4F8216521E0617B200744816 /* Label.cpp in Sources */,
 				4F8216231E04683C00744816 /* UIControlElement.cpp in Sources */,
-				4F82162F1E049FD200744816 /* ChannelGroup.cpp in Sources */,
 				4F82165F1E06D27200744816 /* XYPad.cpp in Sources */,
 				4F8216491E05CEEA00744816 /* Toggle.cpp in Sources */,
 				4F8216201E0454AD00744816 /* FadeCurve.cpp in Sources */,
@@ -330,7 +311,6 @@
 				4F8216171E04531900744816 /* Stage.cpp in Sources */,
 				4F82163D1E05C30500744816 /* UIPart.cpp in Sources */,
 				4F8216461E05C77B00744816 /* Slider.cpp in Sources */,
-				4F8216331E04A01B00744816 /* Fixture.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

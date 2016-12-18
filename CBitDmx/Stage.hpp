@@ -16,8 +16,6 @@ class Stage;
 #include <memory>
 
 #include "Channel.hpp"
-#include "ChannelGroup.hpp"
-#include "Fixture.hpp"
 
 #include "UIControlElement.hpp"
 
@@ -33,8 +31,6 @@ public:
     // interacting with the channels
     bool setValue(ChannelAddress address, ChannelValue value, int uiElementID);
     bool startFade(ChannelAddress address, sf::Time fadeTime, ChannelValue value, FadeCurve fadeCurve, int uiElementID);
-    void setValueForChannelGroup(int id, std::vector<ChannelValue> values, int uiElementID);
-    void startFadeForChannelGroup(int id, sf::Time fadeTime, std::vector<ChannelValue> values, FadeCurve fadeCurve, int uiElementID);
     
     
     // interactiong with UI Element
@@ -43,16 +39,15 @@ public:
     
     // get values
     ChannelValue getValue(ChannelAddress address) const;
-    ChannelGroup* getChannelGroup(int id);
     bool inEditMode();
     sf::Font getFont();
     sf::Time getNow();
     std::string getName();
+    int getChannel(std::string channelName);
+    std::vector<int> getChannels(std::vector<std::string> channelNames);
     
     // configrue
     int addUiElement(std::shared_ptr<UIControlElement> uiElement);
-    int addChannelGroup(ChannelGroup channelGroup);
-    int addFixture(Fixture fixture);
     void setName(std::string name);
     
     // other
@@ -88,8 +83,7 @@ private:
     //stage data
     std::vector<Channel> m_channels;
     std::vector<std::shared_ptr<UIControlElement>> m_ui_elements;
-    std::vector<ChannelGroup> m_channelGroups;
-    std::vector<Fixture> m_fixtures;
+    json m_namedChannels;
 
     
     bool updateChannel(ChannelAddress address);

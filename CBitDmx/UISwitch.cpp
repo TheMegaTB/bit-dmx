@@ -8,9 +8,9 @@
 
 #include "UISwitch.hpp"
 
-UISwitch::UISwitch(Stage* stage, std::string caption, std::vector<int> channelGroups, std::vector<std::vector<ChannelValue>> channelValues, sf::Keyboard::Key hotkey): UISingleHotkey(stage, stage->UIPartWidth, stage->UIPartWidth / 4, hotkey) {
-    m_channelGroups = channelGroups;
+UISwitch::UISwitch(Stage* stage, std::string caption, std::vector<int> channelGroups, std::vector<ChannelValue> channelValues, sf::Keyboard::Key hotkey): UISingleHotkey(stage, stage->UIPartWidth, stage->UIPartWidth / 4, hotkey) {
     
+    m_channels = channelGroups;
     m_channelValues = channelValues;
     
     
@@ -25,14 +25,6 @@ UISwitch::UISwitch(Stage* stage, std::string caption, std::vector<int> channelGr
     m_parts.push_back(m_toggle);
 }
 
-UISwitch::UISwitch(Stage* stage, std::string caption, std::vector<int> channelGroups, sf::Keyboard::Key hotkey) : UISwitch(stage, caption, channelGroups, std::vector<std::vector<ChannelValue>>(), hotkey) {
-    m_channelValues.resize(m_channelGroups.size());
-    
-    for (int i = 0; i < m_channelGroups.size(); i++) {
-        m_channelValues[i].resize(m_stage->getChannelGroup(channelGroups[i])->getChannelNumber());
-    }
-}
-
 void UISwitch::setCaption(std::string caption) {
     m_toggle->setCaption(caption);
 }
@@ -44,7 +36,7 @@ void UISwitch::onHotkey() {
 }
 
 void UISwitch::action() {
-    for (int i = 0; i < m_channelGroups.size(); i++) {
-        m_stage->startFadeForChannelGroup(m_channelGroups[i], m_fadeTime, m_channelValues[i], m_fadeCurve, m_id);
+    for (int i = 0; i < m_channels.size(); i++) {
+        m_stage->startFade(m_channels[i], m_fadeTime, m_channelValues[i], m_fadeCurve, m_id);
     }
 }

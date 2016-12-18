@@ -1,15 +1,16 @@
 {
-    "name": "Example Stage",
-    "size": 6,
-    "fixture_templates": {
-        "scanner": [
-                    {"name": "Shutter", "type": 0, "channels": [0]},
-                    {"name": "Gobo", "type": 0, "channels": [1]},
-                    {"name": "Pan + Tilt", "type": 2, "channels": [2, 3]}
-        ]
-    },
-    "fixtures": [
-                 {"name": "Scanner", "template": "scanner", "channel": 1},
-                 {"name": "Scanner2", "template": "scanner", "channel": 4}
-    ]
+  "name": "Example Stage",
+  "size": 6,
+  "fixture_templates": {
+    "scanner": {
+      "Shutter": 0,
+      "Gobo": 1,
+      "Pan": 2,
+      "Tilt": 3
+    }
+  },
+  "fixtures": [
+    {"name": "Scanner", "template": "scanner", "channel": 0},
+    {"name": "Scanner2", "template": "scanner", "channel": 4}
+  ]
 }

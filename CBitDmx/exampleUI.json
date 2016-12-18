@@ -1,33 +1,33 @@
- [
+[
   {
-  "type": 3,
-  "fade_curve": 0,
-  "fade_time": 2000,
-  "channelx_address": 4,
-  "channely_address": 5
+    "type": 3,
+    "fade_curve": 0,
+    "fade_time": 2000,
+    "channelx_address": "Scanner:Pan",
+    "channely_address": "Scanner:Tilt"
   },
-    {
-        "type": 0,
-        "fade_curve": 0,
-        "fade_time": 2000,
-        "caption": "All On (B)",
-        "channel_groups": [0, 1],
-        "channel_values": [[100], [200]],
-        "hotkey": 1
- },
- {
- "type": 1,
- "fade_curve": 0,
- "fade_time": 2000,
- "caption": "All On",
- "channel_groups": [0, 1],
- "channel_values": [[200], [100]],
- "hotkey": 7
- },
- {
- "type": 2,
- "fade_curve": 0,
- "fade_time": 2000,
- "channel_address": 3
- }
+  {
+    "type": 0,
+    "fade_curve": 0,
+    "fade_time": 2000,
+    "caption": "All On (B)",
+    "channels": ["Scanner1:Shutter", "Scanner:Gobo"],
+    "channel_values": [100, 200],
+    "hotkey": 1
+  },
+  {
+    "type": 1,
+    "fade_curve": 0,
+    "fade_time": 2000,
+    "caption": "All On",
+    "channels": ["Scanner:Shutter", "Scanner:Gobo"],
+    "channel_values": [200, 100],
+    "hotkey": 7
+  },
+  {
+    "type": 2,
+    "fade_curve": 0,
+    "fade_time": 2000,
+    "channel_address": "Scanner:Shutter"
+  }
 ]

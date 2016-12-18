@@ -16,7 +16,7 @@
 class UIChannel : public UIControlElement {
 public:
     UIChannel(Stage* stage, ChannelAddress channelAddress);
-    UIChannel(Stage* stage, json jsonObject) : UIChannel(stage, (ChannelAddress)jsonObject["channel_address"]) {};
+    UIChannel(Stage* stage, json jsonObject) : UIChannel(stage, stage->getChannel(jsonObject["channel_address"])) {};
     
     void setChannelAddress(ChannelAddress channelAddress);
     virtual void action();

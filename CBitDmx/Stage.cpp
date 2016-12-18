@@ -29,25 +29,19 @@ Stage::Stage(std::string fontPath, std::string stagePath, std::string uiPath) {
     
     setName(stageJson["name"]);
     m_channels.resize(stageJson["size"]);
+
     
     for (auto& fixture : stageJson["fixtures"]) {
         ChannelAddress baseAddress = fixture["channel"];
         std::string templateName = fixture["template"];
         
-        std::vector<int> channelGroups;
+        std::string namePrefix = fixture["name"].get<std::string>() + ":";
         
-        for (auto& channelGroup : stageJson["fixture_templates"][templateName]) {
-            channelGroups.push_back(addChannelGroup(ChannelGroup(this, channelGroup["name"], (ChannelGroupType)0, channelGroup["channels"])));
-        }
-        
-        addFixture(Fixture(this, fixture["name"], channelGroups));
-    }
-    
-    for (Fixture fixture : m_fixtures) {
-        for (int channelGroupID : fixture.getChannelGroups()) {
-            std::cout << channelGroupID << " -> " << fixture.getName() << ":" << m_channelGroups[channelGroupID].getName() << std::endl;
+        for (json::iterator it = stageJson["fixture_templates"][templateName].begin(); it != stageJson["fixture_templates"][templateName].end(); ++it) {
+            m_namedChannels[namePrefix + it.key()] = baseAddress + it.value().get<int>();
         }
     }
+    std::cout << std::setw(4) << m_namedChannels << std::endl;
 
     std::ifstream uiInputFile(uiPath);
     json uiJson;
@@ -106,25 +100,6 @@ bool Stage::startFade(ChannelAddress address, sf::Time fadeTime, ChannelValue va
     }
 }
 
-void Stage::setValueForChannelGroup(int id, std::vector<ChannelValue> values, int uiElementID) {
-    if (id < m_channelGroups.size()) {
-        m_channelGroups[id].setValue(values, uiElementID);
-        return true;
-    } else {
-        return false;
-    }
-}
-
-void Stage::startFadeForChannelGroup(int id, sf::Time fadeTime, std::vector<ChannelValue> values, FadeCurve fadeCurve, int uiElementID) {
-    if (id < m_channelGroups.size()) {
-        m_channelGroups[id].startFade(fadeTime, values, fadeCurve, uiElementID);
-        return true;
-    } else {
-        return false;
-    }
-}
-
-
 ////////////////////
 //   UIElements   //
 ////////////////////
@@ -151,10 +126,6 @@ ChannelValue Stage::getValue(ChannelAddress address) const {
     }
 }
 
-ChannelGroup* Stage::getChannelGroup(int id) {
-    return &m_channelGroups[id];
-}
-
 bool Stage::inEditMode() {
     return m_editMode;
 }
@@ -173,23 +144,30 @@ std::string Stage::getName() {
 }
 
 
+int Stage::getChannel(std::string channelName) {
+    return m_namedChannels[channelName];
+}
+
+
+std::vector<int> Stage::getChannels(std::vector<std::string> channelNames) {
+    std::vector<int> result;
+    result.reserve(channelNames.size());
+    
+    
+    for (std::string channelName : channelNames) {
+        result.push_back(getChannel(channelName));
+    }
+    return result;
+}
+
+
 ///////////////////////
 //     Configure     //
 ///////////////////////
 int Stage::addUiElement(std::shared_ptr<UIControlElement> uiElement) {
     uiElement->setID(m_ui_elements.size());
     m_ui_elements.push_back(uiElement);
-    return m_fixtures.size() - 1;
-}
-
-int Stage::addChannelGroup(ChannelGroup channelGroup) {
-    m_channelGroups.push_back(channelGroup);
-    return m_channelGroups.size() - 1;
-}
-
-int Stage::addFixture(Fixture fixture) {
-    m_fixtures.push_back(fixture);
-    return m_fixtures.size() - 1;
+    return m_ui_elements.size() - 1;
 }
 
 

@@ -16,7 +16,7 @@
 class UIXYPad : public UIControlElement {
 public:
     UIXYPad(Stage* stage, ChannelAddress channelXAddress, ChannelAddress channelYAddress);
-    UIXYPad(Stage* stage, json jsonObject) : UIXYPad(stage, (ChannelAddress)jsonObject["channelx_address"], (ChannelAddress)jsonObject["channely_address"]) {};
+    UIXYPad(Stage* stage, json jsonObject) : UIXYPad(stage, stage->getChannel(jsonObject["channelx_address"]), stage->getChannel(jsonObject["channely_address"])) {};
     
     
     
