@@ -11,9 +11,9 @@
 
 #include <stdio.h>
 
-#include "UIControlElement.hpp"
+#include "UILabeledElement.hpp"
 
-class UIChannel : public UIControlElement {
+class UIChannel : public UILabeledElement {
 public:
     UIChannel(Stage* stage, ChannelAddress channelAddress);
     UIChannel(Stage* stage, json jsonObject) : UIChannel(stage, stage->getChannel(jsonObject["channel_address"])) {};

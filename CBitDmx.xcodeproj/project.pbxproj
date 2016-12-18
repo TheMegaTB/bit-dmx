@@ -32,6 +32,8 @@
 		4F82165C1E06C04200744816 /* UISingleHotkey.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F82165A1E06C04200744816 /* UISingleHotkey.cpp */; };
 		4F82165F1E06D27200744816 /* XYPad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F82165D1E06D27200744816 /* XYPad.cpp */; };
 		4F8216621E06DAAD00744816 /* UIXYPad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F8216601E06DAAD00744816 /* UIXYPad.cpp */; };
+		4FDD24F31E06F2A6000C715D /* UILabeledElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FDD24F11E06F2A6000C715D /* UILabeledElement.cpp */; };
+		4FDD24F61E06FD5B000C715D /* UIChaser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FDD24F41E06FD5B000C715D /* UIChaser.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -81,6 +83,10 @@
 		4F82165E1E06D27200744816 /* XYPad.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = XYPad.hpp; sourceTree = "<group>"; };
 		4F8216601E06DAAD00744816 /* UIXYPad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UIXYPad.cpp; sourceTree = "<group>"; };
 		4F8216611E06DAAD00744816 /* UIXYPad.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UIXYPad.hpp; sourceTree = "<group>"; };
+		4FDD24F11E06F2A6000C715D /* UILabeledElement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UILabeledElement.cpp; sourceTree = "<group>"; };
+		4FDD24F21E06F2A6000C715D /* UILabeledElement.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UILabeledElement.hpp; sourceTree = "<group>"; };
+		4FDD24F41E06FD5B000C715D /* UIChaser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UIChaser.cpp; sourceTree = "<group>"; };
+		4FDD24F51E06FD5B000C715D /* UIChaser.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UIChaser.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -167,6 +173,8 @@
 				4F8216221E04683C00744816 /* UIControlElement.hpp */,
 				4F82165A1E06C04200744816 /* UISingleHotkey.cpp */,
 				4F82165B1E06C04200744816 /* UISingleHotkey.hpp */,
+				4FDD24F11E06F2A6000C715D /* UILabeledElement.cpp */,
+				4FDD24F21E06F2A6000C715D /* UILabeledElement.hpp */,
 				4F82162A1E049A7600744816 /* UISwitch.cpp */,
 				4F82162B1E049A7600744816 /* UISwitch.hpp */,
 				4F82164A1E06076A00744816 /* UIPushButton.cpp */,
@@ -175,6 +183,8 @@
 				4F8216381E05787500744816 /* UIChannel.hpp */,
 				4F8216601E06DAAD00744816 /* UIXYPad.cpp */,
 				4F8216611E06DAAD00744816 /* UIXYPad.hpp */,
+				4FDD24F41E06FD5B000C715D /* UIChaser.cpp */,
+				4FDD24F51E06FD5B000C715D /* UIChaser.hpp */,
 			);
 			name = UIControlElement;
 			sourceTree = "<group>";
@@ -297,6 +307,7 @@
 				4F8216231E04683C00744816 /* UIControlElement.cpp in Sources */,
 				4F82165F1E06D27200744816 /* XYPad.cpp in Sources */,
 				4F8216491E05CEEA00744816 /* Toggle.cpp in Sources */,
+				4FDD24F61E06FD5B000C715D /* UIChaser.cpp in Sources */,
 				4F8216201E0454AD00744816 /* FadeCurve.cpp in Sources */,
 				4F8216051E0452C500744816 /* main.cpp in Sources */,
 				4F8216431E05C63F00744816 /* Button.cpp in Sources */,
@@ -306,6 +317,7 @@
 				4F82162C1E049A7600744816 /* UISwitch.cpp in Sources */,
 				4F8216401E05C33900744816 /* UIController.cpp in Sources */,
 				4F8216621E06DAAD00744816 /* UIXYPad.cpp in Sources */,
+				4FDD24F31E06F2A6000C715D /* UILabeledElement.cpp in Sources */,
 				4F82164C1E06076A00744816 /* UIPushButton.cpp in Sources */,
 				4F82164F1E0616D800744816 /* Selector.cpp in Sources */,
 				4F8216171E04531900744816 /* Stage.cpp in Sources */,

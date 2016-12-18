@@ -54,3 +54,8 @@ void UIController::draw(sf::RenderTarget& target, sf::RenderStates states) const
         target.draw(*uiPart, states);
     }
 }
+
+
+void UIController::addPart(std::shared_ptr<UIPart> part) {
+    m_parts.push_back(part);
+}

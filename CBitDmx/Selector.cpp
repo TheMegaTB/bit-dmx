@@ -22,9 +22,9 @@ Selector::Selector(std::function<void(bool)> changeCallback, std::vector<std::st
     m_label = std::make_shared<Label>(m_options[m_currentPosition], width - 2*height,height, font);
     m_buttonLeft->setPosition(width - height, 0);
     
-    m_parts.push_back(m_buttonLeft);
-    m_parts.push_back(m_buttonRight);
-    m_parts.push_back(m_label);
+    addPart(m_buttonLeft);
+    addPart(m_buttonRight);
+    addPart(m_label);
 }
 
 void Selector::select(int position) {

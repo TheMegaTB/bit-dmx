@@ -19,6 +19,9 @@ public:
     UIPushButton(Stage* stage, std::string caption, std::vector<int> channels, sf::Keyboard::Key hotkey) : UIPushButton(stage, caption, channels, std::vector<ChannelValue>(m_channels.size()), hotkey) {};
     UIPushButton(Stage* stage, json jsonObject) : UIPushButton(stage, jsonObject["caption"], stage->getChannels(jsonObject["channels"]), jsonObject["channel_values"], (sf::Keyboard::Key)jsonObject["hotkey"].get<int>()) {};
     
+    
+    virtual void chaserActivate();
+    virtual void chaserDeactivate();
     virtual void onHotkey();
     virtual void onHotkeyRelease();
     

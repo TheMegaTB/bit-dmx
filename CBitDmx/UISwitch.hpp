@@ -22,6 +22,8 @@ public:
     void setCaption(std::string caption);
     
     
+    virtual void chaserActivate();
+    virtual void chaserDeactivate();
     virtual void onHotkey();
     virtual void action();
     

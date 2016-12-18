@@ -15,6 +15,7 @@
 #include "UIPushButton.hpp"
 #include "UIChannel.hpp"
 #include "UIXYPad.hpp"
+#include "UIChaser.hpp"
 
 Stage::Stage(std::string fontPath, std::string stagePath, std::string uiPath) {
     m_font.loadFromFile(fontPath);
@@ -41,40 +42,56 @@ Stage::Stage(std::string fontPath, std::string stagePath, std::string uiPath) {
             m_namedChannels[namePrefix + it.key()] = baseAddress + it.value().get<int>();
         }
     }
-    std::cout << std::setw(4) << m_namedChannels << std::endl;
 
     std::ifstream uiInputFile(uiPath);
     json uiJson;
     uiInputFile >> uiJson;
 
-    
-    for (auto& uiElement : uiJson) {
+    for (json::iterator it = uiJson.begin(); it != uiJson.end(); ++it) {
+        m_namedUIElements[it.key()] = m_ui_elements.size();
+        auto uiElement = it.value();
         UIControlElementType type = (UIControlElementType)uiElement["type"].get<int>();
         
         switch (type) {
-            case UIControlElementType::UIControlElementSwitch: {
+            case UIControlElementChaser: {
+                std::shared_ptr<UIChaser> e = std::make_shared<UIChaser>(this, uiElement);
+                addUiElement(e);
+                break;
+
+            }
+            case UIControlElementSwitch: {
                 std::shared_ptr<UISwitch> e = std::make_shared<UISwitch>(this, uiElement);
                 addUiElement(e);
                 break;
             }
-            case UIControlElementType::UIControlElementPushButton: {
+            case UIControlElementPushButton: {
                 std::shared_ptr<UIPushButton> e = std::make_shared<UIPushButton>(this, uiElement);
                 addUiElement(e);
                 break;
             }
-            case UIControlElementType::UIControlElementChannel: {
+            case UIControlElementChannel: {
                 std::shared_ptr<UIChannel> e = std::make_shared<UIChannel>(this, uiElement);
                 addUiElement(e);
                 break;
             }
-            case UIControlElementType::UIControlElementXYPad: {
+            case UIControlElementXYPad: {
                 std::shared_ptr<UIXYPad> e = std::make_shared<UIXYPad>(this, uiElement);
                 addUiElement(e);
                 break;
             }
         }
-        m_ui_elements.back()->setFadeTime(sf::milliseconds(uiElement["fade_time"]));
-        m_ui_elements.back()->setFadeCurve((FadeCurve)uiElement["fade_curve"].get<int>());
+        if (uiElement.count("caption")) {
+            m_ui_elements.back()->setCaption(uiElement["caption"]);
+        }
+        if (uiElement.count("visible")) {
+            m_ui_elements.back()->setVisibility(uiElement["visible"]);
+        }
+        if (uiElement.count("fade_time")) {
+            m_ui_elements.back()->setFadeTime(sf::milliseconds(uiElement["fade_time"]));
+        }
+        if (uiElement.count("fade_curve")) {
+            m_ui_elements.back()->setFadeCurve((FadeCurve)uiElement["fade_curve"].get<int>());
+        }
     }
 
 }
@@ -111,6 +128,14 @@ void Stage::deactivateUIElement(int elementID) {
     for (ChannelAddress channelAddress = 0; channelAddress < m_channels.size(); channelAddress++) {
         m_channels[channelAddress].disableUIElement(elementID, m_currentTime);
     }
+}
+
+void Stage::chaserActivateUIElement(int elementID) {
+    m_ui_elements[elementID]->chaserActivate();
+}
+
+void Stage::chaserDeactivateUIElement(int elementID) {
+    m_ui_elements[elementID]->chaserDeactivate();
 }
 
 
@@ -161,6 +186,10 @@ std::vector<int> Stage::getChannels(std::vector<std::string> channelNames) {
 }
 
 
+int Stage::getUIElement(std::string elementName) {
+    return m_namedUIElements[elementName];
+}
+
 ///////////////////////
 //     Configure     //
 ///////////////////////
@@ -173,6 +202,9 @@ int Stage::addUiElement(std::shared_ptr<UIControlElement> uiElement) {
 
 void Stage::setCurrentTime(sf::Time currentTime) {
     m_currentTime = currentTime;
+    for (std::shared_ptr<UIControlElement> uiElement : m_ui_elements) {
+        uiElement->update();
+    }
 }
 
 void Stage::setName(std::string name) {
@@ -194,7 +226,7 @@ bool Stage::updateAllChannels() {
 }
 
 bool Stage::updateChannel(ChannelAddress address) {
-    std::cout << "C" << address << " -> " << (int)m_channels[address].getValue(m_currentTime) << std::endl;
+//    std::cout << "C" << address << " -> " << (int)m_channels[address].getValue(m_currentTime) << std::endl;
     return true; //TODO implement
 }
 
@@ -232,13 +264,13 @@ void Stage::onMouseRelease(int x, int y, sf::Mouse::Button mouseButton) {
 }
 
 void Stage::onHotkey(sf::Keyboard::Key key) {
-    if (key == sf::Keyboard::Escape) {
-        toggleEditMode();
-    } else {
-        for (unsigned int i = 0; i < m_ui_elements.size(); i++) {
-            m_ui_elements[i]->hotkeyWrapper(key);
-        }
+//    if (key == sf::Keyboard::Escape) {
+//        toggleEditMode();
+//    } else {
+    for (unsigned int i = 0; i < m_ui_elements.size(); i++) {
+        m_ui_elements[i]->hotkeyWrapper(key);
     }
+//    }
 }
 
 void Stage::onHotkeyRelease(sf::Keyboard::Key key) {
@@ -284,6 +316,10 @@ void Stage::draw(sf::RenderTarget& target, sf::RenderStates states) const
         std::vector<int> height(numberPerRow);
         
         for (unsigned int i = 0; i < m_ui_elements.size(); i++) {
+            if (!m_ui_elements[i]->isVisible()) {
+                continue;
+            }
+            
             unsigned int smallestHeight = height[0];
             unsigned int column = 0;
             
@@ -302,13 +338,13 @@ void Stage::draw(sf::RenderTarget& target, sf::RenderStates states) const
         }
     }
     
-    if (m_editMode) {
-        if (m_uiElementInEditMode != -1) {
-            sf::Transformable a;
-            a.setPosition(target.getSize().x - UIPartWidth - 2 * UIPartDistance, 0);
-            
-            states.transform *= a.getTransform();
-            m_ui_elements[m_uiElementInEditMode]->drawEditor(target, states);
-        };
-    }
+//    if (m_editMode) {
+//        if (m_uiElementInEditMode != -1) {
+//            sf::Transformable a;
+//            a.setPosition(target.getSize().x - UIPartWidth - 2 * UIPartDistance, 0);
+//            
+//            states.transform *= a.getTransform();
+//            m_ui_elements[m_uiElementInEditMode]->drawEditor(target, states);
+//        };
+//    }
 }

@@ -11,9 +11,9 @@
 
 #include <stdio.h>
 
-#include "UIControlElement.hpp"
+#include "UILabeledElement.hpp"
 
-class UIXYPad : public UIControlElement {
+class UIXYPad : public UILabeledElement {
 public:
     UIXYPad(Stage* stage, ChannelAddress channelXAddress, ChannelAddress channelYAddress);
     UIXYPad(Stage* stage, json jsonObject) : UIXYPad(stage, stage->getChannel(jsonObject["channelx_address"]), stage->getChannel(jsonObject["channely_address"])) {};

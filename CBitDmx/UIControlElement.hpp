@@ -28,7 +28,8 @@ class UIControlElement;
 
 
 enum UIControlElementType {
-    UIControlElementSwitch = 0,
+    UIControlElementChaser = 0,
+    UIControlElementSwitch,
     UIControlElementPushButton,
     UIControlElementChannel,
     UIControlElementXYPad
@@ -39,25 +40,32 @@ public:
     UIControlElement(Stage* stage, int width, int height);
     
     void setID(int id);
+    virtual void setCaption(std::string caption);
     void setFadeTime(sf::Time fadeTime);
     void setFadeCurve(FadeCurve fadeCurve);
+    void setVisibility(bool isVisible);
+    bool isVisible();
     
     virtual void hotkeyWrapper(sf::Keyboard::Key hotkey) {};
     virtual void hotkeyReleaseWrapper(sf::Keyboard::Key hotkey) {};
     
     virtual void activate();
     virtual void deactivate();
+    virtual void chaserActivate() {};
+    virtual void chaserDeactivate() {};
     virtual void action() {};
+    virtual void update() {};
     
-    void drawEditor(sf::RenderTarget& target, sf::RenderStates states) const;
     virtual void drawSubEditor(sf::RenderTarget& target, sf::RenderStates states) const {};
     
     int m_id;
 protected:
     bool m_isActivated;
+    bool m_isVisible;
     
     sf::Time m_fadeTime;
     FadeCurve m_fadeCurve;
+    std::string m_caption;
     
     Stage *m_stage;
 };

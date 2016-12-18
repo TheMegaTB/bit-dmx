@@ -21,11 +21,21 @@ UIPushButton::UIPushButton(Stage* stage, std::string caption, std::vector<int> c
         }
     }, caption, stage->UIPartWidth, stage->UIPartWidth / 4, m_stage->getFont());
     
-    m_parts.push_back(m_button);
+    addPart(m_button);
 }
 
 void UIPushButton::setCaption(std::string caption) {
     m_button->setCaption(caption);
+}
+
+void UIPushButton::chaserActivate() {
+    activate();
+    m_button->setPressed(true);
+}
+
+void UIPushButton::chaserDeactivate() {
+    deactivate();
+    m_button->setPressed(false);
 }
 
 

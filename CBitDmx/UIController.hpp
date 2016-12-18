@@ -22,11 +22,13 @@ public:
     virtual void onMouseMove(int x, int y, sf::Mouse::Button mouseButton);
     virtual void onMouseRelease(int x, int y, sf::Mouse::Button mouseButton);
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+    virtual void addPart(std::shared_ptr<UIPart> part);
 protected:
     
     int findPartByXY(int x, int y);
     
     int m_lastClickOn;
+private:
     std::vector<std::shared_ptr<UIPart>> m_parts;
 };
 

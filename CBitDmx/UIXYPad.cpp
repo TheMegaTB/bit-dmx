@@ -8,11 +8,11 @@
 
 #include "UIXYPad.hpp"
 
-UIXYPad::UIXYPad(Stage* stage, ChannelAddress channelXAddress, ChannelAddress channelYAddress): UIControlElement(stage, stage->UIPartWidth, stage->UIPartWidth) {
+UIXYPad::UIXYPad(Stage* stage, ChannelAddress channelXAddress, ChannelAddress channelYAddress): UILabeledElement(stage, stage->UIPartWidth, stage->UIPartWidth) {
     setChannelAddress(channelXAddress, channelYAddress);
     
     m_xyPad = std::make_shared<XYPad>(0, 255, [this](double x, double y) -> void { this->activate(); }, [this]() -> void { this->deactivate(); }, stage->UIPartWidth, stage->UIPartWidth, m_stage->getFont());
-    m_parts.push_back(m_xyPad);
+    addPart(m_xyPad);
 }
 
 void UIXYPad::setChannelAddress(ChannelAddress channelXAddress, ChannelAddress channelYAddress) {

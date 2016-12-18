@@ -22,13 +22,22 @@ UISwitch::UISwitch(Stage* stage, std::string caption, std::vector<int> channelGr
         }
     }, caption, stage->UIPartWidth, stage->UIPartWidth / 4, m_stage->getFont());
                                         
-    m_parts.push_back(m_toggle);
+    addPart(m_toggle);
 }
 
 void UISwitch::setCaption(std::string caption) {
     m_toggle->setCaption(caption);
 }
 
+void UISwitch::chaserActivate() {
+    activate();
+    m_toggle->setActivation(true);
+}
+
+void UISwitch::chaserDeactivate() {
+    deactivate();
+    m_toggle->setActivation(false);
+}
 
 void UISwitch::onHotkey() {
     UISingleHotkey::onHotkey();

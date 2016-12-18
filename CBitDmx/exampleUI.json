@@ -1,33 +1,43 @@
-[
-  {
-    "type": 3,
-    "fade_curve": 0,
+{
+  "scanner1:movement": {
+    "type": 4,
+    "caption": "Scanner 1",
     "fade_time": 2000,
     "channelx_address": "Scanner:Pan",
     "channely_address": "Scanner:Tilt"
   },
-  {
-    "type": 0,
-    "fade_curve": 0,
+  "scanner1:s100": {
+    "type": 1,
+    "fade_curve": 1,
     "fade_time": 2000,
     "caption": "All On (B)",
-    "channels": ["Scanner1:Shutter", "Scanner:Gobo"],
+    "channels": ["Scanner:Shutter", "Scanner:Gobo"],
     "channel_values": [100, 200],
     "hotkey": 1
   },
-  {
+  "scanner1:s200": {
     "type": 1,
-    "fade_curve": 0,
     "fade_time": 2000,
     "caption": "All On",
     "channels": ["Scanner:Shutter", "Scanner:Gobo"],
     "channel_values": [200, 100],
     "hotkey": 7
   },
-  {
-    "type": 2,
-    "fade_curve": 0,
-    "fade_time": 2000,
+  "scanner1:shutter": {
+    "type": 3,
+    "caption": "Scanner 1",
+    "fade_time": 1000,
     "channel_address": "Scanner:Shutter"
-  }
-]
+  },
+    "chaser1": {
+        "type": 0,
+        "caption": "Chaser 1",
+        "chaser": [
+            {"name": "scanner1:s100", "time": 5000},
+           {"name": "scanner1:s200", "time": 5000},
+                   {"name": "chaser1", "time": 0},
+                   {"name": "chaser1", "time": 0}
+        ]
+        
+    }
+}

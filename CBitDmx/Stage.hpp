@@ -36,6 +36,8 @@ public:
     // interactiong with UI Element
     void activateUIElement(int elementID);
     void deactivateUIElement(int elementID);
+    void chaserActivateUIElement(int elementID);
+    void chaserDeactivateUIElement(int elementID);
     
     // get values
     ChannelValue getValue(ChannelAddress address) const;
@@ -45,6 +47,7 @@ public:
     std::string getName();
     int getChannel(std::string channelName);
     std::vector<int> getChannels(std::vector<std::string> channelNames);
+    int getUIElement(std::string elementName);
     
     // configrue
     int addUiElement(std::shared_ptr<UIControlElement> uiElement);
@@ -83,7 +86,8 @@ private:
     //stage data
     std::vector<Channel> m_channels;
     std::vector<std::shared_ptr<UIControlElement>> m_ui_elements;
-    json m_namedChannels;
+    std::map<std::string, int> m_namedChannels;
+    std::map<std::string, int> m_namedUIElements;
 
     
     bool updateChannel(ChannelAddress address);
