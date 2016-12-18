@@ -14,7 +14,6 @@
 typedef int ChannelAddress;
 typedef int ChannelValue;
 
-#define UIPartWidth 160
 #define UIPartDistance 5
 
 #endif /* Types_hpp */

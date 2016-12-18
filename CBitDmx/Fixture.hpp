@@ -19,6 +19,7 @@ class Fixture {
 public:
     Fixture(Stage *stage, std::string name, std::vector<int> channelGroups);
     std::vector<int> getChannelGroups();
+    std::string getName();
 private:
     Stage * m_stage;
     std::string m_name;

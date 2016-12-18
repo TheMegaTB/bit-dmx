@@ -14,16 +14,24 @@ class ChannelGroup;
 #include <stdio.h>
 #include "Stage.hpp"
 
+enum ChannelGroupType {
+    Single = 0,
+    RGB,
+    XY
+};
+
 
 class ChannelGroup {
 public:
-    ChannelGroup(Stage *stage, std::string name, std::vector<int> channels);
+    ChannelGroup(Stage *stage, std::string name, ChannelGroupType channelGroupType, std::vector<int> channels);
     void startFade(sf::Time fadeTime, std::vector<ChannelValue> value, FadeCurve fadeCurve, int uiElementID);
     void setValue(std::vector<ChannelValue> value, int uiElementID);
     int getChannelNumber();
+    std::string getName();
 private:
     Stage *m_stage;
     std::string m_name;
+    ChannelGroupType m_channelGroupType;
     std::vector<int> m_channels;
 };
 

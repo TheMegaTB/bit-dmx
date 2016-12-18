@@ -9,19 +9,16 @@
 #include "UIPart.hpp"
 
 
-int UIPart::getHeight() const {
-    return UIPartWidth / 4;
+UIPart::UIPart(int width, int height) {
+    m_width = width;
+    m_height = height;
 }
-
-void UIPart::onMousePress(int x, int y, sf::Mouse::Button mouseButton) {}
-void UIPart::onMouseMove(int x, int y, sf::Mouse::Button mouseButton) {}
-void UIPart::onMouseRelease(int x, int y, sf::Mouse::Button mouseButton) {}
 
 void UIPart::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     states.transform *= getTransform();
     
-    sf::RectangleShape placeHolder (sf::Vector2f(UIPartWidth, getHeight()));
+    sf::RectangleShape placeHolder (sf::Vector2f(getWidth(), getHeight()));
     placeHolder.setFillColor(sf::Color::Transparent);
     placeHolder.setOutlineThickness(1);
     placeHolder.setOutlineColor(sf::Color::Red);

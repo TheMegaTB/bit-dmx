@@ -18,3 +18,8 @@ Fixture::Fixture(Stage *stage, std::string name, std::vector<int> channelGroups)
 std::vector<int> Fixture::getChannelGroups() {
     return m_channelGroups;
 }
+
+
+std::string Fixture::getName() {
+    return m_name;
+}

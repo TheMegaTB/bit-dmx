@@ -27,6 +27,13 @@
 		4F8216461E05C77B00744816 /* Slider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F8216441E05C77B00744816 /* Slider.cpp */; };
 		4F8216491E05CEEA00744816 /* Toggle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F8216471E05CEEA00744816 /* Toggle.cpp */; };
 		4F82164C1E06076A00744816 /* UIPushButton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F82164A1E06076A00744816 /* UIPushButton.cpp */; };
+		4F82164F1E0616D800744816 /* Selector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F82164D1E0616D800744816 /* Selector.cpp */; };
+		4F8216521E0617B200744816 /* Label.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F8216501E0617B200744816 /* Label.cpp */; };
+		4F8216571E06AA9300744816 /* exampleStage.json in Resources */ = {isa = PBXBuildFile; fileRef = 4F8216561E06AA9300744816 /* exampleStage.json */; };
+		4F8216591E06B7D900744816 /* exampleUI.json in Resources */ = {isa = PBXBuildFile; fileRef = 4F8216581E06B7D900744816 /* exampleUI.json */; };
+		4F82165C1E06C04200744816 /* UISingleHotkey.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F82165A1E06C04200744816 /* UISingleHotkey.cpp */; };
+		4F82165F1E06D27200744816 /* XYPad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F82165D1E06D27200744816 /* XYPad.cpp */; };
+		4F8216621E06DAAD00744816 /* UIXYPad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F8216601E06DAAD00744816 /* UIXYPad.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -68,6 +75,18 @@
 		4F8216481E05CEEA00744816 /* Toggle.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Toggle.hpp; sourceTree = "<group>"; };
 		4F82164A1E06076A00744816 /* UIPushButton.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UIPushButton.cpp; sourceTree = "<group>"; };
 		4F82164B1E06076A00744816 /* UIPushButton.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UIPushButton.hpp; sourceTree = "<group>"; };
+		4F82164D1E0616D800744816 /* Selector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Selector.cpp; sourceTree = "<group>"; };
+		4F82164E1E0616D800744816 /* Selector.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Selector.hpp; sourceTree = "<group>"; };
+		4F8216501E0617B200744816 /* Label.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Label.cpp; sourceTree = "<group>"; };
+		4F8216511E0617B200744816 /* Label.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Label.hpp; sourceTree = "<group>"; };
+		4F8216561E06AA9300744816 /* exampleStage.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = exampleStage.json; sourceTree = "<group>"; };
+		4F8216581E06B7D900744816 /* exampleUI.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = exampleUI.json; sourceTree = "<group>"; };
+		4F82165A1E06C04200744816 /* UISingleHotkey.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UISingleHotkey.cpp; sourceTree = "<group>"; };
+		4F82165B1E06C04200744816 /* UISingleHotkey.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UISingleHotkey.hpp; sourceTree = "<group>"; };
+		4F82165D1E06D27200744816 /* XYPad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = XYPad.cpp; sourceTree = "<group>"; };
+		4F82165E1E06D27200744816 /* XYPad.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = XYPad.hpp; sourceTree = "<group>"; };
+		4F8216601E06DAAD00744816 /* UIXYPad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UIXYPad.cpp; sourceTree = "<group>"; };
+		4F8216611E06DAAD00744816 /* UIXYPad.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UIXYPad.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,6 +125,8 @@
 				4F8216041E0452C500744816 /* main.cpp */,
 				4F8216061E0452C500744816 /* Resources */,
 				4F8215FF1E0452C500744816 /* Supporting Files */,
+				4F8216561E06AA9300744816 /* exampleStage.json */,
+				4F8216581E06B7D900744816 /* exampleUI.json */,
 			);
 			path = CBitDmx;
 			sourceTree = "<group>";
@@ -153,12 +174,16 @@
 			children = (
 				4F8216211E04683C00744816 /* UIControlElement.cpp */,
 				4F8216221E04683C00744816 /* UIControlElement.hpp */,
+				4F82165A1E06C04200744816 /* UISingleHotkey.cpp */,
+				4F82165B1E06C04200744816 /* UISingleHotkey.hpp */,
 				4F82162A1E049A7600744816 /* UISwitch.cpp */,
 				4F82162B1E049A7600744816 /* UISwitch.hpp */,
-				4F8216371E05787500744816 /* UIChannel.cpp */,
-				4F8216381E05787500744816 /* UIChannel.hpp */,
 				4F82164A1E06076A00744816 /* UIPushButton.cpp */,
 				4F82164B1E06076A00744816 /* UIPushButton.hpp */,
+				4F8216371E05787500744816 /* UIChannel.cpp */,
+				4F8216381E05787500744816 /* UIChannel.hpp */,
+				4F8216601E06DAAD00744816 /* UIXYPad.cpp */,
+				4F8216611E06DAAD00744816 /* UIXYPad.hpp */,
 			);
 			name = UIControlElement;
 			sourceTree = "<group>";
@@ -185,6 +210,12 @@
 				4F8216481E05CEEA00744816 /* Toggle.hpp */,
 				4F8216441E05C77B00744816 /* Slider.cpp */,
 				4F8216451E05C77B00744816 /* Slider.hpp */,
+				4F82164D1E0616D800744816 /* Selector.cpp */,
+				4F82164E1E0616D800744816 /* Selector.hpp */,
+				4F8216501E0617B200744816 /* Label.cpp */,
+				4F8216511E0617B200744816 /* Label.hpp */,
+				4F82165D1E06D27200744816 /* XYPad.cpp */,
+				4F82165E1E06D27200744816 /* XYPad.hpp */,
 			);
 			name = UIPart;
 			sourceTree = "<group>";
@@ -247,9 +278,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4F8216571E06AA9300744816 /* exampleStage.json in Resources */,
 				4F82160E1E0452C500744816 /* icon.png in Resources */,
 				4F82160C1E0452C500744816 /* sansation.ttf in Resources */,
 				4F82160A1E0452C500744816 /* nice_music.ogg in Resources */,
+				4F8216591E06B7D900744816 /* exampleUI.json in Resources */,
 				4F8216081E0452C500744816 /* cute_image.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -277,8 +310,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4F82165C1E06C04200744816 /* UISingleHotkey.cpp in Sources */,
+				4F8216521E0617B200744816 /* Label.cpp in Sources */,
 				4F8216231E04683C00744816 /* UIControlElement.cpp in Sources */,
 				4F82162F1E049FD200744816 /* ChannelGroup.cpp in Sources */,
+				4F82165F1E06D27200744816 /* XYPad.cpp in Sources */,
 				4F8216491E05CEEA00744816 /* Toggle.cpp in Sources */,
 				4F8216201E0454AD00744816 /* FadeCurve.cpp in Sources */,
 				4F8216051E0452C500744816 /* main.cpp in Sources */,
@@ -288,7 +324,9 @@
 				4F8216021E0452C500744816 /* ResourcePath.mm in Sources */,
 				4F82162C1E049A7600744816 /* UISwitch.cpp in Sources */,
 				4F8216401E05C33900744816 /* UIController.cpp in Sources */,
+				4F8216621E06DAAD00744816 /* UIXYPad.cpp in Sources */,
 				4F82164C1E06076A00744816 /* UIPushButton.cpp in Sources */,
+				4F82164F1E0616D800744816 /* Selector.cpp in Sources */,
 				4F8216171E04531900744816 /* Stage.cpp in Sources */,
 				4F82163D1E05C30500744816 /* UIPart.cpp in Sources */,
 				4F8216461E05C77B00744816 /* Slider.cpp in Sources */,
@@ -424,6 +462,7 @@
 				4F8216131E0452C500744816 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

@@ -30,3 +30,11 @@ std::string getFadeCurveName(FadeCurve fadeCurve) {
             return "Cubed";
     }
 }
+
+std::vector<std::string> getFadeCurveNames() {
+    std::vector<std::string> v (fadeCurveEnumSize);
+    
+    for (int i = 0; i< fadeCurveEnumSize; i++) {
+        v[i] = getFadeCurveName((FadeCurve)i);
+    }
+}

@@ -7,17 +7,87 @@
 //
 
 #include <iostream>
+#include <fstream>
 
 #include "Stage.hpp"
 
-Stage::Stage(int universeSize, std::string fontPath) {
-    m_channels.resize(universeSize);
+#include "UISwitch.hpp"
+#include "UIPushButton.hpp"
+#include "UIChannel.hpp"
+#include "UIXYPad.hpp"
+
+Stage::Stage(std::string fontPath, std::string stagePath, std::string uiPath) {
     m_font.loadFromFile(fontPath);
     m_lastClickOn = -1;
     m_mouseX = 0;
     m_mouseY = 0;
+
+    std::ifstream stageInputFile(stagePath);
+    json stageJson;
+    stageInputFile >> stageJson;
+    
+    
+    setName(stageJson["name"]);
+    m_channels.resize(stageJson["size"]);
+    
+    for (auto& fixture : stageJson["fixtures"]) {
+        ChannelAddress baseAddress = fixture["channel"];
+        std::string templateName = fixture["template"];
+        
+        std::vector<int> channelGroups;
+        
+        for (auto& channelGroup : stageJson["fixture_templates"][templateName]) {
+            channelGroups.push_back(addChannelGroup(ChannelGroup(this, channelGroup["name"], (ChannelGroupType)0, channelGroup["channels"])));
+        }
+        
+        addFixture(Fixture(this, fixture["name"], channelGroups));
+    }
+    
+    for (Fixture fixture : m_fixtures) {
+        for (int channelGroupID : fixture.getChannelGroups()) {
+            std::cout << channelGroupID << " -> " << fixture.getName() << ":" << m_channelGroups[channelGroupID].getName() << std::endl;
+        }
+    }
+
+    std::ifstream uiInputFile(uiPath);
+    json uiJson;
+    uiInputFile >> uiJson;
+
+    
+    for (auto& uiElement : uiJson) {
+        UIControlElementType type = (UIControlElementType)uiElement["type"].get<int>();
+        
+        switch (type) {
+            case UIControlElementType::UIControlElementSwitch: {
+                std::shared_ptr<UISwitch> e = std::make_shared<UISwitch>(this, uiElement);
+                addUiElement(e);
+                break;
+            }
+            case UIControlElementType::UIControlElementPushButton: {
+                std::shared_ptr<UIPushButton> e = std::make_shared<UIPushButton>(this, uiElement);
+                addUiElement(e);
+                break;
+            }
+            case UIControlElementType::UIControlElementChannel: {
+                std::shared_ptr<UIChannel> e = std::make_shared<UIChannel>(this, uiElement);
+                addUiElement(e);
+                break;
+            }
+            case UIControlElementType::UIControlElementXYPad: {
+                std::shared_ptr<UIXYPad> e = std::make_shared<UIXYPad>(this, uiElement);
+                addUiElement(e);
+                break;
+            }
+        }
+        m_ui_elements.back()->setFadeTime(sf::milliseconds(uiElement["fade_time"]));
+        m_ui_elements.back()->setFadeCurve((FadeCurve)uiElement["fade_curve"].get<int>());
+    }
+
 }
 
+//////////////////
+//   Channels   //
+//////////////////
 bool Stage::setValue(ChannelAddress address, ChannelValue value, int uiElementID) {
     if (address < m_channels.size()) {
         m_channels[address].setValue(value, uiElementID);
@@ -54,6 +124,25 @@ void Stage::startFadeForChannelGroup(int id, sf::Time fadeTime, std::vector<Chan
     }
 }
 
+
+////////////////////
+//   UIElements   //
+////////////////////
+void Stage::activateUIElement(int elementID) {
+    m_ui_elements[elementID]->action();
+}
+
+void Stage::deactivateUIElement(int elementID) {
+    for (ChannelAddress channelAddress = 0; channelAddress < m_channels.size(); channelAddress++) {
+        m_channels[channelAddress].disableUIElement(elementID, m_currentTime);
+    }
+}
+
+
+
+///////////////////
+//      Get      //
+///////////////////
 ChannelValue Stage::getValue(ChannelAddress address) const {
     if (address < m_channels.size()) {
         return m_channels[address].getValue(m_currentTime);
@@ -62,18 +151,88 @@ ChannelValue Stage::getValue(ChannelAddress address) const {
     }
 }
 
-void Stage::onMousePress(int x, int y, sf::Mouse::Button mouseButton) {
-    m_lastClickButton = mouseButton;
-    for (int i = 0; i < m_ui_elements.size(); i++) {
-        sf::Vector2f position = m_ui_elements[i]->getPosition();
-        if ((x >= position.x) && (x <= position.x + UIPartWidth) &&
-            (y >= position.y) && (y <= position.y + m_ui_elements[i]->getHeight())) {
-            m_ui_elements[i]->onMousePress(x - position.x, y - position.y, mouseButton);
-            m_lastClickOn = i;
-            return;
+ChannelGroup* Stage::getChannelGroup(int id) {
+    return &m_channelGroups[id];
+}
+
+bool Stage::inEditMode() {
+    return m_editMode;
+}
+
+sf::Font Stage::getFont() {
+    return m_font;
+}
+
+sf::Time Stage::getNow() {
+    return m_currentTime;
+}
+
+
+std::string Stage::getName() {
+    return  m_name;
+}
+
+
+///////////////////////
+//     Configure     //
+///////////////////////
+int Stage::addUiElement(std::shared_ptr<UIControlElement> uiElement) {
+    uiElement->setID(m_ui_elements.size());
+    m_ui_elements.push_back(uiElement);
+    return m_fixtures.size() - 1;
+}
+
+int Stage::addChannelGroup(ChannelGroup channelGroup) {
+    m_channelGroups.push_back(channelGroup);
+    return m_channelGroups.size() - 1;
+}
+
+int Stage::addFixture(Fixture fixture) {
+    m_fixtures.push_back(fixture);
+    return m_fixtures.size() - 1;
+}
+
+
+void Stage::setCurrentTime(sf::Time currentTime) {
+    m_currentTime = currentTime;
+}
+
+void Stage::setName(std::string name) {
+    m_name = name;
+}
+
+///////////////////
+//     Other     //
+///////////////////
+bool Stage::updateAllChannels() {
+    bool result = false;
+    for (ChannelAddress channelAddress = 0; channelAddress < m_channels.size(); channelAddress++) {
+        ChannelValue currentValue = m_channels[channelAddress].getValue(m_currentTime);
+        if (currentValue != m_channels[channelAddress].getInterfaceValue()) {
+            m_channels[channelAddress].setInterfaceValue(currentValue);
+            updateChannel(channelAddress);
         }
     }
-    m_lastClickOn = -1;
+}
+
+bool Stage::updateChannel(ChannelAddress address) {
+    std::cout << "C" << address << " -> " << (int)m_channels[address].getValue(m_currentTime) << std::endl;
+    return true; //TODO implement
+}
+
+
+////////////////////
+//     Events     //
+////////////////////
+void Stage::onMousePress(int x, int y, sf::Mouse::Button mouseButton) {
+    m_lastClickOn = findUIElementByXY(x, y);
+    if (m_lastClickOn != -1) {
+        sf::Vector2f position = m_ui_elements[m_lastClickOn]->getPosition();
+        m_ui_elements[m_lastClickOn]->onMousePress(x - position.x, y - position.y, mouseButton);
+    }
+    if (m_editMode) {
+        m_uiElementInEditMode = m_lastClickOn;
+    }
 }
 
 
@@ -96,7 +255,7 @@ void Stage::onMouseRelease(int x, int y, sf::Mouse::Button mouseButton) {
 
 void Stage::onHotkey(sf::Keyboard::Key key) {
     if (key == sf::Keyboard::Escape) {
-        m_editMode = !m_editMode;
+        toggleEditMode();
     } else {
         for (unsigned int i = 0; i < m_ui_elements.size(); i++) {
             m_ui_elements[i]->hotkeyWrapper(key);
@@ -104,64 +263,36 @@ void Stage::onHotkey(sf::Keyboard::Key key) {
     }
 }
 
-void Stage::addUiElement(std::shared_ptr<UIControlElement> uiElement) {
-    uiElement->setID(m_ui_elements.size());
-    m_ui_elements.push_back(uiElement);
-}
-
-void Stage::addChannelGroup(ChannelGroup channelGroup) {
-    m_channelGroups.push_back(channelGroup);
-}
-
-void Stage::addFixture(Fixture fixture) {
-    m_fixtures.push_back(fixture);
-}
-
-ChannelGroup* Stage::getChannelGroup(int id) {
-    return &m_channelGroups[id];
-}
-
-void Stage::setCurrentTime(sf::Time currentTime) {
-    m_currentTime = currentTime;
-}
-
-bool Stage::inEditMode() {
-    return m_editMode;
-}
-
-void Stage::activateUIElement(int elementID) {
-    m_ui_elements[elementID]->action();
-}
-
-void Stage::deactivateUIElement(int elementID) {
-    for (ChannelAddress channelAddress = 0; channelAddress < m_channels.size(); channelAddress++) {
-        m_channels[channelAddress].disableUIElement(elementID, m_currentTime);
+void Stage::onHotkeyRelease(sf::Keyboard::Key key) {
+    for (unsigned int i = 0; i < m_ui_elements.size(); i++) {
+        m_ui_elements[i]->hotkeyReleaseWrapper(key);
     }
 }
 
-bool Stage::updateAllChannels() {
-    bool result = false;
-    for (ChannelAddress channelAddress = 0; channelAddress < m_channels.size(); channelAddress++) {
-        ChannelValue currentValue = m_channels[channelAddress].getValue(m_currentTime);
-        if (currentValue != m_channels[channelAddress].getInterfaceValue()) {
-            m_channels[channelAddress].setInterfaceValue(currentValue);
-            updateChannel(channelAddress);
+
+
+
+
+
+
+
+
+
+int Stage::findUIElementByXY(int x, int y) {
+    for (int i = 0; i < m_ui_elements.size(); i++) {
+        sf::Vector2f position = m_ui_elements[i]->getPosition();
+        if ((x >= position.x) && (x <= position.x + UIPartWidth) &&
+            (y >= position.y) && (y <= position.y + m_ui_elements[i]->getHeight())) {
+            return i;
         }
     }
-}
-
-bool Stage::updateChannel(ChannelAddress address) {
-    std::cout << "C" << address << " -> " << (int)m_channels[address].getValue(m_currentTime) << std::endl;
-    return true; //TODO implement
+    return -1;
 }
 
 
-sf::Font Stage::getFont() {
-    return m_font;
-}
-
-sf::Time Stage::getNow() {
-    return m_currentTime;
+void Stage::toggleEditMode() {
+    m_editMode = !m_editMode;
+    m_uiElementInEditMode = -1;
 }
 
 void Stage::draw(sf::RenderTarget& target, sf::RenderStates states) const
@@ -191,5 +322,15 @@ void Stage::draw(sf::RenderTarget& target, sf::RenderStates states) const
             
             target.draw(*m_ui_elements[i]);
         }
+    }
+    
+    if (m_editMode) {
+        if (m_uiElementInEditMode != -1) {
+            sf::Transformable a;
+            a.setPosition(target.getSize().x - UIPartWidth - 2 * UIPartDistance, 0);
+            
+            states.transform *= a.getTransform();
+            m_ui_elements[m_uiElementInEditMode]->drawEditor(target, states);
+        };
     }
 }

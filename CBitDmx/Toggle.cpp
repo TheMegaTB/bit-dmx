@@ -8,7 +8,7 @@
 
 #include "Toggle.hpp"
 
-Toggle::Toggle(std::function<void(bool)> clickCallback, std::string caption, sf::Font font) {
+Toggle::Toggle(std::function<void(bool)> clickCallback, std::string caption, int width, int height, sf::Font font): UIPart(width, height) {
     m_clickCallback = clickCallback;
     m_caption = caption;
     m_font = font;
@@ -31,7 +31,7 @@ void Toggle::onMousePress(int x, int y, sf::Mouse::Button mouseButton) {
 void Toggle::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     states.transform *= getTransform();
     
-    sf::RectangleShape buttonShape (sf::Vector2f(UIPartWidth, getHeight()));
+    sf::RectangleShape buttonShape (sf::Vector2f(getWidth(), getHeight()));
     if (m_activated) {
         buttonShape.setFillColor(sf::Color::Green);
     } else {
@@ -44,7 +44,7 @@ void Toggle::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     target.draw(buttonShape, states);
     
     sf::Text caption = sf::Text(m_caption, m_font, 12);
-    caption.setPosition((UIPartWidth - caption.getLocalBounds().width) / 2, (getHeight() - caption.getLocalBounds().height) / 2);
+    caption.setPosition((getWidth() - caption.getLocalBounds().width) / 2, (getHeight() - caption.getLocalBounds().height) / 2);
     caption.setFillColor(sf::Color::Black);
     
     target.draw(caption, states);

@@ -11,16 +11,22 @@
 
 #include <stdio.h>
 
-#include "UIControlElement.hpp"
+#include "UISingleHotkey.hpp"
 
-class UISwitch : public UIControlElement {
+class UISwitch : public UISingleHotkey {
 public:
-    UISwitch(Stage* stage, std::string caption, std::vector<int> channelGroups);
+    UISwitch(Stage* stage, std::string caption, std::vector<int> channelGroups, std::vector<std::vector<ChannelValue>> channelValues, sf::Keyboard::Key hotkey);
+    UISwitch(Stage* stage, std::string caption, std::vector<int> channelGroups, sf::Keyboard::Key hotkey);
+    UISwitch(Stage* stage, json jsonObject) : UISwitch(stage, jsonObject["caption"], jsonObject["channel_groups"], jsonObject["channel_values"], (sf::Keyboard::Key)jsonObject["hotkey"].get<int>()) {};
     
     void setCaption(std::string caption);
+    
+    
+    virtual void onHotkey();
     virtual void action();
     
-    std::vector<std::vector<ChannelValue>> channelValues;
+    
+    std::vector<std::vector<ChannelValue>> m_channelValues;
 private:
     std::shared_ptr<Toggle> m_toggle;
     

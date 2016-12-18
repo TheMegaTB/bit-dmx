@@ -17,9 +17,10 @@ ChannelValue getFromVector(std::vector<ChannelValue> vector, int index) {
     }
 }
 
-ChannelGroup::ChannelGroup(Stage *stage, std::string name, std::vector<int> channels) {
+ChannelGroup::ChannelGroup(Stage *stage, std::string name, ChannelGroupType channelGroupType, std::vector<int> channels) {
     m_stage = stage;
     m_name = name;
+    m_channelGroupType = channelGroupType;
     m_channels = channels;
 }
 
@@ -37,4 +38,8 @@ void ChannelGroup::setValue(std::vector<ChannelValue> values, int uiElementID) {
 
 int ChannelGroup::getChannelNumber() {
     return m_channels.size();
+}
+
+std::string ChannelGroup::getName() {
+    return m_name;
 }

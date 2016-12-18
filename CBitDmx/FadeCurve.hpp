@@ -11,15 +11,19 @@
 
 #include <stdio.h>
 #include <string>
+#include <vector>
 
 enum FadeCurve {
-    linear,
+    linear = 0,
     squared,
     cubed
 };
 
+#define fadeCurveEnumSize 3
+
 double calculateFadeCurve(FadeCurve fadeCurve, double time);
 std::string getFadeCurveName(FadeCurve fadeCurve);
+
 
 
 #endif /* FadeCurve_hpp */

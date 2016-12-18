@@ -13,7 +13,7 @@
 
 class Slider : public UIPart {
 public:
-    Slider(int minValue, int maxValue, std::function<void(double)> valueChangeCallback, std::function<void()> disableCallback, sf::Font font);
+    Slider(int minValue, int maxValue, std::function<void(double)> valueChangeCallback, std::function<void()> disableCallback, int width, int height, sf::Font font);
     
     void setRawValue(double value, bool callback = true);
     int getValue() const;

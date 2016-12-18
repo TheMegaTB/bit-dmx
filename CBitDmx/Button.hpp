@@ -14,8 +14,9 @@
 
 class Button : public UIPart {
 public:
-    Button(std::function<void(bool)> changeCallback, std::string caption, sf::Font font);
+    Button(std::function<void(bool)> changeCallback, std::string caption, int width, int height, sf::Font font);
     
+    void setPressed(bool pressed);
     void setCaption(std::string caption);
     
     virtual void onMousePress(int x, int y, sf::Mouse::Button mouseButton);

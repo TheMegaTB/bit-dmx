@@ -13,7 +13,7 @@
 
 class Toggle : public UIPart {
 public:
-    Toggle(std::function<void(bool)> clickCallback, std::string caption, sf::Font font);
+    Toggle(std::function<void(bool)> clickCallback, std::string caption, int width, int height, sf::Font font);
     
     void setActivation(bool activated);
     void setCaption(std::string caption);

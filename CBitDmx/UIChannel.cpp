@@ -10,10 +10,10 @@
 
 #include <iostream>
 
-UIChannel::UIChannel(Stage* stage, ChannelAddress channelAddress): UIControlElement(stage, {}) {
+UIChannel::UIChannel(Stage* stage, ChannelAddress channelAddress): UIControlElement(stage, stage->UIPartWidth, stage->UIPartWidth / 4) {
     setChannelAddress(channelAddress);
-    m_slider = std::make_shared<Slider>(Slider(0, 255, [this](double x) -> void { this->activate(); }, [this]() -> void { this->deactivate(); }, m_stage->getFont()));
-    m_uiParts.push_back(m_slider);
+    m_slider = std::make_shared<Slider>(0, 255, [this](double x) -> void { this->activate(); }, [this]() -> void { this->deactivate(); }, stage->UIPartWidth, stage->UIPartWidth / 4, m_stage->getFont());
+    m_parts.push_back(m_slider);
 }
 
 void UIChannel::setChannelAddress(ChannelAddress channelAddress) {
