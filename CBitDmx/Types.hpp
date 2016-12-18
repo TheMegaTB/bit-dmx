@@ -14,7 +14,7 @@
 typedef int ChannelAddress;
 typedef int ChannelValue;
 
-#define UIElementWidth 90
-#define UIElementDistance 5
+#define UIPartWidth 160
+#define UIPartDistance 5
 
 #endif /* Types_hpp */

@@ -9,38 +9,48 @@
 #ifndef UIElement_hpp
 #define UIElement_hpp
 
-class UIElement;
-
 #include <stdio.h>
 
-#include <SFML/Graphics/Drawable.hpp>
-#include <SFML/Graphics/Transformable.hpp>
-#include <SFML/Graphics.hpp>
+class UIControlElement;
+
+#include "UIController.hpp"
+#include "Button.hpp"
+#include "Toggle.hpp"
+#include "Slider.hpp"
 
 #include "Stage.hpp"
 #include "FadeCurve.hpp"
 
-class UIElement : public sf::Drawable, public sf::Transformable {
+class UIControlElement : public UIController {
 public:
-    UIElement(Stage* stage);
+    UIControlElement(Stage* stage, std::vector<std::shared_ptr<UIPart>> uiParts);
+    
     virtual int getHeight() const;
+    
+    sf::Keyboard::Key getHotkey();
+    void setHotkey(sf::Keyboard::Key hotkey);
     
     void setID(int id);
     void setFadeTime(sf::Time fadeTime);
     void setFadeCurve(FadeCurve fadeCurve);
     
+    virtual void hotkeyWrapper(sf::Keyboard::Key hotkey);
+    
+    virtual void activate();
+    virtual void deactivate();
     virtual void action();
-    virtual void onClick(int x, int y);
     virtual void onHotkey();
+    
+    int m_id;
 protected:
+    bool m_isActivated;
+    
+    sf::Keyboard::Key m_hotkey;
     sf::Time m_fadeTime;
     FadeCurve m_fadeCurve;
     
-    int m_width;
-    int m_id;
-    Stage *m_stage;
     
-    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+    Stage *m_stage;
 };
 
 #endif /* UIElement_hpp */

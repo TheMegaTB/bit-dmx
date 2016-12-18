@@ -13,12 +13,13 @@ class Stage;
 
 #include <stdio.h>
 #include <vector>
+#include <memory>
 
-#include "UIElement.hpp"
 #include "Channel.hpp"
-#include "UIElementWrapper.hpp"
 #include "ChannelGroup.hpp"
 #include "Fixture.hpp"
+
+#include "UIControlElement.hpp"
 
 class Stage: public sf::Drawable, public sf::Transformable {
 public:
@@ -33,13 +34,15 @@ public:
     
     bool updateAllChannels();
     
-    sf::Text getText(std::string text);
+    sf::Font getFont();
     sf::Time getNow();
     
-    void onClick(int x, int y);
+    void onMousePress(int x, int y, sf::Mouse::Button mouseButton);
+    void onMouseMove(int x, int y);
+    void onMouseRelease(int x, int y, sf::Mouse::Button mouseButton);
     void onHotkey(sf::Keyboard::Key key);
     
-    void addUiElement(std::shared_ptr<UIElement> uiElement);
+    void addUiElement(std::shared_ptr<UIControlElement> uiElement);
     void addChannelGroup(ChannelGroup channelGroup);
     void addFixture(Fixture fixture);
     
@@ -50,16 +53,25 @@ public:
     void activateUIElement(int elementID);
     void deactivateUIElement(int elementID);
 private:
+    // Edit mode
     bool m_editMode;
+    int m_mouseX;
+    int m_mouseY;
+    
+    //mouse
+    int m_lastClickOn;
+    sf::Mouse::Button m_lastClickButton;
+    
+    // other
     sf::Time m_currentTime;
     sf::Font m_font;
     
+    //stage data
     std::vector<Channel> m_channels;
-    std::vector<UIElementWrapper> m_ui_elements;
+    std::vector<std::shared_ptr<UIControlElement>> m_ui_elements;
     std::vector<ChannelGroup> m_channelGroups;
     std::vector<Fixture> m_fixtures;
-    
-    void updateUIElements();
+
     
     bool updateChannel(ChannelAddress address);
     

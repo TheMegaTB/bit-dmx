@@ -11,7 +11,6 @@
 
 #include <stdio.h>
 #include <string>
-#include <iostream>
 
 enum FadeCurve {
     linear,

@@ -13,6 +13,9 @@
 Stage::Stage(int universeSize, std::string fontPath) {
     m_channels.resize(universeSize);
     m_font.loadFromFile(fontPath);
+    m_lastClickOn = -1;
+    m_mouseX = 0;
+    m_mouseY = 0;
 }
 
 bool Stage::setValue(ChannelAddress address, ChannelValue value, int uiElementID) {
@@ -59,13 +62,35 @@ ChannelValue Stage::getValue(ChannelAddress address) const {
     }
 }
 
-void Stage::onClick(int x, int y) {
-    for (UIElementWrapper uiElementWrapper : m_ui_elements) {
-        sf::Vector2f position = uiElementWrapper.uiElement->getPosition();
-        if ((x >= position.x) && (x <= position.x + UIElementWidth) &&
-            (y >= position.y) && (y <= position.y + uiElementWrapper.uiElement->getHeight())) {
-            uiElementWrapper.onClick(x - position.x, y - position.y);
+void Stage::onMousePress(int x, int y, sf::Mouse::Button mouseButton) {
+    m_lastClickButton = mouseButton;
+    for (int i = 0; i < m_ui_elements.size(); i++) {
+        sf::Vector2f position = m_ui_elements[i]->getPosition();
+        if ((x >= position.x) && (x <= position.x + UIPartWidth) &&
+            (y >= position.y) && (y <= position.y + m_ui_elements[i]->getHeight())) {
+            m_ui_elements[i]->onMousePress(x - position.x, y - position.y, mouseButton);
+            m_lastClickOn = i;
+            return;
         }
+    }
+    m_lastClickOn = -1;
+}
+
+
+void Stage::onMouseMove(int x, int y) {
+    if (m_lastClickOn != -1) {
+        sf::Vector2f position = m_ui_elements[m_lastClickOn]->getPosition();
+        m_ui_elements[m_lastClickOn]->onMouseMove(x - position.x, y - position.y, m_lastClickButton);
+    }
+    m_mouseX = x;
+    m_mouseY = y;
+}
+
+void Stage::onMouseRelease(int x, int y, sf::Mouse::Button mouseButton) {
+    if (m_lastClickOn != -1) {
+        sf::Vector2f position = m_ui_elements[m_lastClickOn]->getPosition();
+        m_ui_elements[m_lastClickOn]->onMouseRelease(x - position.x, y - position.y, mouseButton);
+        m_lastClickOn = -1;
     }
 }
 
@@ -74,14 +99,14 @@ void Stage::onHotkey(sf::Keyboard::Key key) {
         m_editMode = !m_editMode;
     } else {
         for (unsigned int i = 0; i < m_ui_elements.size(); i++) {
-            m_ui_elements[i].onHotkey(key);
+            m_ui_elements[i]->hotkeyWrapper(key);
         }
     }
 }
 
-void Stage::addUiElement(std::shared_ptr<UIElement> uiElement) {
+void Stage::addUiElement(std::shared_ptr<UIControlElement> uiElement) {
     uiElement->setID(m_ui_elements.size());
-    m_ui_elements.push_back(UIElementWrapper(uiElement));
+    m_ui_elements.push_back(uiElement);
 }
 
 void Stage::addChannelGroup(ChannelGroup channelGroup) {
@@ -105,26 +130,13 @@ bool Stage::inEditMode() {
 }
 
 void Stage::activateUIElement(int elementID) {
-//    m_ui_activation_order.push_back(elementID);
-//    updateUIElements();
-    m_ui_elements[elementID].uiElement->action();
+    m_ui_elements[elementID]->action();
 }
 
 void Stage::deactivateUIElement(int elementID) {
-//    removeUIElement(elementID);
-//    updateUIElements();
     for (ChannelAddress channelAddress = 0; channelAddress < m_channels.size(); channelAddress++) {
         m_channels[channelAddress].disableUIElement(elementID, m_currentTime);
     }
-}
-
-void Stage::updateUIElements() { //TODO update once before update all channels
-//    for (ChannelAddress channelAddress = 0; channelAddress < m_channels.size(); channelAddress++) {
-//        m_channels[channelAddress].setValue(0);
-//    }
-//    for (unsigned int i = 0; i < m_ui_activation_order.size(); i++) {
-//        m_ui_elements[m_ui_activation_order[i]].uiElement->action();
-//    }
 }
 
 bool Stage::updateAllChannels() {
@@ -144,8 +156,8 @@ bool Stage::updateChannel(ChannelAddress address) {
 }
 
 
-sf::Text Stage::getText(std::string text) {
-    return sf::Text (text, m_font, 12);
+sf::Font Stage::getFont() {
+    return m_font;
 }
 
 sf::Time Stage::getNow() {
@@ -156,8 +168,8 @@ void Stage::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     states.transform *= getTransform();
     
-    int viewportSize = m_editMode ? target.getSize().x - UIElementWidth - 2 * UIElementDistance : target.getSize().x;
-    int numberPerRow = (viewportSize - UIElementDistance) / (UIElementWidth + UIElementDistance);
+    int viewportSize = m_editMode ? target.getSize().x - UIPartWidth - 2 * UIPartDistance : target.getSize().x;
+    int numberPerRow = (viewportSize - UIPartDistance) / (UIPartWidth + UIPartDistance);
     
     if (numberPerRow > 0) {
         std::vector<int> height(numberPerRow);
@@ -173,11 +185,11 @@ void Stage::draw(sf::RenderTarget& target, sf::RenderStates states) const
                 }
             }
             
-            m_ui_elements[i].uiElement->setPosition(UIElementDistance + column * (UIElementWidth + UIElementDistance), height[column] + UIElementDistance);
+            m_ui_elements[i]->setPosition(UIPartDistance + column * (UIPartWidth + UIPartDistance), height[column] + UIPartDistance);
             
-            height[column] += m_ui_elements[i].uiElement->getHeight() + UIElementDistance;
+            height[column] += m_ui_elements[i]->getHeight() + UIPartDistance;
             
-            target.draw(*m_ui_elements[i].uiElement);
+            target.draw(*m_ui_elements[i]);
         }
     }
 }

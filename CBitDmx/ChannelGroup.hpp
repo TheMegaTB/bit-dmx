@@ -12,7 +12,6 @@
 class ChannelGroup;
 
 #include <stdio.h>
-
 #include "Stage.hpp"
 
 

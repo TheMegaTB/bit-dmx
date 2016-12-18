@@ -14,18 +14,22 @@
 // function `resourcePath()` from ResourcePath.hpp
 //
 
+#include <iostream>
+
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 
 // Here is a small helper for you! Have a look.
 #include "ResourcePath.hpp"
 #include "Stage.hpp"
-#include "Switch.hpp"
+#include "UISwitch.hpp"
+#include "UIPushButton.hpp"
+#include "UIChannel.hpp"
 
 int main(int, char const**)
 {
     // Create the main window
-    sf::RenderWindow window(sf::VideoMode(800, 600), "SFML window");
+    sf::RenderWindow window(sf::VideoMode(800, 600), "BitDMX");
     window.setFramerateLimit(60);
 
     // Set the Icon
@@ -34,30 +38,6 @@ int main(int, char const**)
         return EXIT_FAILURE;
     }
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
-
-//    // Load a sprite to display
-//    sf::Texture texture;
-//    if (!texture.loadFromFile(resourcePath() + "cute_image.jpg")) {
-//        return EXIT_FAILURE;
-//    }
-//    sf::Sprite sprite(texture);
-//
-//    // Create a graphical text to display
-//    sf::Font font;
-//    if (!font.loadFromFile(resourcePath() + "sansation.ttf")) {
-//        return EXIT_FAILURE;
-//    }
-//    sf::Text text("Hello SFML", font, 50);
-//    text.setFillColor(sf::Color::Black);
-//
-//    // Load a music to play
-//    sf::Music music;
-//    if (!music.openFromFile(resourcePath() + "nice_music.ogg")) {
-//        return EXIT_FAILURE;
-//    }
-//
-//    // Play the music
-//    music.play();
     
     Stage stage(6, resourcePath() + "sansation.ttf");
     
@@ -69,17 +49,28 @@ int main(int, char const**)
     
     stage.addFixture(Fixture(&stage, "Scanner", {0, 1, 2}));
     
-    Switch s1 = Switch(&stage, "On 1", {0, 2});
-    s1.setFadeTime(sf::seconds(1));
-    s1.setFadeCurve(FadeCurve::linear);
-    s1.channelValues[0][0] = 50;
-    stage.addUiElement(std::make_shared<Switch>(s1));
+    std::vector<int> test = {0, 2};
+    std::shared_ptr<UISwitch> s2  = std::make_shared<UISwitch>(&stage, "On 2", test);
+    s2->setFadeTime(sf::seconds(3));
+    s2->setFadeCurve(FadeCurve::linear);
+    s2->channelValues[0][0] = 100;
+    stage.addUiElement(s2);
     
-    Switch s2 = Switch(&stage, "On 2", {0, 2});
-    s2.setFadeTime(sf::seconds(3));
-    s2.setFadeCurve(FadeCurve::linear);
-    s2.channelValues[0][0] = 100;
-    stage.addUiElement(std::make_shared<Switch>(s2));
+    std::shared_ptr<UIPushButton> p1 = std::make_shared<UIPushButton>(&stage, "On 2", test);
+    p1->setFadeTime(sf::seconds(3));
+    p1->setFadeCurve(FadeCurve::linear);
+    p1->channelValues[0][0] = 100;
+    stage.addUiElement(p1);
+    
+    std::shared_ptr<UIChannel> c1  = std::make_shared<UIChannel>(&stage, 1);
+    c1->setFadeTime(sf::seconds(1));
+    c1->setFadeCurve(FadeCurve::linear);
+    stage.addUiElement(c1);
+    
+    std::shared_ptr<UIChannel> c2  = std::make_shared<UIChannel>(&stage, 1);
+    c2->setFadeTime(sf::seconds(1));
+    c2->setFadeCurve(FadeCurve::linear);
+    stage.addUiElement(c2);
 
     // Start the game loop
     while (window.isOpen())
@@ -101,10 +92,17 @@ int main(int, char const**)
             }
             
             if (event.type == sf::Event::MouseButtonPressed) {
-                stage.onClick(event.mouseButton.x, event.mouseButton.y);
+                stage.onMousePress(event.mouseButton.x, event.mouseButton.y, event.mouseButton.button);
+            }
+            
+            if (event.type == sf::Event::MouseButtonReleased) {
+                stage.onMouseRelease(event.mouseButton.x, event.mouseButton.y, event.mouseButton.button);
+            }
+            
+            if (event.type == sf::Event::MouseMoved) {
+                stage.onMouseMove(event.mouseMove.x, event.mouseMove.y);
             }
 
-            // Escape pressed: exit
             if (event.type == sf::Event::KeyPressed) {
                 stage.onHotkey(event.key.code);
             }
@@ -113,9 +111,9 @@ int main(int, char const**)
         stage.updateAllChannels();
 
         // Clear screen
-        window.clear();
+        window.clear(sf::Color (50, 21, 100));
 
-        // Draw the sprite
+        // Draw the stage
         window.draw(stage);
         
         
