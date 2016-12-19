@@ -32,6 +32,8 @@
 		4F82165C1E06C04200744816 /* UISingleHotkey.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F82165A1E06C04200744816 /* UISingleHotkey.cpp */; };
 		4F82165F1E06D27200744816 /* XYPad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F82165D1E06D27200744816 /* XYPad.cpp */; };
 		4F8216621E06DAAD00744816 /* UIXYPad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F8216601E06DAAD00744816 /* UIXYPad.cpp */; };
+		4FB7B5161E07D27900D54CC7 /* arduino-serial-dmx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FB7B5141E07D27900D54CC7 /* arduino-serial-dmx.cpp */; };
+		4FB7B5171E07D27900D54CC7 /* arduino-serial-lib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FB7B5151E07D27900D54CC7 /* arduino-serial-lib.cpp */; };
 		4FDD24F31E06F2A6000C715D /* UILabeledElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FDD24F11E06F2A6000C715D /* UILabeledElement.cpp */; };
 		4FDD24F61E06FD5B000C715D /* UIChaser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FDD24F41E06FD5B000C715D /* UIChaser.cpp */; };
 /* End PBXBuildFile section */
@@ -83,6 +85,10 @@
 		4F82165E1E06D27200744816 /* XYPad.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = XYPad.hpp; sourceTree = "<group>"; };
 		4F8216601E06DAAD00744816 /* UIXYPad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UIXYPad.cpp; sourceTree = "<group>"; };
 		4F8216611E06DAAD00744816 /* UIXYPad.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UIXYPad.hpp; sourceTree = "<group>"; };
+		4FB7B5141E07D27900D54CC7 /* arduino-serial-dmx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "arduino-serial-dmx.cpp"; sourceTree = "<group>"; };
+		4FB7B5151E07D27900D54CC7 /* arduino-serial-lib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "arduino-serial-lib.cpp"; sourceTree = "<group>"; };
+		4FB7B5181E07D2CA00D54CC7 /* arduino-serial-lib.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "arduino-serial-lib.hpp"; sourceTree = "<group>"; };
+		4FB7B5191E07D8E600D54CC7 /* arduino-serial-dmx.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "arduino-serial-dmx.hpp"; sourceTree = "<group>"; };
 		4FDD24F11E06F2A6000C715D /* UILabeledElement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UILabeledElement.cpp; sourceTree = "<group>"; };
 		4FDD24F21E06F2A6000C715D /* UILabeledElement.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UILabeledElement.hpp; sourceTree = "<group>"; };
 		4FDD24F41E06FD5B000C715D /* UIChaser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UIChaser.cpp; sourceTree = "<group>"; };
@@ -157,6 +163,10 @@
 				4F8216291E049A6200744816 /* UIControlElement */,
 				4F8216151E04531900744816 /* Stage.cpp */,
 				4F8216161E04531900744816 /* Stage.hpp */,
+				4FB7B5191E07D8E600D54CC7 /* arduino-serial-dmx.hpp */,
+				4FB7B5141E07D27900D54CC7 /* arduino-serial-dmx.cpp */,
+				4FB7B5151E07D27900D54CC7 /* arduino-serial-lib.cpp */,
+				4FB7B5181E07D2CA00D54CC7 /* arduino-serial-lib.hpp */,
 				4F8216191E04538A00744816 /* Types.hpp */,
 				4F82161B1E04547900744816 /* Channel.cpp */,
 				4F82161C1E04547900744816 /* Channel.hpp */,
@@ -310,6 +320,7 @@
 				4FDD24F61E06FD5B000C715D /* UIChaser.cpp in Sources */,
 				4F8216201E0454AD00744816 /* FadeCurve.cpp in Sources */,
 				4F8216051E0452C500744816 /* main.cpp in Sources */,
+				4FB7B5161E07D27900D54CC7 /* arduino-serial-dmx.cpp in Sources */,
 				4F8216431E05C63F00744816 /* Button.cpp in Sources */,
 				4F8216391E05787500744816 /* UIChannel.cpp in Sources */,
 				4F82161D1E04547900744816 /* Channel.cpp in Sources */,
@@ -318,6 +329,7 @@
 				4F8216401E05C33900744816 /* UIController.cpp in Sources */,
 				4F8216621E06DAAD00744816 /* UIXYPad.cpp in Sources */,
 				4FDD24F31E06F2A6000C715D /* UILabeledElement.cpp in Sources */,
+				4FB7B5171E07D27900D54CC7 /* arduino-serial-lib.cpp in Sources */,
 				4F82164C1E06076A00744816 /* UIPushButton.cpp in Sources */,
 				4F82164F1E0616D800744816 /* Selector.cpp in Sources */,
 				4F8216171E04531900744816 /* Stage.cpp in Sources */,

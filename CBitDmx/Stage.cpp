@@ -6,9 +6,6 @@
 //  Copyright © 2016 BitDmx. All rights reserved.
 //
 
-#include <iostream>
-#include <fstream>
-
 #include "Stage.hpp"
 
 #include "UISwitch.hpp"
@@ -17,7 +14,21 @@
 #include "UIXYPad.hpp"
 #include "UIChaser.hpp"
 
-Stage::Stage(std::string fontPath, std::string stagePath, std::string uiPath) {
+
+
+Stage::Stage(std::string port, std::string fontPath, std::string stagePath, std::string uiPath) {
+//    if (port == "") {
+//        m_fakeInterface = true;
+//        std::cout << "Using fake interface" << std::endl;
+//    } else {
+        m_fakeInterface = false;
+        std::cout << "Using interface '" << port << "'" << std::endl;
+//        reconnect();
+        open_port(115200, port.c_str());
+//        m_previousChannel = -1;
+//        openChannel(1);
+//    }
+    
     m_font.loadFromFile(fontPath);
     m_lastClickOn = -1;
     m_mouseX = 0;
@@ -30,16 +41,20 @@ Stage::Stage(std::string fontPath, std::string stagePath, std::string uiPath) {
     
     setName(stageJson["name"]);
     m_channels.resize(stageJson["size"]);
+    
+    for (ChannelAddress channel = 1; channel < m_channels.size(); channel++) {
+        updateChannel(channel);
+    }
 
     
     for (auto& fixture : stageJson["fixtures"]) {
         ChannelAddress baseAddress = fixture["channel"];
         std::string templateName = fixture["template"];
-        
         std::string namePrefix = fixture["name"].get<std::string>() + ":";
         
-        for (json::iterator it = stageJson["fixture_templates"][templateName].begin(); it != stageJson["fixture_templates"][templateName].end(); ++it) {
-            m_namedChannels[namePrefix + it.key()] = baseAddress + it.value().get<int>();
+        std::vector<std::string> channelNames = stageJson["fixture_templates"][templateName];
+        for (int i = 0; i < channelNames.size(); i++) {
+            m_namedChannels[namePrefix + channelNames[i]] = baseAddress + i;
         }
     }
 
@@ -225,9 +240,28 @@ bool Stage::updateAllChannels() {
     }
 }
 
+void Stage::openChannel(ChannelAddress address) {
+//    if (address != m_previousChannel) {
+//        m_previousChannel = address;
+//        m_interface << (char)0x01; //Enter channel mode
+//        char clow = address & 0xff;
+//        char chigh = (address >> 8);
+//        m_interface << chigh;
+//        m_interface << clow;
+//    }
+}
+
 bool Stage::updateChannel(ChannelAddress address) {
-//    std::cout << "C" << address << " -> " << (int)m_channels[address].getValue(m_currentTime) << std::endl;
-    return true; //TODO implement
+//    if (m_fakeInterface) {
+//        std::cout << "C" << address << " -> " << (int)m_channels[address].getValue(m_currentTime) << std::endl;
+//    } else {
+//        openChannel(address);
+//        m_interface << (char)0x00; //Enter value mode
+//        m_interface << (char)m_channels[address].getValue(m_currentTime);
+//    }
+//    return true; //TODO implement
+    write_dmx(address, m_channels[address].getValue(m_currentTime));
+    return true;
 }
 
 

@@ -23,11 +23,11 @@
 #include "ResourcePath.hpp"
 #include "Stage.hpp"
 
-int main(int, char const**)
+int main(int argc, char const** argv)
 {
     // Create the main window
     sf::RenderWindow window(sf::VideoMode(800, 600), "BitDMX");
-    window.setFramerateLimit(60);
+//    window.setFramerateLimit(60);
 
     // Set the Icon
     sf::Image icon;
@@ -35,40 +35,17 @@ int main(int, char const**)
         return EXIT_FAILURE;
     }
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+
+    std::cout << argc << std::endl;
+    std::string port = "";
+    if (argc > 1) {
+        port = argv[1];
+    }
     
-    Stage stage(resourcePath() + "sansation.ttf", resourcePath() + "exampleStage.json", resourcePath() + "exampleUI.json");
+    Stage stage(port, resourcePath() + "sansation.ttf", resourcePath() + "exampleStage.json", resourcePath() + "exampleUI.json");
     
     sf::Clock frameClock;
-    
-    
-//    stage.addChannelGroup(ChannelGroup(&stage, "Shutter", ChannelGroupType::Single, {1}));
-//    stage.addChannelGroup(ChannelGroup(&stage, "Gobo", ChannelGroupType::Single, {2}));
-//    stage.addChannelGroup(ChannelGroup(&stage, "Pan + Tilt", ChannelGroupType::XY, {3, 4}));
-//    
-//    stage.addFixture(Fixture(&stage, "Scanner", {0, 1, 2}));
-    
-//    std::vector<int> test = {0, 2};
-//    std::shared_ptr<UISwitch> s2  = std::make_shared<UISwitch>(&stage, "On 2", test);
-//    s2->setFadeTime(sf::seconds(3));
-//    s2->setFadeCurve(FadeCurve::linear);
-//    s2->channelValues[0][0] = 100;
-//    stage.addUiElement(s2);
-//    
-//    std::shared_ptr<UIPushButton> p1 = std::make_shared<UIPushButton>(&stage, "On 2", test);
-//    p1->setFadeTime(sf::seconds(3));
-//    p1->setFadeCurve(FadeCurve::linear);
-//    p1->channelValues[0][0] = 100;
-//    stage.addUiElement(p1);
-//    
-//    std::shared_ptr<UIChannel> c1  = std::make_shared<UIChannel>(&stage, 1);
-//    c1->setFadeTime(sf::seconds(1));
-//    c1->setFadeCurve(FadeCurve::linear);
-//    stage.addUiElement(c1);
-//    
-//    std::shared_ptr<UIChannel> c2  = std::make_shared<UIChannel>(&stage, 1);
-//    c2->setFadeTime(sf::seconds(1));
-//    c2->setFadeCurve(FadeCurve::linear);
-//    stage.addUiElement(c2);
+
 
     // Start the game loop
     while (window.isOpen())

@@ -1,16 +1,18 @@
 {
   "name": "Example Stage",
-  "size": 6,
+  "size": 95,
   "fixture_templates": {
-    "scanner": {
-      "Shutter": 0,
-      "Gobo": 1,
-      "Pan": 2,
-      "Tilt": 3
-    }
+    "generic": ["Channel"],
+    "rgb-par": ["R", "G", "B"],
+    "scanner": ["Shutter", "Gobo", "Pan", "Tilt"]
   },
   "fixtures": [
-    {"name": "Scanner", "template": "scanner", "channel": 0},
-    {"name": "Scanner2", "template": "scanner", "channel": 4}
+     {"name": "Tower R | RLED", "template": "rgb-par", "channel": 17},
+     {"name": "Tower R | LLED", "template": "rgb-par", "channel": 20},
+     {"name": "Tower L | RLED", "template": "rgb-par", "channel": 31},
+     {"name": "Tower L | LLED", "template": "rgb-par", "channel": 34},
+    {"name": "Tower FR | Drumset", "template": "generic", "channel": 8},
+    {"name": "Scanner", "template": "scanner", "channel": 1},
+    {"name": "Scanner2", "template": "scanner", "channel": 5}
   ]
 }

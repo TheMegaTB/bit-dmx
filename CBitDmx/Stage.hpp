@@ -14,18 +14,20 @@ class Stage;
 #include <stdio.h>
 #include <vector>
 #include <memory>
+#include <fstream>
+#include <iostream>
+#include <fcntl.h>
 
 #include "Channel.hpp"
 
 #include "UIControlElement.hpp"
-
-
+#include "arduino-serial-dmx.hpp"
 
 
 class Stage: public sf::Drawable, public sf::Transformable {
 public:
     int UIPartWidth = 160;
-    Stage(std::string fontPath, std::string stagePath, std::string uiPath);
+    Stage(std::string port, std::string fontPath, std::string stagePath, std::string uiPath);
     
     
     // interacting with the channels
@@ -82,6 +84,9 @@ private:
     sf::Time m_currentTime;
     sf::Font m_font;
     std::string m_name;
+    bool m_fakeInterface;
+    int m_interfaceHandler;
+    ChannelAddress m_previousChannel;
     
     //stage data
     std::vector<Channel> m_channels;
@@ -89,7 +94,7 @@ private:
     std::map<std::string, int> m_namedChannels;
     std::map<std::string, int> m_namedUIElements;
 
-    
+    void openChannel(ChannelAddress address);
     bool updateChannel(ChannelAddress address);
     int findUIElementByXY(int x, int y);
     void toggleEditMode();

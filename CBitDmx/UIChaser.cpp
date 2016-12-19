@@ -24,15 +24,27 @@ UIChaser::UIChaser(Stage* stage, json chaserData): UILabeledElement(stage, stage
 void UIChaser::update() {
     if (m_isActivated) {
         int time = (m_stage->getNow() - m_startTime).asMilliseconds();
-        int chaserTime = m_chaserData[m_position]["time"];
-        if (time > chaserTime) {
-            int old_position = m_position;
-            m_position = (m_position + 1) % m_chaserData.size();
-            m_startTime = m_startTime + sf::milliseconds(chaserTime);
-            m_stage->chaserActivateUIElement(m_stage->getUIElement(m_chaserData[m_position]["name"]));
-            m_stage->chaserDeactivateUIElement(m_stage->getUIElement(m_chaserData[old_position]["name"]));
+        if (time > m_chaserData[m_position]["time"].get<int>()) {
+            next();
         }
     }
+}
+
+void UIChaser::next() {
+    int old_position = m_position;
+//    while (m_chaserData[m_position].count("min_round") && (m_chaserData[m_position]["min_round"].get<int>() > m_round)) {
+    do {
+        m_position = (m_position + 1) % m_chaserData.size();
+        if (m_position == 0) {
+            m_round++;
+            std::cout << m_round << std::endl;
+        }
+    } while (m_chaserData[m_position].count("min_round") && (m_chaserData[m_position]["min_round"].get<int>() > m_round));
+    
+    m_startTime = m_startTime + sf::milliseconds(m_chaserData[m_position]["time"]);
+    
+    m_stage->chaserActivateUIElement(m_stage->getUIElement(m_chaserData[m_position]["name"]));
+    m_stage->chaserDeactivateUIElement(m_stage->getUIElement(m_chaserData[old_position]["name"]));
 }
 
 void UIChaser::chaserActivate() {
@@ -48,6 +60,7 @@ void UIChaser::chaserDeactivate() {
 void UIChaser::activate() {
     if (!m_isActivated) {
         m_position = 0;
+        m_round = 0;
         m_isActivated = true;
         m_startTime = m_stage->getNow();
         m_stage->chaserActivateUIElement(m_stage->getUIElement(m_chaserData[m_position]["name"]));

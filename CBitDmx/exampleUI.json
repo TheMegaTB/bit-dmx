@@ -23,20 +23,36 @@
     "channel_values": [200, 100],
     "hotkey": 7
   },
-  "scanner1:shutter": {
+  "ledPars": {
+    "type": 1,
+    "fade_time": 2000,
+    "caption": "LED Pars",
+    "channels": ["Tower L | RLED:R", "Tower L | RLED:G", "Tower L | RLED:B", "Tower L | LLED:R", "Tower L | LLED:G", "Tower L | LLED:B", "Tower R | RLED:R", "Tower R | RLED:G", "Tower R | RLED:B", "Tower R | LLED:R", "Tower R | LLED:G", "Tower R | LLED:B"],
+    "channel_values": [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+    "hotkey": 8
+  },
+    "test": {
+        "type": 1,
+        "fade_time": 0,
+        "caption": "All On2",
+        "channels": ["Scanner:Shutter", "Scanner:Gobo"],
+        "channel_values": [200, 100],
+        "hotkey": 7
+    },
+  "Tower FR | Drumset": {
     "type": 3,
-    "caption": "Scanner 1",
+    "caption": "Tower FR | Drumset",
     "fade_time": 1000,
-    "channel_address": "Scanner:Shutter"
+    "channel_address": "Tower FR | Drumset:Channel"
   },
     "chaser1": {
         "type": 0,
         "caption": "Chaser 1",
         "chaser": [
-            {"name": "scanner1:s100", "time": 5000},
-           {"name": "scanner1:s200", "time": 5000},
-                   {"name": "chaser1", "time": 0},
-                   {"name": "chaser1", "time": 0}
+            {"name": "scanner1:s100", "time": 2000},
+            {"name": "scanner1:s200", "time": 2000},
+            {"name": "chaser1", "time": 0, "min_round": 1},
+            {"name": "chaser1", "time": 0, "min_round": 1}
         ]
         
     }

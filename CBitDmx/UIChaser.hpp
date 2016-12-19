@@ -30,7 +30,10 @@ private:
     
     sf::Time m_startTime;
     
+    void next();
+    
     int m_position;
+    int m_round;
     std::vector<json> m_chaserData;
 };
 
