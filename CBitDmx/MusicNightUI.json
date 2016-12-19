@@ -24,6 +24,8 @@
         "channel_values": [255, 255, 255, 255]
     },
     
+    
+    
     "stobe": {
         "type": 2,
         "caption": "Strobe",
@@ -31,6 +33,8 @@
         "channels": ["ScannerL:Shutter", "ScannerR:Shutter"],
         "channel_values": [131, 131]
     },
+    
+    
     
     
     "random_fast_init": {
@@ -94,6 +98,8 @@
                    {"name": "random_fast_7", "time": 300}
                    ]
     },
+    
+    
     
     "random_init": {
         "type": 1, "visible": false, "fade_time": 0,
