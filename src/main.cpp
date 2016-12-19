@@ -1,19 +1,3 @@
-
-//
-// Disclaimer:
-// ----------
-//
-// This code will work only if you selected window, graphics and audio.
-//
-// Note that the "Run Script" build phase will copy the required frameworks
-// or dylibs to your application bundle so you can execute it on any OS X
-// computer.
-//
-// Your resource files (images, sounds, fonts, ...) are also copied to your
-// application bundle. To get the path to these resources, use the helper
-// function `resourcePath()` from ResourcePath.hpp
-//
-
 #include <iostream>
 
 #include <SFML/Audio.hpp>
@@ -21,13 +5,10 @@
 
 #ifdef __APPLE__
 #ifdef TARGET_OS_MAC
-
 #include "ResourcePath.hpp"
-
 #endif
 #endif
 
-// Here is a small helper for you! Have a look.
 #include "Stage.hpp"
 
 int main(int argc, char const** argv)
@@ -36,9 +17,7 @@ int main(int argc, char const** argv)
     
     #ifdef __APPLE__
     #ifdef TARGET_OS_MAC
-        
         resourcePath = getBundleResourcePath();
-    
     #endif
     #endif
 
@@ -53,7 +32,9 @@ int main(int argc, char const** argv)
     if (!icon.loadFromFile(resourcePath + "icon.png")) {
         return EXIT_FAILURE;
     }
-    window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+
+    //TODO: Commented this out until SFML #1171 is merged into upstream which fixes a bug in linux which causes a segfault
+    //window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
     std::string port = "";
     std::string name = "example";
