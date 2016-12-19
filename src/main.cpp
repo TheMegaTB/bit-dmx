@@ -20,18 +20,18 @@
 #include <SFML/Graphics.hpp>
 
 // Here is a small helper for you! Have a look.
-#include "ResourcePath.hpp"
 #include "Stage.hpp"
 
 int main(int argc, char const** argv)
 {
+    const std::string resourcePath = "res/";
     // Create the main window
     sf::RenderWindow window(sf::VideoMode(800, 600), "BitDMX");
     window.setFramerateLimit(60);
 
     // Set the Icon
     sf::Image icon;
-    if (!icon.loadFromFile(resourcePath() + "icon.png")) {
+    if (!icon.loadFromFile(resourcePath + "icon.png")) {
         return EXIT_FAILURE;
     }
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
@@ -45,7 +45,7 @@ int main(int argc, char const** argv)
         name = argv[2];
     }
     
-    Stage stage(port, resourcePath() + "sansation.ttf", resourcePath() + name + "Stage.json", resourcePath() + name + "UI.json");
+    Stage stage(port, resourcePath + "sansation.ttf", resourcePath + name + "Stage.json", resourcePath + name + "UI.json");
     
     sf::Clock frameClock;
 
