@@ -19,12 +19,31 @@
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 
+#ifdef __APPLE__
+#ifdef TARGET_OS_MAC
+
+#include "ResourcePath.hpp"
+
+#endif
+#endif
+
 // Here is a small helper for you! Have a look.
 #include "Stage.hpp"
 
 int main(int argc, char const** argv)
 {
-    const std::string resourcePath = "res/";
+    std::string resourcePath = "res/";
+    
+    #ifdef __APPLE__
+    #ifdef TARGET_OS_MAC
+        
+        resourcePath = getBundleResourcePath();
+    
+    #endif
+    #endif
+
+
+    
     // Create the main window
     sf::RenderWindow window(sf::VideoMode(800, 600), "BitDMX");
     window.setFramerateLimit(60);
