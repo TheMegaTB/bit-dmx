@@ -144,7 +144,7 @@
 				4FB7B51C1E0812ED00D54CC7 /* MusicNightUI.json */,
 			);
 			name = BitDmx;
-			path = BitDmx;
+			path = src;
 			sourceTree = "<group>";
 		};
 		4F8215FF1E0452C500744816 /* Supporting Files */ = {
@@ -445,7 +445,7 @@
 		4F8216121E0452C500744816 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				INFOPLIST_FILE = "BitDmx/BitDmx-Info.plist";
+				INFOPLIST_FILE = "src/BitDmx-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -454,7 +454,7 @@
 		4F8216131E0452C500744816 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				INFOPLIST_FILE = "BitDmx/BitDmx-Info.plist";
+				INFOPLIST_FILE = "src/BitDmx-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
