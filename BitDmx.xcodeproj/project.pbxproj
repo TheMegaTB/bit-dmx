@@ -144,7 +144,7 @@
 				4FB7B51C1E0812ED00D54CC7 /* MusicNightUI.json */,
 			);
 			name = BitDmx;
-			path = CBitDmx;
+			path = BitDmx;
 			sourceTree = "<group>";
 		};
 		4F8215FF1E0452C500744816 /* Supporting Files */ = {
@@ -249,7 +249,7 @@
 			dependencies = (
 			);
 			name = BitDmx;
-			productName = CBitDmx;
+			productName = BitDmx;
 			productReference = 4F8215FC1E0452C500744816 /* BitDmx.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -445,7 +445,7 @@
 		4F8216121E0452C500744816 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				INFOPLIST_FILE = "CBitDmx/BitDmx-Info.plist";
+				INFOPLIST_FILE = "BitDmx/BitDmx-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -454,7 +454,7 @@
 		4F8216131E0452C500744816 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				INFOPLIST_FILE = "CBitDmx/BitDmx-Info.plist";
+				INFOPLIST_FILE = "BitDmx/BitDmx-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
