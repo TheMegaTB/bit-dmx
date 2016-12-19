@@ -8,7 +8,7 @@
 
 #include "UIPushButton.hpp"
 
-UIPushButton::UIPushButton(Stage* stage, std::string caption, std::vector<int> channels, std::vector<ChannelValue> channelValues, sf::Keyboard::Key hotkey): UISingleHotkey(stage, stage->UIPartWidth, stage->UIPartWidth / 4, hotkey) {
+UIPushButton::UIPushButton(Stage* stage, std::string caption, std::vector<int> channels, std::vector<ChannelValue> channelValues): UIControlElement(stage, stage->UIPartWidth, stage->UIPartWidth / 4) {
     m_channels = channels;
     
     m_channelValues = channelValues;

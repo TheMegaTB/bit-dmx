@@ -12,9 +12,10 @@
 
 UIControlElement::UIControlElement(Stage* stage, int width, int height) : UIController(width, height) {
     m_stage = stage;
-    m_fadeTime = sf::seconds(1);
+    m_fadeTime = sf::seconds(0.5);
     m_fadeCurve = FadeCurve::linear;
     m_isActivated = false;
+    m_hotkey = sf::Keyboard::Unknown;
     setVisibility(true);
 }
 
@@ -51,4 +52,32 @@ void UIControlElement::activate() {
 void UIControlElement::deactivate() {
     m_isActivated = false;
     m_stage->deactivateUIElement(m_id);
+}
+
+sf::Keyboard::Key UIControlElement::getHotkey() {
+    return m_hotkey;
+}
+
+void UIControlElement::setHotkey(sf::Keyboard::Key hotkey) {
+    m_hotkey = hotkey;
+}
+
+void UIControlElement::hotkeyWrapper(sf::Keyboard::Key hotkey) {
+    if (m_hotkey == hotkey) {
+        onHotkey();
+    }
+}
+
+void UIControlElement::hotkeyReleaseWrapper(sf::Keyboard::Key hotkey) {
+    if (m_hotkey == hotkey) {
+        onHotkeyRelease();
+    }
+}
+
+void UIControlElement::onHotkey() {
+    if (m_isActivated) {
+        deactivate();
+    } else {
+        activate();
+    }
 }

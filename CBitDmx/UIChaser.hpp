@@ -12,6 +12,7 @@
 #include <stdio.h>
 
 #include "UILabeledElement.hpp"
+#include "UISingleHotkey.hpp"
 
 class UIChaser : public UILabeledElement {
 public:

@@ -65,9 +65,7 @@ public:
     void onMouseRelease(int x, int y, sf::Mouse::Button mouseButton);
     void onHotkey(sf::Keyboard::Key key);
     void onHotkeyRelease(sf::Keyboard::Key key);
-    
-    
-   
+    void onScroll(int delta);
 
 private:
     // Edit mode
@@ -79,14 +77,13 @@ private:
     //mouse
     int m_lastClickOn;
     sf::Mouse::Button m_lastClickButton;
+    int m_yScroolPosition;
     
     // other
     sf::Time m_currentTime;
     sf::Font m_font;
     std::string m_name;
     bool m_fakeInterface;
-    int m_interfaceHandler;
-    ChannelAddress m_previousChannel;
     
     //stage data
     std::vector<Channel> m_channels;
@@ -94,7 +91,6 @@ private:
     std::map<std::string, int> m_namedChannels;
     std::map<std::string, int> m_namedUIElements;
 
-    void openChannel(ChannelAddress address);
     bool updateChannel(ChannelAddress address);
     int findUIElementByXY(int x, int y);
     void toggleEditMode();

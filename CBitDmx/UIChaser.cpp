@@ -32,19 +32,26 @@ void UIChaser::update() {
 
 void UIChaser::next() {
     int old_position = m_position;
-//    while (m_chaserData[m_position].count("min_round") && (m_chaserData[m_position]["min_round"].get<int>() > m_round)) {
     do {
         m_position = (m_position + 1) % m_chaserData.size();
         if (m_position == 0) {
             m_round++;
-            std::cout << m_round << std::endl;
         }
-    } while (m_chaserData[m_position].count("min_round") && (m_chaserData[m_position]["min_round"].get<int>() > m_round));
+    } while (
+        (m_chaserData[m_position].count("min_round") && (m_chaserData[m_position]["min_round"].get<int>() >= m_round + 1)) ||
+             (m_chaserData[m_position].count("max_round") && (m_chaserData[m_position]["max_round"].get<int>() <= m_round + 1)) ||
+             (m_chaserData[m_position].count("round") && (m_chaserData[m_position]["round"].get<int>() != m_round + 1)));
     
-    m_startTime = m_startTime + sf::milliseconds(m_chaserData[m_position]["time"]);
     
-    m_stage->chaserActivateUIElement(m_stage->getUIElement(m_chaserData[m_position]["name"]));
-    m_stage->chaserDeactivateUIElement(m_stage->getUIElement(m_chaserData[old_position]["name"]));
+    
+    m_startTime = m_startTime + sf::milliseconds(m_chaserData[old_position]["time"]);
+    
+    if (!m_chaserData[m_position].count("activate") || m_chaserData[m_position]["activate"]) {
+        m_stage->chaserActivateUIElement(m_stage->getUIElement(m_chaserData[m_position]["name"]));
+    }
+    if (!m_chaserData[old_position].count("deactivate") || m_chaserData[old_position]["deactivate"]) {
+        m_stage->chaserDeactivateUIElement(m_stage->getUIElement(m_chaserData[old_position]["name"]));
+    }
 }
 
 void UIChaser::chaserActivate() {
@@ -53,7 +60,8 @@ void UIChaser::chaserActivate() {
 }
 
 void UIChaser::chaserDeactivate() {
-    deactivate();
+    m_isActivated = false;
+    m_toggle->setCaption("Play");
     m_toggle->setActivation(false);
 }
 
@@ -71,4 +79,7 @@ void UIChaser::activate() {
 void UIChaser::deactivate() {
     m_isActivated = false;
     m_toggle->setCaption("Play");
+    m_toggle->setActivation(false);
+    m_stage->chaserDeactivateUIElement(m_stage->getUIElement(m_chaserData[m_position]["name"]));
+
 }

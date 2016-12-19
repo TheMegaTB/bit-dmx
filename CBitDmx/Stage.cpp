@@ -23,16 +23,14 @@ Stage::Stage(std::string port, std::string fontPath, std::string stagePath, std:
 //    } else {
         m_fakeInterface = false;
         std::cout << "Using interface '" << port << "'" << std::endl;
-//        reconnect();
         open_port(115200, port.c_str());
-//        m_previousChannel = -1;
-//        openChannel(1);
 //    }
     
     m_font.loadFromFile(fontPath);
     m_lastClickOn = -1;
     m_mouseX = 0;
     m_mouseY = 0;
+    m_yScroolPosition = 0;
 
     std::ifstream stageInputFile(stagePath);
     json stageJson;
@@ -97,6 +95,8 @@ Stage::Stage(std::string port, std::string fontPath, std::string stagePath, std:
         }
         if (uiElement.count("caption")) {
             m_ui_elements.back()->setCaption(uiElement["caption"]);
+        } else {
+            m_ui_elements.back()->setCaption(it.key());
         }
         if (uiElement.count("visible")) {
             m_ui_elements.back()->setVisibility(uiElement["visible"]);
@@ -106,6 +106,12 @@ Stage::Stage(std::string port, std::string fontPath, std::string stagePath, std:
         }
         if (uiElement.count("fade_curve")) {
             m_ui_elements.back()->setFadeCurve((FadeCurve)uiElement["fade_curve"].get<int>());
+        }
+        if (uiElement.count("activate") && uiElement["activate"]) {
+            m_ui_elements.back()->chaserActivate();
+        }
+        if (uiElement.count("hotkey")) {
+            m_ui_elements.back()->setHotkey((sf::Keyboard::Key) uiElement["hotkey"].get<int>());
         }
     }
 
@@ -240,28 +246,8 @@ bool Stage::updateAllChannels() {
     }
 }
 
-void Stage::openChannel(ChannelAddress address) {
-//    if (address != m_previousChannel) {
-//        m_previousChannel = address;
-//        m_interface << (char)0x01; //Enter channel mode
-//        char clow = address & 0xff;
-//        char chigh = (address >> 8);
-//        m_interface << chigh;
-//        m_interface << clow;
-//    }
-}
-
 bool Stage::updateChannel(ChannelAddress address) {
-//    if (m_fakeInterface) {
-//        std::cout << "C" << address << " -> " << (int)m_channels[address].getValue(m_currentTime) << std::endl;
-//    } else {
-//        openChannel(address);
-//        m_interface << (char)0x00; //Enter value mode
-//        m_interface << (char)m_channels[address].getValue(m_currentTime);
-//    }
-//    return true; //TODO implement
-    
-    std::cout << "C" << address << " -> " << (int)m_channels[address].getValue(m_currentTime) << std::endl;
+//    std::cout << "C" << address << " -> " << (int)m_channels[address].getValue(m_currentTime) << std::endl;
     write_dmx(address, m_channels[address].getValue(m_currentTime));
     return true;
 }
@@ -316,6 +302,14 @@ void Stage::onHotkeyRelease(sf::Keyboard::Key key) {
 }
 
 
+void Stage::onScroll(int delta) {
+    m_yScroolPosition += delta;
+    if (m_yScroolPosition > 0) {
+        m_yScroolPosition = 0;
+    }
+}
+
+
 
 
 
@@ -347,6 +341,8 @@ void Stage::draw(sf::RenderTarget& target, sf::RenderStates states) const
     
     int viewportSize = m_editMode ? target.getSize().x - UIPartWidth - 2 * UIPartDistance : target.getSize().x;
     int numberPerRow = (viewportSize - UIPartDistance) / (UIPartWidth + UIPartDistance);
+    int used_size = numberPerRow * (UIPartWidth + UIPartDistance) - UIPartDistance;
+    int xOffset = (viewportSize-used_size)/2;
     
     if (numberPerRow > 0) {
         std::vector<int> height(numberPerRow);
@@ -366,7 +362,7 @@ void Stage::draw(sf::RenderTarget& target, sf::RenderStates states) const
                 }
             }
             
-            m_ui_elements[i]->setPosition(UIPartDistance + column * (UIPartWidth + UIPartDistance), height[column] + UIPartDistance);
+            m_ui_elements[i]->setPosition(xOffset + column * (UIPartWidth + UIPartDistance), height[column] + UIPartDistance + m_yScroolPosition);
             
             height[column] += m_ui_elements[i]->getHeight() + UIPartDistance;
             

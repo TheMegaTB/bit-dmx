@@ -46,15 +46,21 @@ public:
     void setVisibility(bool isVisible);
     bool isVisible();
     
-    virtual void hotkeyWrapper(sf::Keyboard::Key hotkey) {};
-    virtual void hotkeyReleaseWrapper(sf::Keyboard::Key hotkey) {};
-    
     virtual void activate();
     virtual void deactivate();
     virtual void chaserActivate() {};
     virtual void chaserDeactivate() {};
     virtual void action() {};
     virtual void update() {};
+    
+    sf::Keyboard::Key getHotkey();
+    
+    void setHotkey(sf::Keyboard::Key hotkey);
+    
+    virtual void hotkeyWrapper(sf::Keyboard::Key hotkey);
+    virtual void hotkeyReleaseWrapper(sf::Keyboard::Key hotkey);
+    virtual void onHotkey();
+    virtual void onHotkeyRelease() {};
     
     virtual void drawSubEditor(sf::RenderTarget& target, sf::RenderStates states) const {};
     
@@ -63,6 +69,7 @@ protected:
     bool m_isActivated;
     bool m_isVisible;
     
+    sf::Keyboard::Key m_hotkey;
     sf::Time m_fadeTime;
     FadeCurve m_fadeCurve;
     std::string m_caption;

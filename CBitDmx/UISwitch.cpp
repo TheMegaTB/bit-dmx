@@ -8,7 +8,7 @@
 
 #include "UISwitch.hpp"
 
-UISwitch::UISwitch(Stage* stage, std::string caption, std::vector<int> channelGroups, std::vector<ChannelValue> channelValues, sf::Keyboard::Key hotkey): UISingleHotkey(stage, stage->UIPartWidth, stage->UIPartWidth / 4, hotkey) {
+UISwitch::UISwitch(Stage* stage, std::string caption, std::vector<int> channelGroups, std::vector<ChannelValue> channelValues): UIControlElement(stage, stage->UIPartWidth, stage->UIPartWidth / 4) {
     
     m_channels = channelGroups;
     m_channelValues = channelValues;
@@ -40,7 +40,7 @@ void UISwitch::chaserDeactivate() {
 }
 
 void UISwitch::onHotkey() {
-    UISingleHotkey::onHotkey();
+    UIControlElement::onHotkey();
     m_toggle->setActivation(m_isActivated);
 }
 

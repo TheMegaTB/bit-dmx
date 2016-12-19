@@ -10,7 +10,7 @@
 
 #include <iostream>
 
-UIChannel::UIChannel(Stage* stage, ChannelAddress channelAddress): UILabeledElement(stage, stage->UIPartWidth, stage->UIPartWidth / 2) {
+UIChannel::UIChannel(Stage* stage, ChannelAddress channelAddress): UILabeledElement(stage, stage->UIPartWidth, stage->UIPartWidth / 4) {
     setChannelAddress(channelAddress);
     m_slider = std::make_shared<Slider>(0, 255, [this](double x) -> void { this->activate(); }, [this]() -> void { this->deactivate(); }, stage->UIPartWidth, stage->UIPartWidth / 4, m_stage->getFont());
     addPart(m_slider);

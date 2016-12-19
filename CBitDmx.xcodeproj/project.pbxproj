@@ -35,6 +35,8 @@
 		4FB7B5161E07D27900D54CC7 /* arduino-serial-dmx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FB7B5141E07D27900D54CC7 /* arduino-serial-dmx.cpp */; };
 		4FB7B5171E07D27900D54CC7 /* arduino-serial-lib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FB7B5151E07D27900D54CC7 /* arduino-serial-lib.cpp */; };
 		4FB7B51B1E07EA6300D54CC7 /* keys.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4FB7B51A1E07EA6300D54CC7 /* keys.txt */; };
+		4FB7B51D1E0812ED00D54CC7 /* MusicNightUI.json in Resources */ = {isa = PBXBuildFile; fileRef = 4FB7B51C1E0812ED00D54CC7 /* MusicNightUI.json */; };
+		4FB7B51F1E0812FB00D54CC7 /* MusicNightStage.json in Resources */ = {isa = PBXBuildFile; fileRef = 4FB7B51E1E0812FB00D54CC7 /* MusicNightStage.json */; };
 		4FDD24F31E06F2A6000C715D /* UILabeledElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FDD24F11E06F2A6000C715D /* UILabeledElement.cpp */; };
 		4FDD24F61E06FD5B000C715D /* UIChaser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FDD24F41E06FD5B000C715D /* UIChaser.cpp */; };
 /* End PBXBuildFile section */
@@ -91,6 +93,8 @@
 		4FB7B5181E07D2CA00D54CC7 /* arduino-serial-lib.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "arduino-serial-lib.hpp"; sourceTree = "<group>"; };
 		4FB7B5191E07D8E600D54CC7 /* arduino-serial-dmx.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "arduino-serial-dmx.hpp"; sourceTree = "<group>"; };
 		4FB7B51A1E07EA6300D54CC7 /* keys.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = keys.txt; sourceTree = "<group>"; };
+		4FB7B51C1E0812ED00D54CC7 /* MusicNightUI.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = MusicNightUI.json; sourceTree = "<group>"; };
+		4FB7B51E1E0812FB00D54CC7 /* MusicNightStage.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = MusicNightStage.json; sourceTree = "<group>"; };
 		4FDD24F11E06F2A6000C715D /* UILabeledElement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UILabeledElement.cpp; sourceTree = "<group>"; };
 		4FDD24F21E06F2A6000C715D /* UILabeledElement.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UILabeledElement.hpp; sourceTree = "<group>"; };
 		4FDD24F41E06FD5B000C715D /* UIChaser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UIChaser.cpp; sourceTree = "<group>"; };
@@ -135,7 +139,9 @@
 				4F8216061E0452C500744816 /* Resources */,
 				4F8215FF1E0452C500744816 /* Supporting Files */,
 				4F8216561E06AA9300744816 /* exampleStage.json */,
+				4FB7B51E1E0812FB00D54CC7 /* MusicNightStage.json */,
 				4F8216581E06B7D900744816 /* exampleUI.json */,
+				4FB7B51C1E0812ED00D54CC7 /* MusicNightUI.json */,
 			);
 			path = CBitDmx;
 			sourceTree = "<group>";
@@ -283,8 +289,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4FB7B51F1E0812FB00D54CC7 /* MusicNightStage.json in Resources */,
 				4F8216571E06AA9300744816 /* exampleStage.json in Resources */,
 				4F82160E1E0452C500744816 /* icon.png in Resources */,
+				4FB7B51D1E0812ED00D54CC7 /* MusicNightUI.json in Resources */,
 				4F82160C1E0452C500744816 /* sansation.ttf in Resources */,
 				4FB7B51B1E07EA6300D54CC7 /* keys.txt in Resources */,
 				4F82160A1E0452C500744816 /* nice_music.ogg in Resources */,

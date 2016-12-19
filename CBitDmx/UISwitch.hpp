@@ -11,13 +11,13 @@
 
 #include <stdio.h>
 
-#include "UISingleHotkey.hpp"
+#include "UIControlElement.hpp"
 
-class UISwitch : public UISingleHotkey {
+class UISwitch : public UIControlElement {
 public:
-    UISwitch(Stage* stage, std::string caption, std::vector<int> channels, std::vector<ChannelValue> channelValues, sf::Keyboard::Key hotkey);
-    UISwitch(Stage* stage, std::string caption, std::vector<int> channelGroups, sf::Keyboard::Key hotkey): UISwitch(stage, caption, channelGroups, std::vector<ChannelValue>(m_channels.size()), hotkey) {};
-    UISwitch(Stage* stage, json jsonObject) : UISwitch(stage, jsonObject["caption"], stage->getChannels(jsonObject["channels"]), jsonObject["channel_values"], (sf::Keyboard::Key)jsonObject["hotkey"].get<int>()) {};
+    UISwitch(Stage* stage, std::string caption, std::vector<int> channels, std::vector<ChannelValue> channelValues);
+    UISwitch(Stage* stage, std::string caption, std::vector<int> channelGroups): UISwitch(stage, caption, channelGroups, std::vector<ChannelValue>(m_channels.size())) {};
+    UISwitch(Stage* stage, json jsonObject) : UISwitch(stage, "Untitled", stage->getChannels(jsonObject["channels"]), jsonObject["channel_values"]) {};
     
     void setCaption(std::string caption);
     

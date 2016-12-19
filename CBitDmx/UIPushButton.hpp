@@ -11,13 +11,13 @@
 
 #include <stdio.h>
 
-#include "UISingleHotkey.hpp"
+#include "UIControlElement.hpp"
 
-class UIPushButton : public UISingleHotkey {
+class UIPushButton : public UIControlElement {
 public:
-    UIPushButton(Stage* stage, std::string caption, std::vector<int> channels, std::vector<ChannelValue> channelValues, sf::Keyboard::Key hotkey);
-    UIPushButton(Stage* stage, std::string caption, std::vector<int> channels, sf::Keyboard::Key hotkey) : UIPushButton(stage, caption, channels, std::vector<ChannelValue>(m_channels.size()), hotkey) {};
-    UIPushButton(Stage* stage, json jsonObject) : UIPushButton(stage, jsonObject["caption"], stage->getChannels(jsonObject["channels"]), jsonObject["channel_values"], (sf::Keyboard::Key)jsonObject["hotkey"].get<int>()) {};
+    UIPushButton(Stage* stage, std::string caption, std::vector<int> channels, std::vector<ChannelValue> channelValues);
+    UIPushButton(Stage* stage, std::string caption, std::vector<int> channels) : UIPushButton(stage, caption, channels, std::vector<ChannelValue>(m_channels.size())) {};
+    UIPushButton(Stage* stage, json jsonObject) : UIPushButton(stage, "Untitled", stage->getChannels(jsonObject["channels"]), jsonObject["channel_values"]) {};
     
     
     virtual void chaserActivate();

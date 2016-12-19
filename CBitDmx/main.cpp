@@ -37,11 +37,15 @@ int main(int argc, char const** argv)
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
     std::string port = "";
+    std::string name = "example";
     if (argc > 1) {
         port = argv[1];
     }
+    if (argc > 2) {
+        name = argv[2];
+    }
     
-    Stage stage(port, resourcePath() + "sansation.ttf", resourcePath() + "exampleStage.json", resourcePath() + "exampleUI.json");
+    Stage stage(port, resourcePath() + "sansation.ttf", resourcePath() + name + "Stage.json", resourcePath() + name + "UI.json");
     
     sf::Clock frameClock;
 
@@ -83,6 +87,10 @@ int main(int argc, char const** argv)
             
             if (event.type == sf::Event::KeyReleased) {
                 stage.onHotkeyRelease(event.key.code);
+            }
+            
+            if (event.type == sf::Event::MouseWheelMoved) {
+                stage.onScroll(event.mouseWheel.delta);
             }
         }
         
