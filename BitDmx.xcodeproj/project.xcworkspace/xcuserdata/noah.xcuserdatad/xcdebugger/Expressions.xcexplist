@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "Stage::addUiElement(std::__1::shared_ptr&lt;UIControlElement&gt;):Stage.cpp">
+      </ContextState>
+      <ContextState
+         contextName = "Stage::draw(sf::RenderTarget&amp;, sf::RenderStates) const:Stage.cpp">
+      </ContextState>
+      <ContextState
+         contextName = "UIControlElement::setID(int):UIControlElement.cpp">
+      </ContextState>
+      <ContextState
+         contextName = "Toggle::onMousePress(int, int, sf::Mouse::Button):Toggle.cpp">
+      </ContextState>
+      <ContextState
+         contextName = "std::__1::function&lt;void (double)&gt;::operator()(double) const:functional">
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>

@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "4F8215FB1E0452C500744816"
-               BuildableName = "CBitDmx.app"
-               BlueprintName = "CBitDmx"
-               ReferencedContainer = "container:CBitDmx.xcodeproj">
+               BuildableName = "BitDmx.app"
+               BlueprintName = "BitDmx"
+               ReferencedContainer = "container:BitDmx.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4F8215FB1E0452C500744816"
-            BuildableName = "CBitDmx.app"
-            BlueprintName = "CBitDmx"
-            ReferencedContainer = "container:CBitDmx.xcodeproj">
+            BuildableName = "BitDmx.app"
+            BlueprintName = "BitDmx"
+            ReferencedContainer = "container:BitDmx.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -56,9 +56,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4F8215FB1E0452C500744816"
-            BuildableName = "CBitDmx.app"
-            BlueprintName = "CBitDmx"
-            ReferencedContainer = "container:CBitDmx.xcodeproj">
+            BuildableName = "BitDmx.app"
+            BlueprintName = "BitDmx"
+            ReferencedContainer = "container:BitDmx.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>
@@ -67,12 +67,8 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "MusicNight"
+            argument = "example"
             isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "/Users/noah/Desktop/test.txt"
-            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
       <AdditionalOptions>
@@ -89,9 +85,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4F8215FB1E0452C500744816"
-            BuildableName = "CBitDmx.app"
-            BlueprintName = "CBitDmx"
-            ReferencedContainer = "container:CBitDmx.xcodeproj">
+            BuildableName = "BitDmx.app"
+            BlueprintName = "BitDmx"
+            ReferencedContainer = "container:BitDmx.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

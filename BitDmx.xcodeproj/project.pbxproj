@@ -42,8 +42,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		4F8215FC1E0452C500744816 /* CBitDmx.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CBitDmx.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		4F8216001E0452C500744816 /* CBitDmx-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CBitDmx-Info.plist"; sourceTree = "<group>"; };
+		4F8215FC1E0452C500744816 /* BitDmx.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BitDmx.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4F8216001E0452C500744816 /* BitDmx-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "BitDmx-Info.plist"; sourceTree = "<group>"; };
 		4F8216011E0452C500744816 /* ResourcePath.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ResourcePath.mm; sourceTree = "<group>"; };
 		4F8216031E0452C500744816 /* ResourcePath.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ResourcePath.hpp; sourceTree = "<group>"; };
 		4F8216041E0452C500744816 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
@@ -115,7 +115,7 @@
 		4F8215F21E0452C500744816 = {
 			isa = PBXGroup;
 			children = (
-				4F8215FE1E0452C500744816 /* CBitDmx */,
+				4F8215FE1E0452C500744816 /* BitDmx */,
 				4F8215FD1E0452C500744816 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -123,12 +123,12 @@
 		4F8215FD1E0452C500744816 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				4F8215FC1E0452C500744816 /* CBitDmx.app */,
+				4F8215FC1E0452C500744816 /* BitDmx.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		4F8215FE1E0452C500744816 /* CBitDmx */ = {
+		4F8215FE1E0452C500744816 /* BitDmx */ = {
 			isa = PBXGroup;
 			children = (
 				4F8216141E0452F900744816 /* Logic */,
@@ -143,13 +143,14 @@
 				4F8216581E06B7D900744816 /* exampleUI.json */,
 				4FB7B51C1E0812ED00D54CC7 /* MusicNightUI.json */,
 			);
+			name = BitDmx;
 			path = CBitDmx;
 			sourceTree = "<group>";
 		};
 		4F8215FF1E0452C500744816 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				4F8216001E0452C500744816 /* CBitDmx-Info.plist */,
+				4F8216001E0452C500744816 /* BitDmx-Info.plist */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -234,9 +235,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		4F8215FB1E0452C500744816 /* CBitDmx */ = {
+		4F8215FB1E0452C500744816 /* BitDmx */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4F8216111E0452C500744816 /* Build configuration list for PBXNativeTarget "CBitDmx" */;
+			buildConfigurationList = 4F8216111E0452C500744816 /* Build configuration list for PBXNativeTarget "BitDmx" */;
 			buildPhases = (
 				4F8215F71E0452C500744816 /* Sources */,
 				4F8215F81E0452C500744816 /* Frameworks */,
@@ -247,9 +248,9 @@
 			);
 			dependencies = (
 			);
-			name = CBitDmx;
+			name = BitDmx;
 			productName = CBitDmx;
-			productReference = 4F8215FC1E0452C500744816 /* CBitDmx.app */;
+			productReference = 4F8215FC1E0452C500744816 /* BitDmx.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -267,7 +268,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 4F8215F61E0452C500744816 /* Build configuration list for PBXProject "CBitDmx" */;
+			buildConfigurationList = 4F8215F61E0452C500744816 /* Build configuration list for PBXProject "BitDmx" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -279,7 +280,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				4F8215FB1E0452C500744816 /* CBitDmx */,
+				4F8215FB1E0452C500744816 /* BitDmx */,
 			);
 		};
 /* End PBXProject section */
@@ -444,7 +445,7 @@
 		4F8216121E0452C500744816 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				INFOPLIST_FILE = "CBitDmx/CBitDmx-Info.plist";
+				INFOPLIST_FILE = "CBitDmx/BitDmx-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -453,7 +454,7 @@
 		4F8216131E0452C500744816 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				INFOPLIST_FILE = "CBitDmx/CBitDmx-Info.plist";
+				INFOPLIST_FILE = "CBitDmx/BitDmx-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -462,7 +463,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		4F8215F61E0452C500744816 /* Build configuration list for PBXProject "CBitDmx" */ = {
+		4F8215F61E0452C500744816 /* Build configuration list for PBXProject "BitDmx" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4F82160F1E0452C500744816 /* Debug */,
@@ -471,7 +472,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		4F8216111E0452C500744816 /* Build configuration list for PBXNativeTarget "CBitDmx" */ = {
+		4F8216111E0452C500744816 /* Build configuration list for PBXNativeTarget "BitDmx" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4F8216121E0452C500744816 /* Debug */,

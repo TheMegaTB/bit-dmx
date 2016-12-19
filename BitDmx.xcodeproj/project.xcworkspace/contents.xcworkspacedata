@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:CBitDmx.xcodeproj">
+      location = "self:/Volumes/Data/Programming/CBitDmx/BitDmx.xcodeproj">
    </FileRef>
 </Workspace>
