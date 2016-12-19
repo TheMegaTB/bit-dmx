@@ -20,8 +20,6 @@ int main(int argc, char const** argv)
         resourcePath = getBundleResourcePath();
     #endif
     #endif
-
-
     
     // Create the main window
     sf::RenderWindow window(sf::VideoMode(800, 600), "BitDMX");
@@ -37,15 +35,20 @@ int main(int argc, char const** argv)
     //window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
     std::string port = "";
-    std::string name = "example";
     if (argc > 1) {
         port = argv[1];
     }
+    
+    
+    std::string pathToConfig = resourcePath;
+    
     if (argc > 2) {
-        name = argv[2];
+        pathToConfig = argv[2]; //TODO cut filename if filename
     }
     
-    Stage stage(port, resourcePath + "sansation.ttf", resourcePath + name + "Stage.json", resourcePath + name + "UI.json");
+    std::cout << pathToConfig + "/stage.json" << std::endl;
+    
+    Stage stage(port, resourcePath + "sansation.ttf", pathToConfig + "/stage.json", pathToConfig + "/ui.json");
     
     sf::Clock frameClock;
 

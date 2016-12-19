@@ -28,14 +28,12 @@
 		4FB7B5161E07D27900D54CC7 /* arduino-serial-dmx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FB7B5141E07D27900D54CC7 /* arduino-serial-dmx.cpp */; };
 		4FB7B5171E07D27900D54CC7 /* arduino-serial-lib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FB7B5151E07D27900D54CC7 /* arduino-serial-lib.cpp */; };
 		4FB7B51B1E07EA6300D54CC7 /* keys.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4FB7B51A1E07EA6300D54CC7 /* keys.txt */; };
+		4FDBFA781E088C6800D515AD /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 4FDBFA741E088C6800D515AD /* icon.png */; };
+		4FDBFA791E088C6800D515AD /* sansation.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4FDBFA751E088C6800D515AD /* sansation.ttf */; };
+		4FDBFA7A1E088C6800D515AD /* stage.json in Resources */ = {isa = PBXBuildFile; fileRef = 4FDBFA761E088C6800D515AD /* stage.json */; };
+		4FDBFA7B1E088C6800D515AD /* ui.json in Resources */ = {isa = PBXBuildFile; fileRef = 4FDBFA771E088C6800D515AD /* ui.json */; };
 		4FDD24F31E06F2A6000C715D /* UILabeledElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FDD24F11E06F2A6000C715D /* UILabeledElement.cpp */; };
 		4FDD24F61E06FD5B000C715D /* UIChaser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FDD24F41E06FD5B000C715D /* UIChaser.cpp */; };
-		4FE6B23A1E087F8B007790DD /* exampleStage.json in Resources */ = {isa = PBXBuildFile; fileRef = 4FE6B2341E087F8B007790DD /* exampleStage.json */; };
-		4FE6B23B1E087F8B007790DD /* exampleUI.json in Resources */ = {isa = PBXBuildFile; fileRef = 4FE6B2351E087F8B007790DD /* exampleUI.json */; };
-		4FE6B23C1E087F8B007790DD /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 4FE6B2361E087F8B007790DD /* icon.png */; };
-		4FE6B23D1E087F8B007790DD /* MusicNightStage.json in Resources */ = {isa = PBXBuildFile; fileRef = 4FE6B2371E087F8B007790DD /* MusicNightStage.json */; };
-		4FE6B23E1E087F8B007790DD /* MusicNightUI.json in Resources */ = {isa = PBXBuildFile; fileRef = 4FE6B2381E087F8B007790DD /* MusicNightUI.json */; };
-		4FE6B23F1E087F8B007790DD /* sansation.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4FE6B2391E087F8B007790DD /* sansation.ttf */; };
 		4FE6B2421E088124007790DD /* ResourcePath.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FE6B2411E088124007790DD /* ResourcePath.mm */; };
 /* End PBXBuildFile section */
 
@@ -83,16 +81,15 @@
 		4FB7B5181E07D2CA00D54CC7 /* arduino-serial-lib.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "arduino-serial-lib.hpp"; sourceTree = "<group>"; };
 		4FB7B5191E07D8E600D54CC7 /* arduino-serial-dmx.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "arduino-serial-dmx.hpp"; sourceTree = "<group>"; };
 		4FB7B51A1E07EA6300D54CC7 /* keys.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = keys.txt; sourceTree = "<group>"; };
+		4FDBFA691E088AE000D515AD /* config */ = {isa = PBXFileReference; lastKnownFileType = folder; path = config; sourceTree = SOURCE_ROOT; };
+		4FDBFA741E088C6800D515AD /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon.png; sourceTree = "<group>"; };
+		4FDBFA751E088C6800D515AD /* sansation.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sansation.ttf; sourceTree = "<group>"; };
+		4FDBFA761E088C6800D515AD /* stage.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = stage.json; sourceTree = "<group>"; };
+		4FDBFA771E088C6800D515AD /* ui.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ui.json; sourceTree = "<group>"; };
 		4FDD24F11E06F2A6000C715D /* UILabeledElement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UILabeledElement.cpp; sourceTree = "<group>"; };
 		4FDD24F21E06F2A6000C715D /* UILabeledElement.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UILabeledElement.hpp; sourceTree = "<group>"; };
 		4FDD24F41E06FD5B000C715D /* UIChaser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UIChaser.cpp; sourceTree = "<group>"; };
 		4FDD24F51E06FD5B000C715D /* UIChaser.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UIChaser.hpp; sourceTree = "<group>"; };
-		4FE6B2341E087F8B007790DD /* exampleStage.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = exampleStage.json; path = res/exampleStage.json; sourceTree = SOURCE_ROOT; };
-		4FE6B2351E087F8B007790DD /* exampleUI.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = exampleUI.json; path = res/exampleUI.json; sourceTree = SOURCE_ROOT; };
-		4FE6B2361E087F8B007790DD /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon.png; path = res/icon.png; sourceTree = SOURCE_ROOT; };
-		4FE6B2371E087F8B007790DD /* MusicNightStage.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = MusicNightStage.json; path = res/MusicNightStage.json; sourceTree = SOURCE_ROOT; };
-		4FE6B2381E087F8B007790DD /* MusicNightUI.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = MusicNightUI.json; path = res/MusicNightUI.json; sourceTree = SOURCE_ROOT; };
-		4FE6B2391E087F8B007790DD /* sansation.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = sansation.ttf; path = res/sansation.ttf; sourceTree = SOURCE_ROOT; };
 		4FE6B2401E088124007790DD /* ResourcePath.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ResourcePath.hpp; sourceTree = "<group>"; };
 		4FE6B2411E088124007790DD /* ResourcePath.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ResourcePath.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -127,10 +124,9 @@
 		4F8215FE1E0452C500744816 /* BitDmx */ = {
 			isa = PBXGroup;
 			children = (
+				4FDBFA7F1E088E4700D515AD /* UI */,
 				4F8216141E0452F900744816 /* Logic */,
 				4F8216041E0452C500744816 /* main.cpp */,
-				4FB7B51A1E07EA6300D54CC7 /* keys.txt */,
-				4F8216061E0452C500744816 /* Resources */,
 				4F8215FF1E0452C500744816 /* Supporting Files */,
 			);
 			name = BitDmx;
@@ -140,42 +136,18 @@
 		4F8215FF1E0452C500744816 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				4FDBFA7C1E088C7C00D515AD /* res */,
 				4F8216001E0452C500744816 /* BitDmx-Info.plist */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		4F8216061E0452C500744816 /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				4FE6B2341E087F8B007790DD /* exampleStage.json */,
-				4FE6B2351E087F8B007790DD /* exampleUI.json */,
-				4FE6B2361E087F8B007790DD /* icon.png */,
-				4FE6B2371E087F8B007790DD /* MusicNightStage.json */,
-				4FE6B2381E087F8B007790DD /* MusicNightUI.json */,
-				4FE6B2391E087F8B007790DD /* sansation.ttf */,
-			);
-			name = Resources;
-			sourceTree = "<group>";
-		};
 		4F8216141E0452F900744816 /* Logic */ = {
 			isa = PBXGroup;
 			children = (
-				4F82163A1E05C2F600744816 /* UIPart */,
-				4F8216291E049A6200744816 /* UIControlElement */,
-				4F8216151E04531900744816 /* Stage.cpp */,
-				4F8216161E04531900744816 /* Stage.hpp */,
-				4FB7B5191E07D8E600D54CC7 /* arduino-serial-dmx.hpp */,
-				4FB7B5141E07D27900D54CC7 /* arduino-serial-dmx.cpp */,
-				4FB7B5151E07D27900D54CC7 /* arduino-serial-lib.cpp */,
-				4FB7B5181E07D2CA00D54CC7 /* arduino-serial-lib.hpp */,
-				4F8216191E04538A00744816 /* Types.hpp */,
-				4F82161B1E04547900744816 /* Channel.cpp */,
-				4F82161C1E04547900744816 /* Channel.hpp */,
-				4F82161E1E0454AD00744816 /* FadeCurve.cpp */,
-				4F82161F1E0454AD00744816 /* FadeCurve.hpp */,
-				4FE6B2401E088124007790DD /* ResourcePath.hpp */,
-				4FE6B2411E088124007790DD /* ResourcePath.mm */,
+				4FDBFA811E088E6B00D515AD /* DMX */,
+				4FDBFA7D1E088E2700D515AD /* Arduino Serial */,
+				4FDBFA801E088E5E00D515AD /* Helpers */,
 			);
 			name = Logic;
 			sourceTree = "<group>";
@@ -224,6 +196,70 @@
 				4F82165E1E06D27200744816 /* XYPad.hpp */,
 			);
 			name = UIPart;
+			sourceTree = "<group>";
+		};
+		4FDBFA731E088C6800D515AD /* res */ = {
+			isa = PBXGroup;
+			children = (
+				4FDBFA741E088C6800D515AD /* icon.png */,
+				4FDBFA751E088C6800D515AD /* sansation.ttf */,
+				4FDBFA761E088C6800D515AD /* stage.json */,
+				4FDBFA771E088C6800D515AD /* ui.json */,
+			);
+			path = res;
+			sourceTree = SOURCE_ROOT;
+		};
+		4FDBFA7C1E088C7C00D515AD /* res */ = {
+			isa = PBXGroup;
+			children = (
+				4FB7B51A1E07EA6300D54CC7 /* keys.txt */,
+				4FDBFA731E088C6800D515AD /* res */,
+				4FDBFA691E088AE000D515AD /* config */,
+			);
+			name = res;
+			sourceTree = "<group>";
+		};
+		4FDBFA7D1E088E2700D515AD /* Arduino Serial */ = {
+			isa = PBXGroup;
+			children = (
+				4FB7B5191E07D8E600D54CC7 /* arduino-serial-dmx.hpp */,
+				4FB7B5141E07D27900D54CC7 /* arduino-serial-dmx.cpp */,
+				4FB7B5151E07D27900D54CC7 /* arduino-serial-lib.cpp */,
+				4FB7B5181E07D2CA00D54CC7 /* arduino-serial-lib.hpp */,
+			);
+			name = "Arduino Serial";
+			sourceTree = "<group>";
+		};
+		4FDBFA7F1E088E4700D515AD /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				4F82163A1E05C2F600744816 /* UIPart */,
+				4F8216291E049A6200744816 /* UIControlElement */,
+			);
+			name = UI;
+			sourceTree = "<group>";
+		};
+		4FDBFA801E088E5E00D515AD /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				4FE6B2401E088124007790DD /* ResourcePath.hpp */,
+				4FE6B2411E088124007790DD /* ResourcePath.mm */,
+				4F8216191E04538A00744816 /* Types.hpp */,
+				4F82161E1E0454AD00744816 /* FadeCurve.cpp */,
+				4F82161F1E0454AD00744816 /* FadeCurve.hpp */,
+			);
+			name = Helpers;
+			sourceTree = "<group>";
+		};
+		4FDBFA811E088E6B00D515AD /* DMX */ = {
+			isa = PBXGroup;
+			children = (
+				4F8216151E04531900744816 /* Stage.cpp */,
+				4F8216161E04531900744816 /* Stage.hpp */,
+				4F82161B1E04547900744816 /* Channel.cpp */,
+				4F82161C1E04547900744816 /* Channel.hpp */,
+			);
+			name = DMX;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -284,13 +320,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4FE6B23C1E087F8B007790DD /* icon.png in Resources */,
-				4FE6B23D1E087F8B007790DD /* MusicNightStage.json in Resources */,
-				4FE6B23F1E087F8B007790DD /* sansation.ttf in Resources */,
+				4FDBFA791E088C6800D515AD /* sansation.ttf in Resources */,
+				4FDBFA7B1E088C6800D515AD /* ui.json in Resources */,
+				4FDBFA781E088C6800D515AD /* icon.png in Resources */,
+				4FDBFA7A1E088C6800D515AD /* stage.json in Resources */,
 				4FB7B51B1E07EA6300D54CC7 /* keys.txt in Resources */,
-				4FE6B23B1E087F8B007790DD /* exampleUI.json in Resources */,
-				4FE6B23E1E087F8B007790DD /* MusicNightUI.json in Resources */,
-				4FE6B23A1E087F8B007790DD /* exampleStage.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
