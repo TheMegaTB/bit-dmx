@@ -27,7 +27,7 @@ int main(int argc, char const** argv)
 {
     // Create the main window
     sf::RenderWindow window(sf::VideoMode(800, 600), "BitDMX");
-//    window.setFramerateLimit(60);
+    window.setFramerateLimit(60);
 
     // Set the Icon
     sf::Image icon;
@@ -36,7 +36,6 @@ int main(int argc, char const** argv)
     }
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
-    std::cout << argc << std::endl;
     std::string port = "";
     if (argc > 1) {
         port = argv[1];

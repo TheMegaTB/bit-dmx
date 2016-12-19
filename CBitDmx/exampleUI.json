@@ -1,19 +1,54 @@
 {
-  "scanner1:movement": {
+  "scannerL:movement": {
     "type": 4,
-    "caption": "Scanner 1",
-    "fade_time": 2000,
-    "channelx_address": "Scanner:Pan",
-    "channely_address": "Scanner:Tilt"
+    "caption": "Scanner L",
+    "fade_time": 0,
+    "channelx_address": "ScannerL:Pan",
+    "channely_address": "ScannerL:Tilt"
   },
-  "scanner1:s100": {
+  "scannerR:movement": {
+    "type": 4,
+    "caption": "Scanner R",
+    "fade_time": 0,
+    "channelx_address": "ScannerR:Pan",
+    "channely_address": "ScannerR:Tilt"
+  },
+  "scannerOL:movement": {
+    "type": 4,
+    "caption": "Scanner OL",
+    "fade_time": 0,
+    "channelx_address": "ScannerOL:Pan",
+    "channely_address": "ScannerOL:Tilt"
+  },
+  "scannerIL:movement": {
+    "type": 4,
+    "caption": "Scanner IL",
+    "fade_time": 0,
+    "channelx_address": "ScannerIL:Pan",
+    "channely_address": "ScannerIL:Tilt"
+  },
+  "scannerIR:movement": {
+    "type": 4,
+    "caption": "Scanner IR",
+    "fade_time": 0,
+    "channelx_address": "ScannerIR:Pan",
+    "channely_address": "ScannerIR:Tilt"
+  },
+  "scannerOR:movement": {
+    "type": 4,
+    "caption": "Scanner OR",
+    "fade_time": 0,
+    "channelx_address": "ScannerOR:Pan",
+    "channely_address": "ScannerOR:Tilt"
+  },
+  "scanner_on": {
     "type": 1,
     "fade_curve": 1,
-    "fade_time": 2000,
-    "caption": "All On (B)",
-    "channels": ["Scanner:Shutter", "Scanner:Gobo"],
-    "channel_values": [100, 200],
-    "hotkey": 1
+    "fade_time": 0,
+    "caption": "Scanner On",
+    "channels": ["ScannerL:Shutter", "ScannerL:Gobo", "ScannerR:Shutter", "ScannerR:Gobo", "ScannerOL:Gobo", "ScannerIL:Gobo", "ScannerIR:Gobo", "ScannerOR:Gobo"],
+    "channel_values": [255, 0, 255, 0, 10, 10, 10, 10],
+    "hotkey": 0
   },
   "scanner1:s200": {
     "type": 1,
@@ -43,17 +78,6 @@
     "type": 3,
     "caption": "Tower FR | Drumset",
     "fade_time": 1000,
-    "channel_address": "Tower FR | Drumset:Channel"
-  },
-    "chaser1": {
-        "type": 0,
-        "caption": "Chaser 1",
-        "chaser": [
-            {"name": "scanner1:s100", "time": 2000},
-            {"name": "scanner1:s200", "time": 2000},
-            {"name": "chaser1", "time": 0, "min_round": 1},
-            {"name": "chaser1", "time": 0, "min_round": 1}
-        ]
-        
-    }
+    "channel_address": "ScannerOL:Gobo"
+  }
 }

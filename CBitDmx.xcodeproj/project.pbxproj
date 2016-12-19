@@ -34,6 +34,7 @@
 		4F8216621E06DAAD00744816 /* UIXYPad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F8216601E06DAAD00744816 /* UIXYPad.cpp */; };
 		4FB7B5161E07D27900D54CC7 /* arduino-serial-dmx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FB7B5141E07D27900D54CC7 /* arduino-serial-dmx.cpp */; };
 		4FB7B5171E07D27900D54CC7 /* arduino-serial-lib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FB7B5151E07D27900D54CC7 /* arduino-serial-lib.cpp */; };
+		4FB7B51B1E07EA6300D54CC7 /* keys.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4FB7B51A1E07EA6300D54CC7 /* keys.txt */; };
 		4FDD24F31E06F2A6000C715D /* UILabeledElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FDD24F11E06F2A6000C715D /* UILabeledElement.cpp */; };
 		4FDD24F61E06FD5B000C715D /* UIChaser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FDD24F41E06FD5B000C715D /* UIChaser.cpp */; };
 /* End PBXBuildFile section */
@@ -89,6 +90,7 @@
 		4FB7B5151E07D27900D54CC7 /* arduino-serial-lib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "arduino-serial-lib.cpp"; sourceTree = "<group>"; };
 		4FB7B5181E07D2CA00D54CC7 /* arduino-serial-lib.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "arduino-serial-lib.hpp"; sourceTree = "<group>"; };
 		4FB7B5191E07D8E600D54CC7 /* arduino-serial-dmx.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "arduino-serial-dmx.hpp"; sourceTree = "<group>"; };
+		4FB7B51A1E07EA6300D54CC7 /* keys.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = keys.txt; sourceTree = "<group>"; };
 		4FDD24F11E06F2A6000C715D /* UILabeledElement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UILabeledElement.cpp; sourceTree = "<group>"; };
 		4FDD24F21E06F2A6000C715D /* UILabeledElement.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UILabeledElement.hpp; sourceTree = "<group>"; };
 		4FDD24F41E06FD5B000C715D /* UIChaser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UIChaser.cpp; sourceTree = "<group>"; };
@@ -129,6 +131,7 @@
 				4F8216011E0452C500744816 /* ResourcePath.mm */,
 				4F8216031E0452C500744816 /* ResourcePath.hpp */,
 				4F8216041E0452C500744816 /* main.cpp */,
+				4FB7B51A1E07EA6300D54CC7 /* keys.txt */,
 				4F8216061E0452C500744816 /* Resources */,
 				4F8215FF1E0452C500744816 /* Supporting Files */,
 				4F8216561E06AA9300744816 /* exampleStage.json */,
@@ -283,6 +286,7 @@
 				4F8216571E06AA9300744816 /* exampleStage.json in Resources */,
 				4F82160E1E0452C500744816 /* icon.png in Resources */,
 				4F82160C1E0452C500744816 /* sansation.ttf in Resources */,
+				4FB7B51B1E07EA6300D54CC7 /* keys.txt in Resources */,
 				4F82160A1E0452C500744816 /* nice_music.ogg in Resources */,
 				4F8216591E06B7D900744816 /* exampleUI.json in Resources */,
 				4F8216081E0452C500744816 /* cute_image.jpg in Resources */,

@@ -260,6 +260,8 @@ bool Stage::updateChannel(ChannelAddress address) {
 //        m_interface << (char)m_channels[address].getValue(m_currentTime);
 //    }
 //    return true; //TODO implement
+    
+    std::cout << "C" << address << " -> " << (int)m_channels[address].getValue(m_currentTime) << std::endl;
     write_dmx(address, m_channels[address].getValue(m_currentTime));
     return true;
 }
