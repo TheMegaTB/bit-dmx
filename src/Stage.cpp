@@ -247,7 +247,7 @@ bool Stage::updateAllChannels() {
 }
 
 bool Stage::updateChannel(ChannelAddress address) {
-//    std::cout << "C" << address << " -> " << (int)m_channels[address].getValue(m_currentTime) << std::endl;
+    std::cout << "C" << address << " -> " << (int)m_channels[address].getValue(m_currentTime) << std::endl;
     write_dmx(address, m_channels[address].getValue(m_currentTime));
     return true;
 }

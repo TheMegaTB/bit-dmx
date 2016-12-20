@@ -26,7 +26,7 @@ int serialport_init(const char* serialport, int baud)
     struct termios toptions;
     int fd;
 
-    //fd = open(serialport, O_RDWR | O_NOCTTY | O_NDELAY);
+//    fd = open(serialport, O_RDWR | O_NOCTTY | O_NDELAY);
     fd = open(serialport, O_RDWR | O_NONBLOCK );
 
     if (fd == -1)  {
@@ -104,6 +104,7 @@ int serialport_close( int fd )
 int serialport_writebyte( int fd, uint8_t b)
 {
     int n = write(fd,&b,1);
+    std::cout << n << std::endl;
     if( n!=1)
         return -1;
     return 0;

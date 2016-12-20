@@ -8,9 +8,18 @@
         "channel_values": [255, 0, 255, 0, 10, 10, 10, 10],
         "hotkey": 0
     },
+    "stars": {
+        "type": 1,
+        "fade_time": 10000,
+        "caption": "Agora lighting",
+        "activate": false,
+        "channels": ["OR:4"],
+        "channel_values": [255],
+        "hotkey": 0
+    },
     "mods_on": {
         "type": 1,
-        "fade_time": 0,
+        "fade_time": 2000,
         "caption": "Mods Scene",
         "channels": ["OL:1", "OR:3", "Tower L | RLED:R", "Tower L | RLED:B", "Tower R | LLED:R", "Tower R | LLED:B", "ScannerL:Shutter", "ScannerL:Pan", "ScannerL:Tilt", "ScannerL:Color", "ScannerR:Shutter", "ScannerR:Pan", "ScannerR:Tilt", "ScannerR:Color"],
         "channel_values": [255, 255, 5, 5, 5, 5, 255, 129, 54, 70, 255, 99, 75, 70],

@@ -76,7 +76,7 @@ int write_to_serial(uint8_t b) {
   if (!fake) {
     memset(buf, 0, sizeof buf);
     int result = serialport_writebyte(fd, b);
-//    if (serialport_read(fd, buf, 1, 5000) < 0) { printf("READ FAILED\n"); }
+    if (serialport_read(fd, buf, 1, 5000) < 0) { printf("READ FAILED\n"); }
 //    uint8_t response = ~buf[0];
 //    if (response != b) {
 //      connected = false;

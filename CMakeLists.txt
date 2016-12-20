@@ -11,6 +11,8 @@ ExternalProject_Add(
     GIT_REPOSITORY git@github.com:nlohmann/json.git
     CMAKE_ARGS -DBuildTests=OFF -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_LOCATION}
 )
+# TODO: If the device is offline add UPDATE_COMMAND "" to the externalproject_add to not fetch update
+
 
 
 #### BitDMX Binary ####
