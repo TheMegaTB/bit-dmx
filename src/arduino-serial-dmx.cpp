@@ -76,7 +76,9 @@ int write_to_serial(uint8_t b) {
   if (!fake) {
     memset(buf, 0, sizeof buf);
     int result = serialport_writebyte(fd, b);
-    if (serialport_read(fd, buf, 1, 5000) < 0) { printf("READ FAILED\n"); }
+    #ifndef __APPLE__
+      if (serialport_read(fd, buf, 1, 5000) < 0) { printf("READ FAILED\n"); }
+    #endif
 //    uint8_t response = ~buf[0];
 //    if (response != b) {
 //      connected = false;
