@@ -11,22 +11,25 @@
 
 #include <stdio.h>
 
-#include "UILabeledElement.hpp"
+#include "UIControlElement.hpp"
 
-class UIXYPad : public UILabeledElement {
+class UIXYPad : public UIControlElement {
 public:
-    UIXYPad(Stage* stage, ChannelAddress channelXAddress, ChannelAddress channelYAddress);
-    UIXYPad(Stage* stage, json jsonObject) : UIXYPad(stage, stage->getChannel(jsonObject["channelx_address"]), stage->getChannel(jsonObject["channely_address"])) {};
+    UIXYPad(Stage* stage, UnvaluedActionGroup actionGroupX, UnvaluedActionGroup actionGroupY);
     
+    virtual void setValue(std::string subname, ChannelValue value, int activationID);
+    virtual void startFade(std::string subname, sf::Time fadeTime, ChannelValue value, FadeCurve fadeCurve, int activationID);
+    virtual void deactivateActivation(int activationID);
     
-    
-    void setChannelAddress(ChannelAddress channelXAddress, ChannelAddress channelYAddress);
-    virtual void action();
+    virtual bool isActivated() { return m_virtualChannelX.getValue() >= 0 || m_virtualChannelY.getValue() >= 0; };
+    virtual void update();
 private:
     std::shared_ptr<XYPad> m_xyPad;
+    UnvaluedActionGroup m_actionGroupX;
+    UnvaluedActionGroup m_actionGroupY;
     
-    ChannelAddress m_channelXAddress;
-    ChannelAddress m_channelYAddress;
+    Channel m_virtualChannelX;
+    Channel m_virtualChannelY;
 };
 
 #endif /* UIXYPad_hpp */

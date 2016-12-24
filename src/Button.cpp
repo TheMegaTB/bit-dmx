@@ -9,29 +9,22 @@
 #include "Button.hpp"
 
 
-Button::Button(std::function<void(bool)> changeCallback, std::string caption, int width, int height, sf::Font font): UIPart(width, height) {
-    m_changeCallback = changeCallback;
+Button::Button(std::string caption, int width, int height, sf::Font font): Element(width, height) {
     setCaption(caption);
     m_font = font;
     m_pressed = false;
-}
-
-void Button::setPressed(bool pressed) {
-    m_pressed = pressed;
-}
-
-void Button::setCaption(std::string caption) {
-    m_caption = caption;
+    m_colorActivated = sf::Color(0xBF, 0xBF, 0xBF, 0xFF);
+    m_colorDeactivated = sf::Color(0x80, 0x80, 0x80, 0xFF);
 }
 
 void Button::onMousePress(int x, int y, sf::Mouse::Button mouseButton) {
     m_pressed = true;
-    m_changeCallback(true);
+    if (m_clickCallback) m_clickCallback(true);
 }
 
 void Button::onMouseRelease(int x, int y, sf::Mouse::Button mouseButton) {
     m_pressed = false;
-    m_changeCallback(false);
+    if (m_clickCallback) m_clickCallback(false);
 }
 
 void Button::draw(sf::RenderTarget& target, sf::RenderStates states) const
@@ -39,10 +32,10 @@ void Button::draw(sf::RenderTarget& target, sf::RenderStates states) const
     states.transform *= getTransform();
     
     sf::RectangleShape buttonShape (sf::Vector2f(getWidth(), getHeight()));
-    if (m_pressed) {
-        buttonShape.setFillColor(sf::Color::Green);
+    if (drawActivated()) {
+        buttonShape.setFillColor(m_colorActivated);
     } else {
-        buttonShape.setFillColor(sf::Color::Red);
+        buttonShape.setFillColor(m_colorDeactivated);
     }
     
     buttonShape.setOutlineThickness(1);

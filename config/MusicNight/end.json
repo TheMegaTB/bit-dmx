@@ -1,0 +1,19 @@
+{
+    "import": [],
+    "data": {
+        "Status End": {
+            "type": 1,
+            "fade_time": 0,
+            "group": 13,
+            "channels": ["StatusLED:G"],
+            "channel_values": [255]
+        },
+        "End": {
+            "type": 1,
+            "fade_time": 0,
+            "group": 13,
+            "channels": ["OL:1", "OL:2", "OL:3", "OR:3", "OR:1", "OR:2", "FL:Drum", "FL:Floor", "LOLED:B", "LOLED:G", "LILED:B", "LILED:G", "FL:Long", "FL:Short", "FR:Floor", "RILED:B", "RILED:G", "ROLED:B", "ROLED:G", "FR:Long", "FR:Short", "ScannerL:Color", "ScannerR:Color", "ScannerR:Pan", "ScannerR:Tilt", "ScannerL:Pan", "ScannerL:Tilt", "ScannerL:Shutter", "ScannerR:Shutter"],
+            "channel_values": [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 77, 80, 104, 129, 139, 78, 255, 255]
+        }
+    }
+}

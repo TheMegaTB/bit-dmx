@@ -9,22 +9,21 @@
 #ifndef Toggle_hpp
 #define Toggle_hpp
 
-#include "UIPart.hpp"
+#include "Button.hpp"
 
-class Toggle : public UIPart {
+class Toggle : public Button {
 public:
-    Toggle(std::function<void(bool)> clickCallback, std::string caption, int width, int height, sf::Font font);
+    Toggle(std::string caption, int width, int height, sf::Font font);
     
-    void setActivation(bool activated);
-    void setCaption(std::string caption);
+    void onChange(std::function<void(bool)> changeCallback) {m_changeCallback = changeCallback;};
+    void setActivation(bool activated) { m_activated = activated; };
     
     virtual void onMousePress(int x, int y, sf::Mouse::Button mouseButton);
-    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 protected:
+    virtual bool drawActivated() const { return m_activated; };
+    
     bool m_activated;
-    std::string m_caption;
-    sf::Font m_font;
-    std::function<void(bool)> m_clickCallback;
+    std::function<void(bool)> m_changeCallback;
 };
 
 #endif /* Toggle_hpp */

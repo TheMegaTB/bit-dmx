@@ -1,0 +1,73 @@
+{
+    "import": [],
+    "data": {
+        "intro_step_0": {
+            "type": 1, "fade_time": 0,
+            "channels": ["LILED:R", "RILED:R"],
+            "channel_values": [255, 255]
+        },
+        "intro_step_0.1": {
+            "type": 1, "fade_time": 1800,
+            "channels": ["LILED:R", "RILED:R"],
+            "channel_values": [0, 0]
+        },
+        "intro_step_1": {
+            "type": 1, "fade_time": 0,
+            "channels": ["LOLED:R", "ROLED:R"],
+            "channel_values": [255, 255]
+        },
+        "intro_step_1.1": {
+            "type": 1, "fade_time": 1800,
+            "channels": ["LOLED:R", "ROLED:R"],
+            "channel_values": [0, 0]
+        },
+        "intro_step_2": {
+            "type": 1, "fade_time": 0,
+            "channels": ["LILED:G", "RILED:G"],
+            "channel_values": [255, 255]
+        },
+        "intro_step_2.1": {
+            "type": 1, "fade_time": 1800,
+            "channels": ["LILED:G", "RILED:G"],
+            "channel_values": [0, 0]
+        },
+        "intro_step_3": {
+            "type": 1, "fade_time": 0,
+            "channels": ["LOLED:G", "ROLED:G"],
+            "channel_values": [255, 255]
+        },
+        "intro_step_3.1": {
+            "type": 1, "fade_time": 1800,
+            "channels": ["LOLED:G", "ROLED:G"],
+            "channel_values": [0, 0]
+        },
+        "intro_step_4": {
+            "type": 1, "fade_time": 0,
+            "channels": ["LILED:B", "RILED:B"],
+            "channel_values": [255, 255]
+        },
+        "intro_step_4.1": {
+            "type": 1, "fade_time": 1800,
+            "channels": ["LILED:B", "RILED:B"],
+            "channel_values": [0, 0]
+        },
+        "intro_step_5": {
+            "type": 1, "fade_time": 0,
+            "channels": ["LOLED:B", "ROLED:B"],
+            "channel_values": [255, 255]
+        },
+        "intro_step_5.1": {
+            "type": 1, "fade_time": 1800,
+            "channels": ["LOLED:B", "ROLED:B"],
+            "channel_values": [0, 0]
+        },
+        "intro_step_6": {
+            "type": 1, "fade_time": 1800,
+            "channels": ["LOLED:R", "LOLED:G", "LOLED:B",
+                         "LILED:R", "LILED:G", "LILED:B",
+                         "ROLED:R", "ROLED:G", "ROLED:B",
+                         "RILED:R", "RILED:G", "RILED:B"],
+            "channel_values": [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+        }
+    }
+}

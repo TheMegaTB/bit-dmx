@@ -1,0 +1,50 @@
+{
+    "import": [],
+    "data": {
+        "random_init": {
+            "type": 1, "fade_time": 0,
+            "channels": ["ScannerL:Shutter", "ScannerR:Shutter"],
+            "channel_values": [255, 255]
+        },
+        "random_0": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["ScannerL:Pan", "ScannerL:Tilt", "ScannerR:Pan", "ScannerR:Tilt"],
+            "channel_values": [91, 97, 139, 123]
+        },
+        "random_1": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["ScannerL:Pan", "ScannerL:Tilt", "ScannerR:Pan", "ScannerR:Tilt"],
+            "channel_values": [135, 84, 134, 207]
+        },
+        "random_2": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["ScannerL:Pan", "ScannerL:Tilt", "ScannerR:Pan", "ScannerR:Tilt"],
+            "channel_values": [62, 62, 84, 132]
+        },
+        "random_3": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["ScannerL:Pan", "ScannerL:Tilt", "ScannerR:Pan", "ScannerR:Tilt"],
+            "channel_values": [135, 81, 153, 84]
+        },
+        "random_4": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["ScannerL:Pan", "ScannerL:Tilt", "ScannerR:Pan", "ScannerR:Tilt"],
+            "channel_values": [84, 123, 75, 155]
+        },
+        "random_5": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["ScannerL:Pan", "ScannerL:Tilt", "ScannerR:Pan", "ScannerR:Tilt"],
+            "channel_values": [135, 150, 104, 179]
+        },
+        "random_6": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["ScannerL:Pan", "ScannerL:Tilt", "ScannerR:Pan", "ScannerR:Tilt"],
+            "channel_values": [64, 69, 150, 102]
+        },
+        "random_7": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["ScannerL:Pan", "ScannerL:Tilt", "ScannerR:Pan", "ScannerR:Tilt"],
+            "channel_values": [140, 0, 89, 49]
+        }
+    }
+}

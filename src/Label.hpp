@@ -9,10 +9,10 @@
 #ifndef Label_hpp
 #define Label_hpp
 
-#include "UIPart.hpp"
+#include "Element.hpp"
 
 
-class Label : public UIPart {
+class Label : public Element {
 public:
     Label(std::string caption, int width, int height, sf::Font font);
     

@@ -1,0 +1,20 @@
+{
+    "import": [],
+    "data": {
+        "Status Zara (Gitarre)": {
+            "type": 1,
+            "fade_time": 0,
+            "group": 5,
+            "channels": ["StatusLED:B"],
+            "channel_values": [255]
+        },
+        "zarag": {
+            "type": 1,
+            "fade_time": 0,
+            "caption": "Zara 1",
+            "group": 5,
+            "channels": ["OL:1", "OR:3", "LOLED:R", "LOLED:G", "LILED:R", "LILED:G", "RILED:R", "RILED:G", "ROLED:R", "ROLED:G", "ScannerL:Shutter", "ScannerL:Pan", "ScannerL:Tilt", "ScannerL:Color", "ScannerR:Shutter", "ScannerR:Pan", "ScannerR:Tilt", "ScannerR:Color"],
+            "channel_values": [150, 150, 255, 110, 255, 110, 255, 110, 255, 110, 255, 129, 54, 56, 255, 99, 75, 56]
+        }
+    }
+}

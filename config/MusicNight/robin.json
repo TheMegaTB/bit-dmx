@@ -1,0 +1,21 @@
+{
+    "import": [],
+    "data": {
+        "Status Robbin": {
+            "type": 1,
+            "fade_time": 0,
+            "group": 4,
+            "channels": ["StatusLED:G"],
+            "channel_values": [255]
+        },
+        "robbin": {
+            "type": 1,
+            "fade_time": 1000,
+            "caption": "Robbin",
+            "group": 4,
+            "activate": false,
+            "channels": ["LOLED:R", "LOLED:G", "LOLED:B", "LILED:R", "LILED:G", "LILED:B", "RILED:R", "RILED:G", "RILED:B", "ROLED:R", "ROLED:G", "ROLED:B", "FL:Long", "FR:Long", "FR:Short", "OR:2", "OL:3"],
+            "channel_values": [255, 160, 10, 255, 160, 10, 255, 160, 10, 255, 160, 10, 255, 128, 128, 128, 128]
+        }
+    }
+}

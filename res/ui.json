@@ -1,284 +1,70 @@
 {
-  "0?ScannerR Shutter": {
-    "type": 3,
-    "fade_time": 0,
-    "channel_address": "ScannerR:Shutter"
-  },
-  "LTruss Long Left": {
-    "type": 3,
-    "caption": "Truss | Long L",
-    "fade_time": 1000,
-    "channel_address": "OL:1"
-  },
-  "LTruss Short Left": {
-    "type": 3,
-    "caption": "Truss | Short LL",
-    "fade_time": 1000,
-    "channel_address": "OL:2"
-  },
-  "LTruss Short Right": {
-    "type": 3,
-    "caption": "Truss | Short LR",
-    "fade_time": 1000,
-    "channel_address": "OL:3"
-  },
-  "LTruss Mirrorball": {
-    "type": 3,
-    "caption": "Truss | Mb",
-    "fade_time": 1000,
-    "channel_address": "OL:4"
-  },
-  "RTruss Short Left": {
-    "type": 3,
-    "caption": "Truss | Short RL",
-    "fade_time": 1000,
-    "channel_address": "OR:1"
-  },
-  "RTruss Short Right": {
-    "type": 3,
-    "caption": "Truss | Short RR",
-    "fade_time": 1000,
-    "channel_address": "OR:2"
-  },
-  "RTruss Long Right": {
-    "type": 3,
-    "caption": "Truss | Long R",
-    "fade_time": 1000,
-    "channel_address": "OR:3"
-  },
-  "RTruss Stars": {
-    "type": 3,
-    "caption": "Truss | St",
-    "fade_time": 1000,
-    "channel_address": "OR:4"
-  },
-  "Tower FL | Drumset": {
-    "type": 3,
-    "caption": "Tower FL | Drumset",
-    "fade_time": 1000,
-    "channel_address": "FL:1"
-  },
-  "Tower FL | Long": {
-    "type": 3,
-    "caption": "Tower FL | Long",
-    "fade_time": 1000,
-    "channel_address": "FL:2"
-  },
-  "Tower FL | Short": {
-    "type": 3,
-    "caption": "Tower FL | Short",
-    "fade_time": 1000,
-    "channel_address": "FL:3"
-  },
-  "Tower FL | Floodlight": {
-    "type": 3,
-    "caption": "Tower FL | Floodlight",
-    "fade_time": 1000,
-    "channel_address": "FL:4"
-  },
-  "Tower FR | Long": {
-    "type": 3,
-    "caption": "Tower FR | Long",
-    "fade_time": 1000,
-    "channel_address": "FR:2"
-  },
-  "Tower FR | Short": {
-    "type": 3,
-    "caption": "Tower FR | Short",
-    "fade_time": 1000,
-    "channel_address": "FR:3"
-  },
-  "Tower FR | Floodlight": {
-    "type": 3,
-    "caption": "Tower FR | Floodlight",
-    "fade_time": 1000,
-    "channel_address": "FR:4"
-  },
-  "Tower FR | LEDL:R": {
-    "type": 3,
-    "caption": "Tower FR | LedL R",
-    "fade_time": 1000,
-    "channel_address": "Tower R | LLED:R"
-  },
-  "Tower FR | LEDL:G": {
-    "type": 3,
-    "caption": "Tower FR | LedL G",
-    "fade_time": 1000,
-    "channel_address": "Tower R | LLED:G"
-  },
-  "Tower FR | LEDL:B": {
-    "type": 3,
-    "caption": "Tower FR | LedL B",
-    "fade_time": 1000,
-    "channel_address": "Tower R | LLED:B"
-  },
-  "Tower FR | LEDR:R": {
-    "type": 3,
-    "caption": "Tower FR | LedR R",
-    "fade_time": 1000,
-    "channel_address": "Tower R | RLED:R"
-  },
-  "Tower FR | LEDR:G": {
-    "type": 3,
-    "caption": "Tower FR | LedR G",
-    "fade_time": 1000,
-    "channel_address": "Tower R | RLED:G"
-  },
-  "Tower FR | LEDR:B": {
-    "type": 3,
-    "caption": "Tower FR | LedR B",
-    "fade_time": 1000,
-    "channel_address": "Tower R | RLED:B"
-  },
-  "Tower FL | LEDL:R": {
-    "type": 3,
-    "caption": "Tower FL | LedL R",
-    "fade_time": 1000,
-    "channel_address": "Tower L | LLED:R"
-  },
-  "Tower FL | LEDL:G": {
-    "type": 3,
-    "caption": "Tower FL | LedL G",
-    "fade_time": 1000,
-    "channel_address": "Tower L | LLED:G"
-  },
-  "Tower FL | LEDL:B": {
-    "type": 3,
-    "caption": "Tower FL | LedL B",
-    "fade_time": 1000,
-    "channel_address": "Tower L | LLED:B"
-  },
-  "Tower FL | LEDR:R": {
-    "type": 3,
-    "caption": "Tower FL | LedR R",
-    "fade_time": 1000,
-    "channel_address": "Tower L | RLED:R"
-  },
-  "Tower FL | LEDR:G": {
-    "type": 3,
-    "caption": "Tower FL | LedR G",
-    "fade_time": 1000,
-    "channel_address": "Tower L | RLED:G"
-  },
-  "Tower FL | LEDR:B": {
-    "type": 3,
-    "caption": "Tower FL | LedR B",
-    "fade_time": 1000,
-    "channel_address": "Tower L | RLED:B"
-  },
-  "Zcanner L Color": {
-    "type": 3,
-    "caption": "ScannerL Color",
-    "fade_time": 0,
-    "channel_address": "ScannerL:Color"
-  },
-  "Zcanner R Color": {
-    "type": 3,
-    "caption": "ScannerR Color",
-    "fade_time": 0,
-    "channel_address": "ScannerR:Color"
-  },
-  "Fogger": {
-    "type": 3,
-    "caption": "Fogger",
-    "fade_time": 0,
-    "channel_address": "fog:pressure"
-  },
-  "scannerL:movement": {
-    "visible": true,
-    "type": 4,
-    "caption": "Scanner L",
-    "fade_time": 0,
-    "channelx_address": "ScannerL:Pan",
-    "channely_address": "ScannerL:Tilt"
-  },
-  "scannerR:movement": {
-    "visible": true,
-    "type": 4,
-    "caption": "Scanner R",
-    "fade_time": 0,
-    "channelx_address": "ScannerR:Pan",
-    "channely_address": "ScannerR:Tilt"
-  },
-  "scannerOL:movement": {
-    "visible": true,
-    "type": 4,
-    "caption": "Scanner OL",
-    "fade_time": 0,
-    "channelx_address": "ScannerOL:Pan",
-    "channely_address": "ScannerOL:Tilt"
-  },
-  "scannerOL Color": {
-    "type": 3,
-    "fade_time": 0,
-    "channel_address": "ScannerOL:Gobo"
-  },
-  "scannerIL:movement": {
-    "visible": true,
-    "type": 4,
-    "caption": "Scanner IL",
-    "fade_time": 0,
-    "channelx_address": "ScannerIL:Pan",
-    "channely_address": "ScannerIL:Tilt"
-  },
-  "scannerIR:movement": {
-    "visible": true,
-    "type": 4,
-    "caption": "Scanner IR",
-    "fade_time": 0,
-    "channelx_address": "ScannerIR:Pan",
-    "channely_address": "ScannerIR:Tilt"
-  },
-  "scannerOR:movement": {
-    "visible": true,
-    "type": 4,
-    "caption": "Scanner OR",
-    "fade_time": 0,
-    "channelx_address": "ScannerOR:Pan",
-    "channely_address": "ScannerOR:Tilt"
-  },
-  "scanner_on": {
-    "visible": true,
-    "type": 1,
-    "fade_curve": 1,
-    "fade_time": 0,
-    "caption": "Scanner On",
-    "activate": true,
-    "channels": ["ScannerL:Shutter", "ScannerL:Gobo", "ScannerR:Shutter", "ScannerR:Gobo", "ScannerOL:Gobo", "ScannerIL:Gobo", "ScannerIR:Gobo", "ScannerOR:Gobo"],
-    "channel_values": [255, 0, 255, 0, 10, 10, 10, 10],
-    "hotkey": 0
-  },
-  "scanner1:s200": {
-    "visible": false,
-    "type": 1,
-    "fade_time": 2000,
-    "caption": "All On",
-    "channels": ["Scanner:Shutter", "Scanner:Gobo"],
-    "channel_values": [200, 100],
-    "hotkey": 7
-  },
-  "ledPars": {
-    "visible": false,
-    "type": 1,
-    "fade_time": 2000,
-    "caption": "LED Pars",
-    "channels": ["Tower L | RLED:R", "Tower L | RLED:G", "Tower L | RLED:B", "Tower L | LLED:R", "Tower L | LLED:G", "Tower L | LLED:B", "Tower R | RLED:R", "Tower R | RLED:G", "Tower R | RLED:B", "Tower R | LLED:R", "Tower R | LLED:G", "Tower R | LLED:B"],
-    "channel_values": [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
-    "hotkey": 8
-  },
-    "test": {
-      "visible": false,
-      "type": 1,
-        "fade_time": 0,
-        "caption": "All On2",
-        "channels": ["Scanner:Shutter", "Scanner:Gobo"],
-        "channel_values": [200, 100],
-        "hotkey": 7
-    },
-  "Tower FR | Drumset": {
-    "type": 3,
-    "caption": "Tower FR | Drumset",
-    "fade_time": 1000,
-    "channel_address": "FR:1"
-  }
+    "import": [],
+    "data": {
+        "RGTest": {
+            "type": 3,
+            "group": 0,
+            "hotkey": 0,
+            "actions": {
+                "UplightL": {
+                    "R": {"fade_time": 2000},
+                    "G": {}
+                },
+                "UplightR": {
+                    "R": {"fade_time": 2000},
+                    "G": {}
+                }
+            }
+        },
+        "BTest": {
+            "type": 3,
+            "group": 0,
+            "actions": {
+                "UplightL:B": {},
+                "UplightR:B": {}
+            }
+        },
+        "XYTest": {
+            "type": 4,
+            "group": 0,
+            "actionsX": {
+                "ScannerIL:Pan": {},
+                "ScannerIR:Pan": {}
+            },
+            "actionsY": {
+                "ScannerIL:Tilt": {},
+                "ScannerIR:Tilt": {}
+            }
+        },
+        "SwitchTest": {
+            "type": 1,
+            "group": 0,
+            "hotkey": 1,
+            "actions": {
+                "UplightL:B": {"value": 100},
+                "UplightR:B": {"value":100},
+                "XYTest": {
+                    "x": {"value": 255, "fade_time": 8000, "fade_curve": 2},
+                    "y": {"value": 255, "fade_time": 8000}
+                }
+            }
+        },
+        "ChaserTest": {
+            "type": 0,
+            "group": 1,
+            "hotkey": 2,
+            "chaser": [
+               {"time": 2000, "round": 2, "deactivate": false, "actions": {
+                       "XYTest": {
+                           "x": {"value": 255, "fade_time": 2000, "fade_curve": 2},
+                           "y": {"value": 255, "fade_time": 2000}
+                       }
+                }},
+                       {"time": 2000, "actions": {"UplightL:B": {"value": 255}}},
+                       {"time": 2000, "actions": {"UplightL:B": {"value": 0}}},
+                       {"time": 2000, "round": 4, "actions": {"XYTest": {"x": {"value": -1}, "y": {"value": -1}}}},
+                       {"time": 2000, "round": 4, "actions": {"ChaserTest:value": {"value": -1}}}
+            ]
+        }
+    }
 }

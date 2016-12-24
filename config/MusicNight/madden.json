@@ -1,0 +1,136 @@
+{
+    "import": [],
+    "data": {
+        "Status Maddon": {
+            "type": 1,
+            "fade_time": 0,
+            "group": 11,
+            "channels": ["StatusLED:B"],
+            "channel_values": [255]
+        },
+        "maddenInit": {
+            "type": 1,
+            "fade_time": 1000,
+            "caption": "Madden Init",
+            "group": 11,
+            "channels": ["FR:Drum", "FL:Drum", "OL:2", "OR:1", "OR:2", "FR:Short", "FR:Long", "FL:Short", "FL:Long", "OL:1", "OR:3"],
+            "channel_values": [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+        },
+        "madden1.1": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:G", "LILED:R", "LILED:G", "RILED:R", "RILED:G","ROLED:G"],
+            "channel_values": [255, 255, 255, 255, 255, 255]
+        },
+        "madden1.2": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:R", "LOLED:G", "LILED:G", "RILED:G", "ROLED:R", "ROLED:G"],
+            "channel_values": [255, 255, 255, 255, 255, 255]
+        },
+        "madden1.3": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:R", "LOLED:G", "LILED:R", "LILED:G", "RILED:R", "RILED:G", "ROLED:R", "ROLED:G"],
+            "channel_values": [255, 255, 255, 255, 255, 255, 255, 255]
+        },
+        "madden1.4": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:G", "LILED:G", "RILED:G","ROLED:G"],
+            "channel_values": [255, 255, 255, 255]
+        },
+        "madden1.5": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:R", "LOLED:G", "LILED:R", "LILED:G", "RILED:R", "RILED:G", "ROLED:R", "ROLED:G"],
+            "channel_values": [255, 255, 255, 255, 255, 255, 255, 255]
+        },
+        "madden1.6": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:G", "LILED:G", "RILED:G","ROLED:G"],
+            "channel_values": [255, 255, 255, 255]
+        },
+        "madden1": {
+            "type": 0,
+            "caption": "Madden 1",
+            "group": 11,
+            "chaser": [
+                       {"name": "madden1.1", "time": 1000},
+                       {"name": "madden1.2", "time": 1000},
+                       {"name": "madden1.3", "time": 1000},
+                       {"name": "madden1.4", "time": 1000},
+                       {"name": "madden1.5", "time": 500},
+                       {"name": "madden1.6", "time": 500}
+                       ]
+        },
+        
+        
+        "madden2.1": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:G", "LILED:R", "RILED:R","ROLED:G"],
+            "channel_values": [255, 255, 255, 255]
+        },
+        "madden2.2": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:R", "LILED:R", "RILED:R","ROLED:R"],
+            "channel_values": [255, 255, 255, 255]
+        },
+        "madden2.3": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:R", "LILED:G", "RILED:G","ROLED:R"],
+            "channel_values": [255, 255, 255, 255]
+        },
+        "madden2.4": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:R", "LILED:R", "RILED:R","ROLED:R"],
+            "channel_values": [255, 255, 255, 255]
+        },
+        "madden2.5": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:G", "LILED:G", "RILED:G","ROLED:G"],
+            "channel_values": [255, 255, 255, 255]
+        },
+        "madden2.6": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:R", "LILED:R", "RILED:R","ROLED:R"],
+            "channel_values": [255, 255, 255, 255]
+        },
+        
+        "madden2": {
+            "type": 0,
+            "caption": "Madden 2",
+            "group": 11,
+            "chaser": [
+                       {"name": "madden2.1", "time": 1000},
+                       {"name": "madden2.2", "time": 1000},
+                       {"name": "madden2.3", "time": 1000},
+                       {"name": "madden2.4", "time": 1000},
+                       {"name": "madden2.5", "time": 500},
+                       {"name": "madden2.6", "time": 500}
+                       ]
+        },
+        
+        "madden3.1": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:R", "LOLED:G", "LOLED:B", "LILED:R", "LILED:G", "LILED:B",  "RILED:R", "RILED:G", "RILED:B", "ROLED:R", "ROLED:G", "ROLED:B"],
+            "channel_values": [100, 100, 255, 100, 100, 255, 100, 100, 255, 100, 100, 255]
+        },
+        "madden3.2": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:R", "LOLED:G", "LOLED:B", "LILED:R", "LILED:G", "LILED:B",  "RILED:R", "RILED:G", "RILED:B", "ROLED:R", "ROLED:G", "ROLED:B"],
+            "channel_values": [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+        },
+        "madden3.3": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:B", "LILED:B", "RILED:B","ROLED:B"],
+            "channel_values": [255, 255, 255, 255]
+        },
+        
+        "madden3": {
+            "type": 0,
+            "caption": "Madden 3",
+            "group": 11,
+            "chaser": [
+                       {"name": "madden3.1", "time": 1000},
+                       {"name": "madden3.2", "time": 1000},
+                       {"name": "madden3.3", "time": 1000}
+                       ]
+        }
+    }
+}

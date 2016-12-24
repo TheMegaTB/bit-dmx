@@ -1,0 +1,15 @@
+{
+    "name": "MusicNight Stage",
+    "size": 100,
+    "fixture_templates": {
+        "d-rgb-par": ["Master", "Strobe", "Color", "Speed", "R", "G", "B"],
+        "dimmerPack1": ["1", "2", "3", "Stars"],
+        "dimmerPack2": ["Spot", "MB"]
+    },
+    "fixtures": [
+                 {"name": "Dimmer1", "template": "dimmerPack1", "channel": 73},
+                 {"name": "UplightL", "template": "d-rgb-par", "channel": 81},
+                 {"name": "UplightR", "template": "d-rgb-par", "channel": 88},
+                 {"name": "Dimmer2", "template": "dimmerPack2", "channel": 95}
+        ]
+}

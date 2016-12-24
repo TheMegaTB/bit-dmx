@@ -13,18 +13,20 @@
 		4F8216201E0454AD00744816 /* FadeCurve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F82161E1E0454AD00744816 /* FadeCurve.cpp */; };
 		4F8216231E04683C00744816 /* UIControlElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F8216211E04683C00744816 /* UIControlElement.cpp */; };
 		4F82162C1E049A7600744816 /* UISwitch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F82162A1E049A7600744816 /* UISwitch.cpp */; };
-		4F8216391E05787500744816 /* UIChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F8216371E05787500744816 /* UIChannel.cpp */; };
-		4F82163D1E05C30500744816 /* UIPart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F82163B1E05C30500744816 /* UIPart.cpp */; };
-		4F8216401E05C33900744816 /* UIController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F82163E1E05C33900744816 /* UIController.cpp */; };
+		4F8216391E05787500744816 /* UISlieder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F8216371E05787500744816 /* UISlieder.cpp */; };
+		4F82163D1E05C30500744816 /* Element.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F82163B1E05C30500744816 /* Element.cpp */; };
+		4F8216401E05C33900744816 /* ElementController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F82163E1E05C33900744816 /* ElementController.cpp */; };
 		4F8216431E05C63F00744816 /* Button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F8216411E05C63F00744816 /* Button.cpp */; };
-		4F8216461E05C77B00744816 /* Slider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F8216441E05C77B00744816 /* Slider.cpp */; };
+		4F8216461E05C77B00744816 /* VerticalSlider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F8216441E05C77B00744816 /* VerticalSlider.cpp */; };
 		4F8216491E05CEEA00744816 /* Toggle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F8216471E05CEEA00744816 /* Toggle.cpp */; };
 		4F82164C1E06076A00744816 /* UIPushButton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F82164A1E06076A00744816 /* UIPushButton.cpp */; };
-		4F82164F1E0616D800744816 /* Selector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F82164D1E0616D800744816 /* Selector.cpp */; };
 		4F8216521E0617B200744816 /* Label.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F8216501E0617B200744816 /* Label.cpp */; };
-		4F82165C1E06C04200744816 /* UISingleHotkey.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F82165A1E06C04200744816 /* UISingleHotkey.cpp */; };
 		4F82165F1E06D27200744816 /* XYPad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F82165D1E06D27200744816 /* XYPad.cpp */; };
 		4F8216621E06DAAD00744816 /* UIXYPad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F8216601E06DAAD00744816 /* UIXYPad.cpp */; };
+		4FA245A21E0C99DF0097B27D /* HorizontalSlider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FA245A11E0C99DF0097B27D /* HorizontalSlider.cpp */; };
+		4FA245A91E0D5E940097B27D /* ActionGroup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FA245A71E0D5E940097B27D /* ActionGroup.cpp */; };
+		4FA245AC1E0DA2940097B27D /* Action.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FA245AA1E0DA2940097B27D /* Action.cpp */; };
+		4FA245B21E0DE1710097B27D /* UISingleVChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FA245B01E0DE1710097B27D /* UISingleVChannel.cpp */; };
 		4FB7B5161E07D27900D54CC7 /* arduino-serial-dmx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FB7B5141E07D27900D54CC7 /* arduino-serial-dmx.cpp */; };
 		4FB7B5171E07D27900D54CC7 /* arduino-serial-lib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FB7B5151E07D27900D54CC7 /* arduino-serial-lib.cpp */; };
 		4FB7B51B1E07EA6300D54CC7 /* keys.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4FB7B51A1E07EA6300D54CC7 /* keys.txt */; };
@@ -32,7 +34,6 @@
 		4FDBFA791E088C6800D515AD /* sansation.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4FDBFA751E088C6800D515AD /* sansation.ttf */; };
 		4FDBFA7A1E088C6800D515AD /* stage.json in Resources */ = {isa = PBXBuildFile; fileRef = 4FDBFA761E088C6800D515AD /* stage.json */; };
 		4FDBFA7B1E088C6800D515AD /* ui.json in Resources */ = {isa = PBXBuildFile; fileRef = 4FDBFA771E088C6800D515AD /* ui.json */; };
-		4FDD24F31E06F2A6000C715D /* UILabeledElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FDD24F11E06F2A6000C715D /* UILabeledElement.cpp */; };
 		4FDD24F61E06FD5B000C715D /* UIChaser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FDD24F41E06FD5B000C715D /* UIChaser.cpp */; };
 		4FE6B2421E088124007790DD /* ResourcePath.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FE6B2411E088124007790DD /* ResourcePath.mm */; };
 /* End PBXBuildFile section */
@@ -52,30 +53,34 @@
 		4F8216221E04683C00744816 /* UIControlElement.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UIControlElement.hpp; sourceTree = "<group>"; };
 		4F82162A1E049A7600744816 /* UISwitch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UISwitch.cpp; sourceTree = "<group>"; };
 		4F82162B1E049A7600744816 /* UISwitch.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UISwitch.hpp; sourceTree = "<group>"; };
-		4F8216371E05787500744816 /* UIChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UIChannel.cpp; sourceTree = "<group>"; };
-		4F8216381E05787500744816 /* UIChannel.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UIChannel.hpp; sourceTree = "<group>"; };
-		4F82163B1E05C30500744816 /* UIPart.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UIPart.cpp; sourceTree = "<group>"; };
-		4F82163C1E05C30500744816 /* UIPart.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UIPart.hpp; sourceTree = "<group>"; };
-		4F82163E1E05C33900744816 /* UIController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UIController.cpp; sourceTree = "<group>"; };
-		4F82163F1E05C33900744816 /* UIController.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UIController.hpp; sourceTree = "<group>"; };
+		4F8216371E05787500744816 /* UISlieder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UISlieder.cpp; sourceTree = "<group>"; };
+		4F8216381E05787500744816 /* UISlieder.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UISlieder.hpp; sourceTree = "<group>"; };
+		4F82163B1E05C30500744816 /* Element.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Element.cpp; sourceTree = "<group>"; };
+		4F82163C1E05C30500744816 /* Element.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Element.hpp; sourceTree = "<group>"; };
+		4F82163E1E05C33900744816 /* ElementController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ElementController.cpp; sourceTree = "<group>"; };
+		4F82163F1E05C33900744816 /* ElementController.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ElementController.hpp; sourceTree = "<group>"; };
 		4F8216411E05C63F00744816 /* Button.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Button.cpp; sourceTree = "<group>"; };
 		4F8216421E05C63F00744816 /* Button.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Button.hpp; sourceTree = "<group>"; };
-		4F8216441E05C77B00744816 /* Slider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Slider.cpp; sourceTree = "<group>"; };
-		4F8216451E05C77B00744816 /* Slider.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Slider.hpp; sourceTree = "<group>"; };
+		4F8216441E05C77B00744816 /* VerticalSlider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VerticalSlider.cpp; sourceTree = "<group>"; };
+		4F8216451E05C77B00744816 /* VerticalSlider.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = VerticalSlider.hpp; sourceTree = "<group>"; };
 		4F8216471E05CEEA00744816 /* Toggle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Toggle.cpp; sourceTree = "<group>"; };
 		4F8216481E05CEEA00744816 /* Toggle.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Toggle.hpp; sourceTree = "<group>"; };
 		4F82164A1E06076A00744816 /* UIPushButton.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UIPushButton.cpp; sourceTree = "<group>"; };
 		4F82164B1E06076A00744816 /* UIPushButton.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UIPushButton.hpp; sourceTree = "<group>"; };
-		4F82164D1E0616D800744816 /* Selector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Selector.cpp; sourceTree = "<group>"; };
-		4F82164E1E0616D800744816 /* Selector.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Selector.hpp; sourceTree = "<group>"; };
 		4F8216501E0617B200744816 /* Label.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Label.cpp; sourceTree = "<group>"; };
 		4F8216511E0617B200744816 /* Label.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Label.hpp; sourceTree = "<group>"; };
-		4F82165A1E06C04200744816 /* UISingleHotkey.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UISingleHotkey.cpp; sourceTree = "<group>"; };
-		4F82165B1E06C04200744816 /* UISingleHotkey.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UISingleHotkey.hpp; sourceTree = "<group>"; };
 		4F82165D1E06D27200744816 /* XYPad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = XYPad.cpp; sourceTree = "<group>"; };
 		4F82165E1E06D27200744816 /* XYPad.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = XYPad.hpp; sourceTree = "<group>"; };
 		4F8216601E06DAAD00744816 /* UIXYPad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UIXYPad.cpp; sourceTree = "<group>"; };
 		4F8216611E06DAAD00744816 /* UIXYPad.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UIXYPad.hpp; sourceTree = "<group>"; };
+		4FA245A11E0C99DF0097B27D /* HorizontalSlider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HorizontalSlider.cpp; sourceTree = "<group>"; };
+		4FA245A31E0C99F10097B27D /* HorizontalSlider.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = HorizontalSlider.hpp; sourceTree = "<group>"; };
+		4FA245A71E0D5E940097B27D /* ActionGroup.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ActionGroup.cpp; sourceTree = "<group>"; };
+		4FA245A81E0D5E940097B27D /* ActionGroup.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ActionGroup.hpp; sourceTree = "<group>"; };
+		4FA245AA1E0DA2940097B27D /* Action.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Action.cpp; sourceTree = "<group>"; };
+		4FA245AB1E0DA2940097B27D /* Action.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Action.hpp; sourceTree = "<group>"; };
+		4FA245B01E0DE1710097B27D /* UISingleVChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UISingleVChannel.cpp; sourceTree = "<group>"; };
+		4FA245B11E0DE1710097B27D /* UISingleVChannel.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UISingleVChannel.hpp; sourceTree = "<group>"; };
 		4FB7B5141E07D27900D54CC7 /* arduino-serial-dmx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "arduino-serial-dmx.cpp"; sourceTree = "<group>"; };
 		4FB7B5151E07D27900D54CC7 /* arduino-serial-lib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "arduino-serial-lib.cpp"; sourceTree = "<group>"; };
 		4FB7B5181E07D2CA00D54CC7 /* arduino-serial-lib.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "arduino-serial-lib.hpp"; sourceTree = "<group>"; };
@@ -86,8 +91,6 @@
 		4FDBFA751E088C6800D515AD /* sansation.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sansation.ttf; sourceTree = "<group>"; };
 		4FDBFA761E088C6800D515AD /* stage.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = stage.json; sourceTree = "<group>"; };
 		4FDBFA771E088C6800D515AD /* ui.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ui.json; sourceTree = "<group>"; };
-		4FDD24F11E06F2A6000C715D /* UILabeledElement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UILabeledElement.cpp; sourceTree = "<group>"; };
-		4FDD24F21E06F2A6000C715D /* UILabeledElement.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UILabeledElement.hpp; sourceTree = "<group>"; };
 		4FDD24F41E06FD5B000C715D /* UIChaser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UIChaser.cpp; sourceTree = "<group>"; };
 		4FDD24F51E06FD5B000C715D /* UIChaser.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UIChaser.hpp; sourceTree = "<group>"; };
 		4FE6B2401E088124007790DD /* ResourcePath.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ResourcePath.hpp; sourceTree = "<group>"; };
@@ -157,16 +160,14 @@
 			children = (
 				4F8216211E04683C00744816 /* UIControlElement.cpp */,
 				4F8216221E04683C00744816 /* UIControlElement.hpp */,
-				4F82165A1E06C04200744816 /* UISingleHotkey.cpp */,
-				4F82165B1E06C04200744816 /* UISingleHotkey.hpp */,
-				4FDD24F11E06F2A6000C715D /* UILabeledElement.cpp */,
-				4FDD24F21E06F2A6000C715D /* UILabeledElement.hpp */,
+				4FA245B01E0DE1710097B27D /* UISingleVChannel.cpp */,
+				4FA245B11E0DE1710097B27D /* UISingleVChannel.hpp */,
 				4F82162A1E049A7600744816 /* UISwitch.cpp */,
 				4F82162B1E049A7600744816 /* UISwitch.hpp */,
 				4F82164A1E06076A00744816 /* UIPushButton.cpp */,
 				4F82164B1E06076A00744816 /* UIPushButton.hpp */,
-				4F8216371E05787500744816 /* UIChannel.cpp */,
-				4F8216381E05787500744816 /* UIChannel.hpp */,
+				4F8216371E05787500744816 /* UISlieder.cpp */,
+				4F8216381E05787500744816 /* UISlieder.hpp */,
 				4F8216601E06DAAD00744816 /* UIXYPad.cpp */,
 				4F8216611E06DAAD00744816 /* UIXYPad.hpp */,
 				4FDD24F41E06FD5B000C715D /* UIChaser.cpp */,
@@ -178,18 +179,18 @@
 		4F82163A1E05C2F600744816 /* UIPart */ = {
 			isa = PBXGroup;
 			children = (
-				4F82163B1E05C30500744816 /* UIPart.cpp */,
-				4F82163C1E05C30500744816 /* UIPart.hpp */,
-				4F82163E1E05C33900744816 /* UIController.cpp */,
-				4F82163F1E05C33900744816 /* UIController.hpp */,
+				4F82163B1E05C30500744816 /* Element.cpp */,
+				4F82163C1E05C30500744816 /* Element.hpp */,
+				4F82163E1E05C33900744816 /* ElementController.cpp */,
+				4F82163F1E05C33900744816 /* ElementController.hpp */,
 				4F8216411E05C63F00744816 /* Button.cpp */,
 				4F8216421E05C63F00744816 /* Button.hpp */,
 				4F8216471E05CEEA00744816 /* Toggle.cpp */,
 				4F8216481E05CEEA00744816 /* Toggle.hpp */,
-				4F8216441E05C77B00744816 /* Slider.cpp */,
-				4F8216451E05C77B00744816 /* Slider.hpp */,
-				4F82164D1E0616D800744816 /* Selector.cpp */,
-				4F82164E1E0616D800744816 /* Selector.hpp */,
+				4F8216441E05C77B00744816 /* VerticalSlider.cpp */,
+				4F8216451E05C77B00744816 /* VerticalSlider.hpp */,
+				4FA245A11E0C99DF0097B27D /* HorizontalSlider.cpp */,
+				4FA245A31E0C99F10097B27D /* HorizontalSlider.hpp */,
 				4F8216501E0617B200744816 /* Label.cpp */,
 				4F8216511E0617B200744816 /* Label.hpp */,
 				4F82165D1E06D27200744816 /* XYPad.cpp */,
@@ -258,6 +259,10 @@
 				4F8216161E04531900744816 /* Stage.hpp */,
 				4F82161B1E04547900744816 /* Channel.cpp */,
 				4F82161C1E04547900744816 /* Channel.hpp */,
+				4FA245A71E0D5E940097B27D /* ActionGroup.cpp */,
+				4FA245A81E0D5E940097B27D /* ActionGroup.hpp */,
+				4FA245AA1E0DA2940097B27D /* Action.cpp */,
+				4FA245AB1E0DA2940097B27D /* Action.hpp */,
 			);
 			name = DMX;
 			sourceTree = "<group>";
@@ -351,29 +356,30 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4F82165C1E06C04200744816 /* UISingleHotkey.cpp in Sources */,
 				4F8216521E0617B200744816 /* Label.cpp in Sources */,
 				4F8216231E04683C00744816 /* UIControlElement.cpp in Sources */,
 				4F82165F1E06D27200744816 /* XYPad.cpp in Sources */,
+				4FA245A91E0D5E940097B27D /* ActionGroup.cpp in Sources */,
 				4F8216491E05CEEA00744816 /* Toggle.cpp in Sources */,
 				4FDD24F61E06FD5B000C715D /* UIChaser.cpp in Sources */,
 				4F8216201E0454AD00744816 /* FadeCurve.cpp in Sources */,
 				4F8216051E0452C500744816 /* main.cpp in Sources */,
 				4FE6B2421E088124007790DD /* ResourcePath.mm in Sources */,
+				4FA245A21E0C99DF0097B27D /* HorizontalSlider.cpp in Sources */,
 				4FB7B5161E07D27900D54CC7 /* arduino-serial-dmx.cpp in Sources */,
 				4F8216431E05C63F00744816 /* Button.cpp in Sources */,
-				4F8216391E05787500744816 /* UIChannel.cpp in Sources */,
+				4F8216391E05787500744816 /* UISlieder.cpp in Sources */,
 				4F82161D1E04547900744816 /* Channel.cpp in Sources */,
 				4F82162C1E049A7600744816 /* UISwitch.cpp in Sources */,
-				4F8216401E05C33900744816 /* UIController.cpp in Sources */,
+				4F8216401E05C33900744816 /* ElementController.cpp in Sources */,
 				4F8216621E06DAAD00744816 /* UIXYPad.cpp in Sources */,
-				4FDD24F31E06F2A6000C715D /* UILabeledElement.cpp in Sources */,
 				4FB7B5171E07D27900D54CC7 /* arduino-serial-lib.cpp in Sources */,
 				4F82164C1E06076A00744816 /* UIPushButton.cpp in Sources */,
-				4F82164F1E0616D800744816 /* Selector.cpp in Sources */,
 				4F8216171E04531900744816 /* Stage.cpp in Sources */,
-				4F82163D1E05C30500744816 /* UIPart.cpp in Sources */,
-				4F8216461E05C77B00744816 /* Slider.cpp in Sources */,
+				4F82163D1E05C30500744816 /* Element.cpp in Sources */,
+				4F8216461E05C77B00744816 /* VerticalSlider.cpp in Sources */,
+				4FA245AC1E0DA2940097B27D /* Action.cpp in Sources */,
+				4FA245B21E0DE1710097B27D /* UISingleVChannel.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

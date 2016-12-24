@@ -11,31 +11,50 @@
 
 #include <stdio.h>
 
-#include "UILabeledElement.hpp"
-#include "UISingleHotkey.hpp"
+#include "UISingleVChannel.hpp"
 
-class UIChaser : public UILabeledElement {
+class ChaserStep {
 public:
-    UIChaser(Stage* stage, json chaserData);
+    ChaserStep(Stage *stage, json jsonData);
     
+    ValuedActionGroup getActionGroup() { return m_actionGroup; }
+    sf::Time getChaserTime() const { return m_chaserTime; };
     
+    bool activate() { return m_activate; };
+    bool deactivate() { return m_deactivate; };
+    
+    bool inRound(int round);
+    
+private:
+    ValuedActionGroup m_actionGroup;
+    
+    sf::Time m_chaserTime;
+    
+    int m_minRound;
+    int m_round;
+    int m_maxRound;
+    
+    bool m_activate;
+    bool m_deactivate;
+};
+
+
+class UIChaser : public UISingleVChannel {
+public:
+    UIChaser(Stage* stage, std::vector<ChaserStep> chaserSteps);
     virtual void update();
-    
-    virtual void chaserActivate();
-    virtual void chaserDeactivate();
-    
-    virtual void activate();
-    virtual void deactivate();
 private:
     std::shared_ptr<Toggle> m_toggle;
     
     sf::Time m_startTime;
     
     void next();
+    void activateStep(int id);
+    void deactivateStep(int id);
     
     int m_position;
     int m_round;
-    std::vector<json> m_chaserData;
+    std::vector<ChaserStep> m_chaserSteps;
 };
 
 #endif /* UIChaser_hpp */

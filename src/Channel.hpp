@@ -16,31 +16,31 @@
 
 #include "Types.hpp"
 #include "FadeCurve.hpp"
-
+#include <iostream>
 
 class Channel {
 public:
-    Channel();
-    ChannelValue getValue(sf::Time time) const;
-    ChannelValue getInterfaceValue() const;
-    void setInterfaceValue(ChannelValue interfaceValue);
+    Channel(ChannelValue defaultValue = 0);
     
-    void startFade(sf::Time startTime, sf::Time fadeTime, ChannelValue value, FadeCurve fadeCurve, int uiElementID);
-    void setValue(ChannelValue value, int uiElementID);
+    ChannelValue getValue() const { return m_lastValue; };
+    bool update(sf::Time time);
     
-    void disableUIElement(int uiElementID, sf::Time now);
+    void setValue(ChannelValue value, int activationID);
+    void startFade(sf::Time startTime, sf::Time fadeTime, ChannelValue value, FadeCurve fadeCurve, int activationID);
+    void deactivateActivation(sf::Time now, int activationID);
+    
+    void deactivateAll();
 private:
-    ChannelValue m_fadeStartValue;
-    std::vector<ChannelValue> m_fadeEndValues;
-    ChannelValue m_interfaceValue;
+    ChannelValue m_lastValue;
     
-    std::vector<int> m_uiElementIDs;
+    //current fade
+    ChannelValue m_fadeStartValue;
+    sf::Time m_fadeStartTime;
+    //fade history
+    std::vector<int> m_activations;
+    std::vector<ChannelValue> m_fadeEndValues;
     std::vector<sf::Time> m_fadeTimes;
     std::vector<FadeCurve> m_fadeCurves;
-    
-    sf::Time m_fadeStartTime;
-    
-    void removeUIElement(int elementID);
 };
 
 #endif /* Channel_hpp */
