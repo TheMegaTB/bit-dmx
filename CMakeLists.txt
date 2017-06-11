@@ -1,18 +1,26 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.6)
 include(ExternalProject)
 
 project(BitDMX C CXX)
 
+set(CMAKE_CXX_STANDARD 11)
 
-# Download and compile external libraries
+## Download and compile external libraries
+# Set export location
 set(EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/lib)
+
+# Check if repository updates should be skipped
+if($ENV{OFFLINE})
+    set(OFFLINE_PARAM "UPDATE_COMMAND \"\"")
+endif()
+
+# Fetch the jsoncpp project
 ExternalProject_Add(
     json
     GIT_REPOSITORY git@github.com:nlohmann/json.git
     CMAKE_ARGS -DBuildTests=OFF -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_LOCATION}
+    ${OFFLINE_PARAM}
 )
-# TODO: If the device is offline add UPDATE_COMMAND "" to the externalproject_add to not fetch update
-
 
 
 #### BitDMX Binary ####
