@@ -1,13 +1,13 @@
 //
-//  UIPart.hpp
+//  UIElement.hpp
 //  CBitDmx
 //
 //  Created by Noah Peeters on 12/17/16.
 //  Copyright © 2016 BitDmx. All rights reserved.
 //
 
-#ifndef UIPart_hpp
-#define UIPart_hpp
+#ifndef Element_hpp
+#define Element_hpp
 
 #include <vector>
 #include <stdio.h>
@@ -21,19 +21,24 @@ using json = nlohmann::json;
 
 #include "Types.hpp"
 
-class UIPart : public sf::Drawable, public sf::Transformable {
+class Element : public sf::Drawable, public sf::Transformable {
 public:
-    UIPart(int width, int height);
+    Element(int width, int height);
+    
+    virtual void setWidth(int width) { m_width = width; };
+    virtual void setHeight(int height) { m_height = height; };
+    
     virtual int getWidth() const { return m_width; };
     virtual int getHeight() const { return m_height; };
     
     virtual void onMousePress(int x, int y, sf::Mouse::Button mouseButton) {};
-    virtual void onMouseMove(int x, int y, sf::Mouse::Button mouseButton) {};
+    virtual void onMouseDrag(int x, int y, sf::Mouse::Button mouseButton) {};
     virtual void onMouseRelease(int x, int y, sf::Mouse::Button mouseButton) {};
+    
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 private:
     int m_height;
     int m_width;
 };
 
-#endif /* UIPart_hpp */
+#endif /* Element_hpp */

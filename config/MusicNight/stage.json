@@ -1,6 +1,6 @@
 {
     "name": "MusicNight Stage",
-    "size": 100,
+    "size": 110,
     "fixture_templates": {
         "generic": ["Channel"],
         "fog": ["pressure"],
@@ -8,22 +8,21 @@
         "rgb-par": ["R", "G", "B"],
         "d-rgb-par": ["Master", "Strobe", "Color", "Speed", "R", "G", "B"],
         "dimmerPack": ["1", "2", "3", "4"],
+        "dimmerPackF": ["Drum", "Long", "Short", "Floor"],
         "DScanner": ["Gobo", "Shutter", "Pan", "Tilt"],
         "ADJScanner": ["Pan", "Tilt", "Color", "Gobo", "Shutter"]
     },
     "fixtures": [
                  {"name": "fog", "template": "fog", "channel": 7},
-                 {"name": "FR", "template": "dimmerPack", "channel": 8},
+                 {"name": "FR", "template": "dimmerPackF", "channel": 8},
                  {"name": "ScannerR", "template": "ADJScanner", "channel": 12},
-                 {"name": "Tower R | RLED", "template": "rgb-par", "channel": 17},
-                 {"name": "Tower R | LLED", "template": "rgb-par", "channel": 20},
+                 {"name": "ROLED", "template": "rgb-par", "channel": 17},
+                 {"name": "RILED", "template": "rgb-par", "channel": 20},
                  
-                 
-                 
-                 {"name": "Tower L | RLED", "template": "rgb-par", "channel": 31},
-                 {"name": "Tower L | LLED", "template": "rgb-par", "channel": 34},
+                 {"name": "LILED", "template": "rgb-par", "channel": 31},
+                 {"name": "LOLED", "template": "rgb-par", "channel": 34},
                  {"name": "ScannerL", "template": "ADJScanner", "channel": 37},
-                 {"name": "FL", "template": "dimmerPack", "channel": 42},
+                 {"name": "FL", "template": "dimmerPackF", "channel": 42},
                  {"name": "Hazer", "template": "hazer", "channel": 46},
                  {"name": "ScannerOL", "template": "DScanner", "channel": 48},
                  {"name": "OL", "template": "dimmerPack", "channel": 55},
@@ -33,6 +32,7 @@
                  {"name": "ScannerOR", "template": "DScanner", "channel": 77},
                  {"name": "UplightL", "template": "d-rgb-par", "channel": 81},
                  {"name": "UplightR", "template": "d-rgb-par", "channel": 88},
-                 {"name": "Ventilation", "template": "dimmerPack", "channel": 95}
+                 {"name": "Ventilation", "template": "dimmerPack", "channel": 95},
+                 {"name": "StatusLED", "template": "rgb-par", "channel": 99}
         ]
 }

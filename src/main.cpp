@@ -46,9 +46,7 @@ int main(int argc, char const** argv)
         pathToConfig = argv[2]; //TODO cut filename if filename
     }
     
-    std::cout << pathToConfig + "/stage.json" << std::endl;
-    
-    Stage stage(port, resourcePath + "sansation.ttf", pathToConfig + "/stage.json", pathToConfig + "/ui.json");
+    Stage stage(port, resourcePath + "sansation.ttf", pathToConfig);
     
     sf::Clock frameClock;
 
@@ -81,7 +79,7 @@ int main(int argc, char const** argv)
             }
             
             if (event.type == sf::Event::MouseMoved) {
-                stage.onMouseMove(event.mouseMove.x, event.mouseMove.y);
+                stage.onMouseDrag(event.mouseMove.x, event.mouseMove.y);
             }
 
             if (event.type == sf::Event::KeyPressed) {

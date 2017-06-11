@@ -14,6 +14,8 @@
 typedef int ChannelAddress;
 typedef int ChannelValue;
 
-#define UIPartDistance 5
+#define UIElementDistance 5
+#define BASE_ACTIVATION -1
+#define SELF_ACTIVATION -2
 
 #endif /* Types_hpp */

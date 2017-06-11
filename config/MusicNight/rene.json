@@ -1,0 +1,20 @@
+{
+    "import": [],
+    "data": {
+        "Status Rene": {
+            "type": 1,
+            "fade_time": 0,
+            "group": 10,
+            "channels": ["StatusLED:G"],
+            "channel_values": [255]
+        },
+        "rene": {
+            "type": 1,
+            "fade_time": 0,
+            "caption": "Rene",
+            "group": 10,
+            "channels": ["OL:1", "OR:3", "LOLED:R", "LOLED:G", "LILED:R", "LILED:G", "RILED:R", "RILED:G", "ROLED:R", "ROLED:G", "ScannerL:Shutter", "ScannerL:Pan", "ScannerL:Tilt", "ScannerL:Color", "ScannerR:Shutter", "ScannerR:Pan", "ScannerR:Tilt", "ScannerR:Color", "OL:2", "OL:3", "OR:1", "OR:2", "FR:Short", "FR:Long", "FL:Short", "FL:Long"],
+            "channel_values": [255, 255, 255, 110, 255, 10, 255, 10, 255, 110, 255, 129, 54, 56, 255, 99, 75, 56, 128, 128, 128, 128, 128, 128, 128]
+        }
+    }
+}

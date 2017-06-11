@@ -8,63 +8,71 @@
 
 #include "Channel.hpp"
 
-Channel::Channel() {
-    m_fadeStartValue = 0;
-    m_fadeEndValues = {0}; //Default Value
-    m_interfaceValue = 0;
+Channel::Channel(ChannelValue defaultValue) {
+    m_fadeStartValue = defaultValue;
+    m_fadeEndValues = {defaultValue};
+    m_lastValue = 0;
     
     m_fadeStartTime = sf::Time::Zero;
-    m_uiElementIDs = {-1};
+    m_activations = {BASE_ACTIVATION};
     m_fadeTimes = {sf::Time::Zero};
     m_fadeCurves = {FadeCurve::linear};
 }
 
-ChannelValue Channel::getValue(sf::Time time) const {
-    if ((m_fadeTimes.back().asMicroseconds() == 0) || (time > m_fadeStartTime + m_fadeTimes.back())) {
-        return m_fadeEndValues.back();
-    } else {
+bool Channel::update(sf::Time time) {
+    ChannelValue new_value = m_fadeEndValues.back();
+    
+    if (!((m_fadeTimes.back().asMicroseconds() == 0) || (time > m_fadeStartTime + m_fadeTimes.back()))) {
         ChannelValue deltaValue = m_fadeEndValues.back() - m_fadeStartValue;
-        return m_fadeStartValue + calculateFadeCurve(m_fadeCurves.back(), (time-m_fadeStartTime) / m_fadeTimes.back()) * deltaValue;
+        new_value = m_fadeStartValue + calculateFadeCurve(m_fadeCurves.back(), (time-m_fadeStartTime) / m_fadeTimes.back()) * deltaValue;
     }
+    
+    if (new_value != m_lastValue) {
+        m_lastValue = new_value;
+        return true;
+    } else return false;
 }
 
-ChannelValue Channel::getInterfaceValue() const {
-    return m_interfaceValue;
-}
-
-void Channel::setInterfaceValue(ChannelValue interfaceValue) {
-    m_interfaceValue = interfaceValue;
-}
-
-void Channel::startFade(sf::Time startTime, sf::Time fadeTime, ChannelValue value, FadeCurve fadeCurve, int uiElementID) {
-    m_fadeStartValue = getValue(startTime);
-    removeUIElement(uiElementID);
-    m_uiElementIDs.push_back(uiElementID);
+void Channel::startFade(sf::Time startTime, sf::Time fadeTime, ChannelValue value, FadeCurve fadeCurve, int activationID) {
+    if (value == -1) {
+        deactivateAll();
+        return;
+    }
+    deactivateActivation(startTime, activationID);
+    m_fadeStartValue = getValue();
+    m_activations.push_back(activationID);
     m_fadeStartTime = startTime;
     m_fadeEndValues.push_back(value);
     m_fadeTimes.push_back(fadeTime);
     m_fadeCurves.push_back(fadeCurve);
 }
 
-void Channel::setValue(ChannelValue value, int uiElementID) {
-    startFade(sf::Time::Zero, sf::Time::Zero, value, FadeCurve::linear, uiElementID);
+void Channel::setValue(ChannelValue value, int activationID) {
+    startFade(sf::Time::Zero, sf::Time::Zero, value, FadeCurve::linear, activationID);
 }
 
-void Channel::disableUIElement(int uiElementID, sf::Time now) {
-    m_fadeStartValue = getValue(now);
-    removeUIElement(uiElementID); //TODO check if its the last one -> activate the previous one
-    m_fadeStartTime = now;
-}
-
-void Channel::removeUIElement(int elementID) {
-    for (int i = 0; i < m_uiElementIDs.size(); i++) {
-        if (m_uiElementIDs[i] == elementID) {
-            m_uiElementIDs.erase(m_uiElementIDs.begin() + i);
+void Channel::deactivateActivation(sf::Time now, int activationID) {
+    for (int i = 0; i < m_activations.size(); i++) {
+        if (m_activations[i] == activationID) {
+            
+            if (i == m_activations.size() - 1) {
+                m_fadeStartValue = getValue();
+                m_fadeStartTime = now;
+            }
+            m_activations.erase(m_activations.begin() + i);
             m_fadeTimes.erase(m_fadeTimes.begin() + i);
             m_fadeCurves.erase(m_fadeCurves.begin() + i);
             m_fadeEndValues.erase(m_fadeEndValues.begin() + i);
             return;
         }
     }
-    
+}
+
+void Channel::deactivateAll() {
+    m_fadeEndValues.resize(1);
+    m_fadeStartValue = m_fadeEndValues[0];
+    m_fadeStartTime = sf::Time::Zero;
+    m_activations = {BASE_ACTIVATION};
+    m_fadeTimes = {sf::Time::Zero};
+    m_fadeCurves = {FadeCurve::linear};
 }

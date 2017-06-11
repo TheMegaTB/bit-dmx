@@ -1,0 +1,50 @@
+{
+    "import": [],
+    "data": {
+        "random_fast_init": {
+            "type": 1, "fade_time": 0,
+            "channels": ["ScannerL:Shutter", "ScannerR:Shutter", "ScannerL:Color", "ScannerR:Color"],
+            "channel_values": [255, 255, 255, 255]
+        },
+        "random_fast_0": {
+            "type": 1, "fade_time": 300,
+            "channels": ["ScannerL:Pan", "ScannerL:Tilt", "ScannerR:Pan", "ScannerR:Tilt", "ScannerOL:Gobo", "ScannerIL:Gobo", "ScannerIR:Gobo", "ScannerOR:Gobo", "ScannerOL:Tilt", "ScannerOL:Pan", "ScannerIL:Tilt", "ScannerIL:Pan", "ScannerIR:Tilt", "ScannerIR:Pan", "ScannerOR:Tilt", "ScannerOR:Pan"],
+            "channel_values": [91, 97, 139, 123, 0, 0, 0, 0, 113, 142, 80, 214, 237, 161, 194, 153]
+        },
+        "random_fast_1": {
+            "type": 1, "fade_time": 300,
+            "channels": ["ScannerL:Pan", "ScannerL:Tilt", "ScannerR:Pan", "ScannerR:Tilt", "ScannerOL:Gobo", "ScannerIL:Gobo", "ScannerIR:Gobo", "ScannerOR:Gobo", "ScannerOL:Tilt", "ScannerOL:Pan", "ScannerIL:Tilt", "ScannerIL:Pan", "ScannerIR:Tilt", "ScannerIR:Pan", "ScannerOR:Tilt", "ScannerOR:Pan"],
+            "channel_values": [135, 84, 134, 207, 128, 128, 128, 128, 196, 148, 147, 118, 131, 123, 113, 118]
+        },
+        "random_fast_2": {
+            "type": 1, "fade_time": 300,
+            "channels": ["ScannerL:Pan", "ScannerL:Tilt", "ScannerR:Pan", "ScannerR:Tilt", "ScannerOL:Gobo", "ScannerIL:Gobo", "ScannerIR:Gobo", "ScannerOR:Gobo", "ScannerOL:Tilt", "ScannerOL:Pan", "ScannerIL:Tilt", "ScannerIL:Pan", "ScannerIR:Tilt", "ScannerIR:Pan", "ScannerOR:Tilt", "ScannerOR:Pan"],
+            "channel_values": [62, 62, 84, 132, 255, 255, 255, 255, 84, 115, 62, 89, 201, 65, 204, 131]
+        },
+        "random_fast_3": {
+            "type": 1, "fade_time": 300,
+            "channels": ["ScannerL:Pan", "ScannerL:Tilt", "ScannerR:Pan", "ScannerR:Tilt", "ScannerOL:Gobo", "ScannerIL:Gobo", "ScannerIR:Gobo", "ScannerOR:Gobo", "ScannerOL:Tilt", "ScannerOL:Pan", "ScannerIL:Tilt", "ScannerIL:Pan", "ScannerIR:Tilt", "ScannerIR:Pan", "ScannerOR:Tilt", "ScannerOR:Pan"],
+            "channel_values": [135, 81, 153, 84, 128, 128, 128, 128, 145, 207, 77, 177, 226, 140, 201, 212]
+        },
+        "random_fast_4": {
+            "type": 1, "fade_time": 300,
+            "channels": ["ScannerL:Pan", "ScannerL:Tilt", "ScannerR:Pan", "ScannerR:Tilt", "ScannerOL:Gobo", "ScannerIL:Gobo", "ScannerIR:Gobo", "ScannerOR:Gobo", "ScannerOL:Tilt", "ScannerOL:Pan", "ScannerIL:Tilt", "ScannerIL:Pan", "ScannerIR:Tilt", "ScannerIR:Pan", "ScannerOR:Tilt", "ScannerOR:Pan"],
+            "channel_values": [84, 123, 75, 155, 0, 0, 0, 0, 220, 139, 151, 151, 140, 169, 77, 121]
+        },
+        "random_fast_5": {
+            "type": 1, "fade_time": 300,
+            "channels": ["ScannerL:Pan", "ScannerL:Tilt", "ScannerR:Pan", "ScannerR:Tilt", "ScannerOL:Gobo", "ScannerIL:Gobo", "ScannerIR:Gobo", "ScannerOR:Gobo", "ScannerOL:Tilt", "ScannerOL:Pan", "ScannerIL:Tilt", "ScannerIL:Pan", "ScannerIR:Tilt", "ScannerIR:Pan", "ScannerOR:Tilt", "ScannerOR:Pan"],
+            "channel_values": [135, 150, 104, 179, 128, 128, 128, 128, 198, 97, 97, 91, 169, 77, 161, 92]
+        },
+        "random_fast_6": {
+            "type": 1, "fade_time": 300,
+            "channels": ["ScannerL:Pan", "ScannerL:Tilt", "ScannerR:Pan", "ScannerR:Tilt", "ScannerOL:Gobo", "ScannerIL:Gobo", "ScannerIR:Gobo", "ScannerOR:Gobo", "ScannerOL:Tilt", "ScannerOL:Pan", "ScannerIL:Tilt", "ScannerIL:Pan", "ScannerIR:Tilt", "ScannerIR:Pan", "ScannerOR:Tilt", "ScannerOR:Pan"],
+            "channel_values": [64, 69, 150, 102, 255, 255, 255, 255, 94, 140, 183, 230, 159, 180, 91, 225]
+        },
+        "random_fast_7": {
+            "type": 1, "fade_time": 300,
+            "channels": ["ScannerL:Pan", "ScannerL:Tilt", "ScannerR:Pan", "ScannerR:Tilt", "ScannerOL:Gobo", "ScannerIL:Gobo", "ScannerIR:Gobo", "ScannerOR:Gobo", "ScannerOL:Tilt", "ScannerOL:Pan", "ScannerIL:Tilt", "ScannerIL:Pan", "ScannerIR:Tilt", "ScannerIR:Pan", "ScannerOR:Tilt", "ScannerOR:Pan"],
+            "channel_values": [140, 0, 89, 49, 128, 128, 128, 128, 204, 161, 137, 183, 158, 163, 153, 172]
+        }
+    }
+}

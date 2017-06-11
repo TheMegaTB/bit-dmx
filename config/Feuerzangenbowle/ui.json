@@ -1,0 +1,53 @@
+{
+    "inti_slow": {
+        "type": 1,
+        "fade_time": 10000,
+        "activate": true,
+        "visible": false,
+        "channels": ["Dimmer1:Stars", "UplightL:R", "UplightR:R"],
+        "channel_values": [0, 0, 0]
+    },
+    "inti": {
+        "type": 1,
+        "fade_time": 1000,
+        "activate": true,
+        "visible": false,
+        "channels": ["Dimmer2:MB", "Dimmer2:Spot", "UplightL:Master", "UplightR:Master"],
+        "channel_values": [0, 0, 255, 255]
+    },
+    "stars": {
+        "type": 1,
+        "fade_time": 10000,
+        "caption": "Stars",
+        "activate": false,
+        "channels": ["Dimmer1:Stars"],
+        "channel_values": [255]
+    },
+    "pause": {
+        "type": 1,
+        "fade_time": 10000,
+        "caption": "Pause (P)",
+        "activate": false,
+        "channels": ["Dimmer1:Stars", "UplightL:R", "UplightR:R"],
+        "channel_values": [255, 255, 255],
+        "hotkey": 15
+    },
+    "disco": {
+        "type": 1,
+        "fade_time": 1000,
+        "caption": "Disco (D)",
+        "activate": false,
+        "channels": ["Dimmer2:MB"],
+        "channel_values": [255],
+        "hotkey": 3
+    },
+    "spot": {
+        "type": 1,
+        "fade_time": 1000,
+        "caption": "Spot (S)",
+        "activate": false,
+        "channels": ["Dimmer2:Spot"],
+        "channel_values": [255],
+        "hotkey": 18
+    }
+}

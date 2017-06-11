@@ -1,0 +1,21 @@
+{
+    "import": [],
+    "data": {
+        "Status Chor": {
+            "type": 1,
+            "fade_time": 0,
+            "group": 3,
+            "channels": ["StatusLED:R"],
+            "channel_values": [255]
+        },
+        "chor": {
+            "type": 1,
+            "fade_time": 1000,
+            "caption": "Chor",
+            "group": 3,
+            "activate": false,
+            "channels": ["OL:1", "OL:2", "OL:3", "OR:3", "OR:1", "OR:2", "LOLED:R", "LILED:B", "LILED:G", "LILED:R", "FL:2", "FL:3", "RILED:B", "RILED:G", "RILED:R", "ROLED:R", "FR:2", "FR:3", "ScannerL:Color", "ScannerR:Color", "ScannerL:Pan", "ScannerL:Tilt", "ScannerR:Pan", "ScannerR:Tilt", "ScannerOL:Pan", "ScannerOL:Tilt", "ScannerOR:Pan", "ScannerOR:Tilt", "ScannerL:Shutter", "ScannerR:Shutter"],
+            "channel_values": [100, 70, 140, 100, 70, 100, 200, 150, 110, 60, 255, 255, 150, 110, 50, 255, 255, 255, 22, 27, 140, 140, 108, 190, 241, 139, 46, 156, 255, 255]
+        }
+    }
+}

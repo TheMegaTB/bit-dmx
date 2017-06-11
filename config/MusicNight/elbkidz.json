@@ -1,0 +1,136 @@
+{
+    "import": [],
+    "data": {
+        "Status Elbkidz": {
+            "type": 1,
+            "fade_time": 0,
+            "group": 7,
+            "channels": ["StatusLED:G"],
+            "channel_values": [255]
+        },
+        "elbkidzInit": {
+            "type": 1,
+            "fade_time": 1000,
+            "caption": "Elbkidz Init",
+            "group": 7,
+            "channels": ["FR:Drum", "FL:Drum", "OL:2", "OR:1", "OR:2", "FR:Short", "FR:Long", "FL:Short", "FL:Long", "OL:1", "OR:3"],
+            "channel_values": [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+        },
+        "elbkidz1.1": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:G", "LILED:R", "LILED:G", "RILED:R", "RILED:G","ROLED:G"],
+            "channel_values": [255, 255, 255, 255, 255, 255]
+        },
+        "elbkidz1.2": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:R", "LOLED:G", "LILED:G", "RILED:G", "ROLED:R", "ROLED:G"],
+            "channel_values": [255, 255, 255, 255, 255, 255]
+        },
+        "elbkidz1.3": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:R", "LOLED:G", "LILED:R", "LILED:G", "RILED:R", "RILED:G", "ROLED:R", "ROLED:G"],
+            "channel_values": [255, 255, 255, 255, 255, 255, 255, 255]
+        },
+        "elbkidz1.4": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:G", "LILED:G", "RILED:G","ROLED:G"],
+            "channel_values": [255, 255, 255, 255]
+        },
+        "elbkidz1.5": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:R", "LOLED:G", "LILED:R", "LILED:G", "RILED:R", "RILED:G", "ROLED:R", "ROLED:G"],
+            "channel_values": [255, 255, 255, 255, 255, 255, 255, 255]
+        },
+        "elbkidz1.6": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:G", "LILED:G", "RILED:G","ROLED:G"],
+            "channel_values": [255, 255, 255, 255]
+        },
+        "elbkidz1": {
+            "type": 0,
+            "caption": "Elbkidz 1",
+            "group": 7,
+            "chaser": [
+                       {"name": "elbkidz1.1", "time": 1000},
+                       {"name": "elbkidz1.2", "time": 1000},
+                       {"name": "elbkidz1.3", "time": 1000},
+                       {"name": "elbkidz1.4", "time": 1000},
+                       {"name": "elbkidz1.5", "time": 500},
+                       {"name": "elbkidz1.6", "time": 500}
+                       ]
+        },
+        
+        
+        "elbkidz2.1": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:G", "LILED:R", "RILED:R","ROLED:G"],
+            "channel_values": [255, 255, 255, 255]
+        },
+        "elbkidz2.2": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:R", "LILED:R", "RILED:R","ROLED:R"],
+            "channel_values": [255, 255, 255, 255]
+        },
+        "elbkidz2.3": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:R", "LILED:G", "RILED:G","ROLED:R"],
+            "channel_values": [255, 255, 255, 255]
+        },
+        "elbkidz2.4": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:R", "LILED:R", "RILED:R","ROLED:R"],
+            "channel_values": [255, 255, 255, 255]
+        },
+        "elbkidz2.5": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:G", "LILED:G", "RILED:G","ROLED:G"],
+            "channel_values": [255, 255, 255, 255]
+        },
+        "elbkidz2.6": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:R", "LILED:R", "RILED:R","ROLED:R"],
+            "channel_values": [255, 255, 255, 255]
+        },
+        
+        "elbkidz2": {
+            "type": 0,
+            "caption": "Elbkidz 2",
+            "group": 7,
+            "chaser": [
+                       {"name": "elbkidz2.1", "time": 1000},
+                       {"name": "elbkidz2.2", "time": 1000},
+                       {"name": "elbkidz2.3", "time": 1000},
+                       {"name": "elbkidz2.4", "time": 1000},
+                       {"name": "elbkidz2.5", "time": 500},
+                       {"name": "elbkidz2.6", "time": 500}
+                       ]
+        },
+        
+        "elbkidz3.1": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:R", "LOLED:G", "LOLED:B", "LILED:R", "LILED:G", "LILED:B",  "RILED:R", "RILED:G", "RILED:B", "ROLED:R", "ROLED:G", "ROLED:B"],
+            "channel_values": [100, 100, 255, 100, 100, 255, 100, 100, 255, 100, 100, 255]
+        },
+        "elbkidz3.2": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:R", "LOLED:G", "LOLED:B", "LILED:R", "LILED:G", "LILED:B",  "RILED:R", "RILED:G", "RILED:B", "ROLED:R", "ROLED:G", "ROLED:B"],
+            "channel_values": [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+        },
+        "elbkidz3.3": {
+            "type": 1, "fade_time": 1000,
+            "channels": ["LOLED:B", "LILED:B", "RILED:B","ROLED:B"],
+            "channel_values": [255, 255, 255, 255]
+        },
+        
+        "elbkidz3": {
+            "type": 0,
+            "caption": "Elbkidz 3",
+            "group": 7,
+            "chaser": [
+                       {"name": "elbkidz3.1", "time": 1000},
+                       {"name": "elbkidz3.2", "time": 1000},
+                       {"name": "elbkidz3.3", "time": 1000}
+                       ]
+        }
+    }
+}

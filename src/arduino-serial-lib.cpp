@@ -104,7 +104,6 @@ int serialport_close( int fd )
 int serialport_writebyte( int fd, uint8_t b)
 {
     int n = write(fd,&b,1);
-    std::cout << n << std::endl;
     if( n!=1)
         return -1;
     return 0;

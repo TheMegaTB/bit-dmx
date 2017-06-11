@@ -1,0 +1,29 @@
+{
+    "import": [],
+    "data": {
+        "fogger": {
+            "type": 2,
+            "caption": "Fogger",
+            "fade_time": 0,
+            "hotkey": 85,
+            "channels": ["fog:pressure"],
+            "channel_values": [255]
+        },
+        "hazer": {
+            "type": 1,
+            "caption": "Hazer",
+            "fade_time": 0,
+            "hotkey": 86,
+            "channels": ["Hazer:speed", "Hazer:volume"],
+            "channel_values": [255, 255]
+        },
+        "clear": {
+            "type": 1,
+            "caption": "Clear",
+            "fade_time": 0,
+            "hotkey": 2,
+            "channels": ["Ventilation:1", "Ventilation:2"],
+            "channel_values": [255, 255]
+        }
+    }
+}

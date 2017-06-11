@@ -1,20 +1,20 @@
 //
-//  UIPart.cpp
+//  UIElement.cpp
 //  CBitDmx
 //
 //  Created by Noah Peeters on 12/17/16.
 //  Copyright © 2016 BitDmx. All rights reserved.
 //
 
-#include "UIPart.hpp"
+#include "Element.hpp"
 
 
-UIPart::UIPart(int width, int height) {
+Element::Element(int width, int height) {
     m_width = width;
     m_height = height;
 }
 
-void UIPart::draw(sf::RenderTarget& target, sf::RenderStates states) const
+void Element::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     states.transform *= getTransform();
     

@@ -11,28 +11,17 @@
 
 #include <stdio.h>
 
-#include "UIControlElement.hpp"
+#include "UISingleVChannel.hpp"
 
-class UISwitch : public UIControlElement {
+class UISwitch : public UISingleVChannel {
 public:
-    UISwitch(Stage* stage, std::string caption, std::vector<int> channels, std::vector<ChannelValue> channelValues);
-    UISwitch(Stage* stage, std::string caption, std::vector<int> channelGroups): UISwitch(stage, caption, channelGroups, std::vector<ChannelValue>(m_channels.size())) {};
-    UISwitch(Stage* stage, json jsonObject) : UISwitch(stage, "Untitled", stage->getChannels(jsonObject["channels"]), jsonObject["channel_values"]) {};
+    UISwitch(Stage* stage, ValuedActionGroup actionGroup);
     
     void setCaption(std::string caption);
-    
-    
-    virtual void chaserActivate();
-    virtual void chaserDeactivate();
-    virtual void onHotkey();
-    virtual void action();
-    
-    
-    std::vector<ChannelValue> m_channelValues;
+    virtual void update();
 private:
     std::shared_ptr<Toggle> m_toggle;
-    
-    std::vector<int> m_channels;
+    ValuedActionGroup m_actionGroup;
 };
 
 

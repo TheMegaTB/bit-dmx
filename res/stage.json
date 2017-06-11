@@ -1,6 +1,6 @@
 {
   "name": "Example Stage",
-  "size": 95,
+  "size": 110,
   "fixture_templates": {
     "generic": ["Channel"],
     "fog": ["pressure"],
@@ -15,7 +15,7 @@
      {"name": "fog", "template": "fog", "channel": 7},
      {"name": "FR", "template": "dimmerPack", "channel": 8},
      {"name": "ScannerR", "template": "ADJScanner", "channel": 12},
-     {"name": "Tower R | RLED", "template": "rgb-par", "channel": 17},
+     {"name": "ROLED", "template": "rgb-par", "channel": 17},
      {"name": "Tower R | LLED", "template": "rgb-par", "channel": 20},
                
                
@@ -32,7 +32,8 @@
      {"name": "OR", "template": "dimmerPack", "channel": 73},
      {"name": "ScannerOR", "template": "DScanner", "channel": 77},
      {"name": "UplightL", "template": "d-rgb-par", "channel": 81},
-     {"name": "UplightR", "template": "d-rgb-par", "channel": 88}
+       {"name": "UplightR", "template": "d-rgb-par", "channel": 88},
+       {"name": "StatusLED", "template": "rgb-par", "channel": 99}
                
   ]
 }

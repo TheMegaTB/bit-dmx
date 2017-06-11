@@ -1,0 +1,20 @@
+{
+    "import": [],
+    "data": {
+        "Status Cup": {
+            "type": 1,
+            "fade_time": 0,
+            "group": 8,
+            "channels": ["StatusLED:B"],
+            "channel_values": [255]
+        },
+        "cup": {
+            "type": 1,
+            "fade_time": 0,
+            "caption": "Cup",
+            "group": 8,
+            "channels": ["OL:1", "OR:3", "LILED:R", "LILED:B", "RILED:R", "RILED:B", "ScannerL:Shutter", "ScannerL:Pan", "ScannerL:Tilt", "ScannerL:Color", "ScannerR:Shutter", "ScannerR:Pan", "ScannerR:Tilt", "ScannerR:Color"],
+            "channel_values": [255, 255, 100, 5, 100, 5, 255, 129, 54, 70, 255, 99, 75, 70]
+        }
+    }
+}

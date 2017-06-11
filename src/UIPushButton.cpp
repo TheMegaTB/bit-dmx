@@ -8,51 +8,43 @@
 
 #include "UIPushButton.hpp"
 
-UIPushButton::UIPushButton(Stage* stage, std::string caption, std::vector<int> channels, std::vector<ChannelValue> channelValues): UIControlElement(stage, stage->UIPartWidth, stage->UIPartWidth / 4) {
-    m_channels = channels;
+UIPushButton::UIPushButton(Stage* stage, ValuedActionGroup actionGroup): m_actionGroup(actionGroup), UISingleVChannel(stage, stage->UIElementWidth, stage->UIElementWidth / 4) {
     
-    m_channelValues = channelValues;
+    m_button = std::make_shared<Button>("Untitled", stage->UIElementWidth, stage->UIElementWidth / 4, m_stage->getFont());
     
-    m_button = std::make_shared<Button>([this](bool isActivated) -> void {
+    m_button->onClick([this](bool isActivated) -> void {
         if (isActivated) {
-            this->activate();
+            this->setValue("value", 255, SELF_ACTIVATION);
         } else {
-            this->deactivate();
+            this->deactivateActivation(SELF_ACTIVATION);
         }
-    }, caption, stage->UIPartWidth, stage->UIPartWidth / 4, m_stage->getFont());
+    });
     
-    addPart(m_button);
+    addElement(m_button);
 }
 
 void UIPushButton::setCaption(std::string caption) {
     m_button->setCaption(caption);
 }
 
-void UIPushButton::chaserActivate() {
-    activate();
-    m_button->setPressed(true);
-}
-
-void UIPushButton::chaserDeactivate() {
-    deactivate();
-    m_button->setPressed(false);
-}
-
-
 void UIPushButton::onHotkey() {
-    if (!m_isActivated) {
-        activate();
-        m_button->setPressed(true);
+    if (!isActivated()) {
+        setValue("value", 255, SELF_ACTIVATION);
     }
 }
 
 void UIPushButton::onHotkeyRelease() {
-    deactivate();
-    m_button->setPressed(false);
+    deactivateActivation(SELF_ACTIVATION);
 }
 
-void UIPushButton::action() {
-    for (int i = 0; i < m_channels.size(); i++) {
-        m_stage->startFade(m_channels[i], m_fadeTime, m_channelValues[i], m_fadeCurve, m_id);
+void UIPushButton::update() {
+    if (m_virtualChannel.update(m_stage->getNow())) {
+        if (isActivated()) {
+            m_button->setPressed(true);
+            m_stage->activateActivationGroup(m_actionGroup);
+        } else {
+            m_button->setPressed(false);
+            m_stage->deactivateActivationGroup(m_actionGroup);
+        }
     }
 }

@@ -8,9 +8,7 @@
 
 #include "XYPad.hpp"
 
-XYPad::XYPad(int minValue, int maxValue, std::function<void(double, double)> valueChangeCallback, std::function<void()> disableCallback, int width, int height, sf::Font font): UIPart(width, height) {
-    m_valueChangeCallback = valueChangeCallback;
-    m_disableCallback = disableCallback;
+XYPad::XYPad(int minValue, int maxValue, int width, int height, sf::Font font): Element(width, height) {
     m_minValue = minValue;
     m_maxValue = maxValue;
     m_xValue = 0;
@@ -18,13 +16,11 @@ XYPad::XYPad(int minValue, int maxValue, std::function<void(double, double)> val
     m_font = font;
 }
 
-void XYPad::setRawValue(double xValue, double yValue, bool callback) {
+void XYPad::setRawValue(double xValue, double yValue) {
     if (m_xValue != xValue || m_yValue != yValue) {
         m_xValue = xValue;
         m_yValue = yValue;
-        if (callback) {
-            m_valueChangeCallback(getXValue(), getYValue());
-        }
+        if (m_changeCallback) m_changeCallback(getXValue(), getYValue());
     }
 }
 
@@ -36,17 +32,29 @@ int XYPad::getYValue() const {
     return round(m_minValue + (m_maxValue - m_minValue) * (1.f-m_yValue));
 }
 
+void XYPad::setValue(double xValue, double yValue) {
+    setXValue(xValue);
+    setYValue(yValue);
+}
+
+void XYPad::setXValue(double xValue) {
+    m_xValue = (xValue - m_minValue)/(m_maxValue - m_minValue);
+}
+
+void XYPad::setYValue(double yValue) {
+    m_yValue = 1 - (yValue - m_minValue)/(m_maxValue - m_minValue);
+}
+
 void XYPad::onMousePress(int x, int y, sf::Mouse::Button mouseButton) {
     if (mouseButton == sf::Mouse::Left) {
         setRawValue((double)x / (double)getWidth(), (double)y / (double)getHeight());
     } else if (mouseButton == sf::Mouse::Right) {
         setRawValue(0, false);
-        m_disableCallback();
+        if (m_disableCallback) m_disableCallback();
     }
 }
 
-
-void XYPad::onMouseMove(int x, int y, sf::Mouse::Button mouseButton) {
+void XYPad::onMouseDrag(int x, int y, sf::Mouse::Button mouseButton) {
     if (mouseButton == sf::Mouse::Left) {
         setRawValue(fmin(fmax((double)x / (double)getWidth(), 0.f), 1.f), fmin(fmax((double)y / (double)getHeight(), 0.f), 1.f));
     }

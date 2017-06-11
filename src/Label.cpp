@@ -8,7 +8,7 @@
 
 #include "Label.hpp"
 
-Label::Label(std::string caption, int width, int height, sf::Font font): UIPart(width, height) {
+Label::Label(std::string caption, int width, int height, sf::Font font): Element(width, height) {
     setCaption(caption);
     m_font = font;
 }

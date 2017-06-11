@@ -1,52 +1,42 @@
 //
-//  Slider.cpp
+//  HorizontalSlider.cpp
 //  CBitDmx
 //
 //  Created by Noah Peeters on 12/17/16.
 //  Copyright © 2016 BitDmx. All rights reserved.
 //
 
-#include "Slider.hpp"
-#include <string>
+#include "HorizontalSlider.hpp"
 
-Slider::Slider(int minValue, int maxValue, std::function<void(double)> valueChangeCallback, std::function<void()> disableCallback, int width, int height, sf::Font font): UIPart(width, height) {
-    m_valueChangeCallback = valueChangeCallback;
-    m_disableCallback = disableCallback;
+HorizontalSlider::HorizontalSlider(int minValue, int maxValue, int width, int height, sf::Font font): Element(width, height) {
     m_minValue = minValue;
     m_maxValue = maxValue;
     m_font = font;
 }
 
-void Slider::setRawValue(double value, bool callback) {
+void HorizontalSlider::setRawValue(double value) {
     if (m_value != value) {
         m_value = value;
-        if (callback) {
-            m_valueChangeCallback(getValue());
-        }
+        if (m_changeCallback) m_changeCallback(getValue());
     }
 }
 
-int Slider::getValue() const {
-    return round(m_minValue + (m_maxValue - m_minValue) * m_value);
-}
-
-void Slider::onMousePress(int x, int y, sf::Mouse::Button mouseButton) {
+void HorizontalSlider::onMousePress(int x, int y, sf::Mouse::Button mouseButton) {
     if (mouseButton == sf::Mouse::Left) {
         setRawValue((double)x / (double)getWidth());
     } else if (mouseButton == sf::Mouse::Right) {
-        setRawValue(0, false);
-        m_disableCallback();
+        if (m_disableCallback) m_disableCallback();
     }
 }
 
 
-void Slider::onMouseMove(int x, int y, sf::Mouse::Button mouseButton) {
+void HorizontalSlider::onMouseDrag(int x, int y, sf::Mouse::Button mouseButton) {
     if (mouseButton == sf::Mouse::Left) {
         setRawValue(fmin(fmax((double)x / (double)getWidth(), 0.f), 1.f));
     }
 }
 
-void Slider::draw(sf::RenderTarget& target, sf::RenderStates states) const
+void HorizontalSlider::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     states.transform *= getTransform();
     

@@ -15,12 +15,12 @@ class UIControlElement;
 
 #include <memory>
 
-#include "UIController.hpp"
+#include "ElementController.hpp"
 #include "Button.hpp"
 #include "Toggle.hpp"
-#include "Slider.hpp"
+#include "HorizontalSlider.hpp"
+#include "VerticalSlider.hpp"
 #include "XYPad.hpp"
-#include "Selector.hpp"
 
 
 #include "Stage.hpp"
@@ -31,47 +31,33 @@ enum UIControlElementType {
     UIControlElementChaser = 0,
     UIControlElementSwitch,
     UIControlElementPushButton,
-    UIControlElementChannel,
+    UIControlElementSlieder,
     UIControlElementXYPad
 };
 
-class UIControlElement : public UIController {
+class UIControlElement : public ElementController {
 public:
     UIControlElement(Stage* stage, int width, int height);
     
-    void setID(int id);
-    virtual void setCaption(std::string caption);
-    void setFadeTime(sf::Time fadeTime);
-    void setFadeCurve(FadeCurve fadeCurve);
-    void setVisibility(bool isVisible);
-    bool isVisible();
+    virtual void setValue(std::string subname, ChannelValue value, int activationID) {};
+    virtual void startFade(std::string subname, sf::Time fadeTime, ChannelValue value, FadeCurve fadeCurve, int activationID) {};
+    virtual void deactivateActivation(int activationID) {};
+    virtual bool isActivated() { return false; };
     
-    virtual void activate();
-    virtual void deactivate();
-    virtual void chaserActivate() {};
-    virtual void chaserDeactivate() {};
-    virtual void action() {};
     virtual void update() {};
     
-    sf::Keyboard::Key getHotkey();
     
-    void setHotkey(sf::Keyboard::Key hotkey);
+    // caption & hotkey
+    sf::Keyboard::Key getHotkey() { return m_hotkey; };
+    void setHotkey(sf::Keyboard::Key hotkey) { m_hotkey = hotkey; };
+    virtual void setCaption(std::string caption) { m_caption = caption; };
     
     virtual void hotkeyWrapper(sf::Keyboard::Key hotkey);
     virtual void hotkeyReleaseWrapper(sf::Keyboard::Key hotkey);
-    virtual void onHotkey();
+    virtual void onHotkey() {};
     virtual void onHotkeyRelease() {};
-    
-    virtual void drawSubEditor(sf::RenderTarget& target, sf::RenderStates states) const {};
-    
-    int m_id;
 protected:
-    bool m_isActivated;
-    bool m_isVisible;
-    
     sf::Keyboard::Key m_hotkey;
-    sf::Time m_fadeTime;
-    FadeCurve m_fadeCurve;
     std::string m_caption;
     
     Stage *m_stage;

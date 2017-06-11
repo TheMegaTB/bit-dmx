@@ -1,0 +1,11 @@
+{
+    "import": [],
+    "data": {
+        "stobe": {
+            "type": 2,
+            "caption": "Strobe",
+            "channels": ["ScannerL:Shutter", "ScannerR:Shutter"],
+            "channel_values": [131, 131]
+        }
+    }
+}
